@@ -1,9 +1,9 @@
-```php
+
 <?php
 
 session_start();
 
-include "koneksi.php";
+include "config/koneksi.php";
 
 $email = $_POST['email'];
 $password = $_POST['password'];
@@ -43,4 +43,4 @@ mysqli_stmt_close($stmt);
 mysqli_close($koneksi);
 
 ?>
-```
+
