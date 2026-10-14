@@ -1,209 +1,62 @@
 
 <?php
-
-include "includes/cek_session.php";
-include "config/koneksi.php";
-
-if ($_SESSION['role'] != "admin") {
-    header("Location: dashboard.php");
-    exit;
-}
-
-$query = "SELECT id, nip, nama, email, status_aktif
-          FROM t_guru
-          ORDER BY id DESC";
-
-$result = mysqli_query($koneksi, $query);
-
+$menuAktif = $menuAktif ?? "";
 ?>
 
-<!DOCTYPE html>
-<html lang="id">
-
-<head>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Kelola Data Guru - Sistem Informasi Pelanggaran Siswa</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-          rel="stylesheet">
-
-</head>
-
-<body>
-
-<div class="container-fluid">
-
-    <div class="row">
-
-        <!-- SIDEBAR -->
-        <?php include "includes/sidebar.php"; ?>
-
-
-        <!-- KONTEN -->
-        <main class="col-md-9 col-lg-10 p-4">
-
-            <!-- JUDUL -->
-            <div class="mb-4">
-
-                <h2 class="mb-1">
-                    Kelola Data Guru
-                </h2>
-
-                <p class="text-muted">
-                    Kelola data guru yang terdaftar dalam sistem.
-                </p>
-
-            </div>
-
-
-            <!-- CARD DATA GURU -->
-            <div class="card shadow-sm">
-
-                <div class="card-body">
-
-
-                    <!-- HEADER CARD -->
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-
-                        <h5 class="card-title mb-0">
-                            Daftar Guru
-                        </h5>
-
-                        <a href="tambah_guru.php" class="btn btn-primary">
-                            + Tambah Guru
-                        </a>
-
-                    </div>
-
-
-                    <!-- TABEL -->
-                    <div class="table-responsive">
-
-                        <table class="table table-bordered table-hover align-middle mb-0">
-
-                            <thead class="table-dark">
-
-                                <tr>
-
-                                    <th width="60">No</th>
-                                    <th>NIP</th>
-                                    <th>Nama</th>
-                                    <th>Email</th>
-                                    <th>Status</th>
-                                    <th width="160">Aksi</th>
-
-                                </tr>
-
-                            </thead>
-
-
-                            <tbody>
-
-                                <?php
-
-                                $no = 1;
-
-                                if (mysqli_num_rows($result) > 0) {
-
-                                    while ($guru = mysqli_fetch_assoc($result)) {
-
-                                ?>
-
-                                    <tr>
-
-                                        <td>
-                                            <?php echo $no++; ?>
-                                        </td>
-
-                                        <td>
-                                            <?php echo htmlspecialchars($guru['nip']); ?>
-                                        </td>
-
-                                        <td>
-                                            <?php echo htmlspecialchars($guru['nama']); ?>
-                                        </td>
-
-                                        <td>
-                                            <?php echo htmlspecialchars($guru['email']); ?>
-                                        </td>
-
-                                        <td>
-
-                                            <?php if ($guru['status_aktif'] == 1) { ?>
-
-                                                <span class="badge bg-success">
-                                                    Aktif
-                                                </span>
-
-                                            <?php } else { ?>
-
-                                                <span class="badge bg-secondary">
-                                                    Tidak Aktif
-                                                </span>
-
-                                            <?php } ?>
-
-                                        </td>
-
-                                        <td>
-
-                                            <a href="#"
-                                               class="btn btn-sm btn-warning">
-                                                Edit
-                                            </a>
-
-                                            <a href="#"
-                                               class="btn btn-sm btn-danger">
-                                                Hapus
-                                            </a>
-
-                                        </td>
-
-                                    </tr>
-
-                                <?php
-
-                                    }
-
-                                } else {
-
-                                ?>
-
-                                    <tr>
-
-                                        <td colspan="6" class="text-center text-muted py-4">
-
-                                            Belum ada data guru.
-
-                                        </td>
-
-                                    </tr>
-
-                                <?php
-
-                                }
-
-                                ?>
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </main>
-
-    </div>
-
+<div class="position-fixed top-0 start-0 bg-dark text-white vh-100 p-3"
+     style="width: 220px; overflow-y: auto; z-index: 1000;">
+
+    <h5 class="text-white mb-4">Sistem Pelanggaran</h5>
+
+    <ul class="nav nav-pills flex-column">
+
+        <li class="nav-item mb-2">
+            <a href="dashboard.php"
+               class="nav-link <?php echo $menuAktif == 'dashboard' ? 'active' : 'text-white'; ?>">
+                Dashboard
+            </a>
+        </li>
+
+        <li class="nav-item mb-2">
+            <a href="siswa.php"
+               class="nav-link <?php echo $menuAktif == 'siswa' ? 'active' : 'text-white'; ?>">
+                Data Siswa
+            </a>
+        </li>
+
+        <li class="nav-item mb-2">
+            <a href="data_guru.php"
+               class="nav-link <?php echo $menuAktif == 'guru' ? 'active' : 'text-white'; ?>">
+                Data Guru
+            </a>
+        </li>
+
+        <li class="nav-item mb-2">
+            <a href="kelas.php"
+               class="nav-link <?php echo $menuAktif == 'kelas' ? 'active' : 'text-white'; ?>">
+                Kelas
+            </a>
+        </li>
+
+        <li class="nav-item mb-2">
+            <a href="#" class="nav-link text-white">
+                Laporan
+            </a>
+        </li>
+
+        <li class="nav-item mb-2">
+            <a href="about.php" class="nav-link text-white">
+                About Me
+            </a>
+        </li>
+
+        <hr class="text-secondary">
+
+        <li class="nav-item">
+            <a href="logout.php" class="nav-link text-danger">
+                Logout
+            </a>
+        </li>
+
+    </ul>
 </div>
-
-</body>
-
-</html>

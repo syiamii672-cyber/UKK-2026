@@ -32,7 +32,7 @@ $role = $_SESSION['role'];
                 </li>
 
                 <li class="nav-item mb-2">
-                    <a href="#" class="nav-link text-white">
+                    <a href="siswa.php" class="nav-link text-white">
                         Data Siswa
                     </a>
                 </li>
@@ -44,7 +44,7 @@ $role = $_SESSION['role'];
                 </li>
 
                 <li class="nav-item mb-2">
-                    <a href="#" class="nav-link text-white">
+                    <a href="kelas.php" class="nav-link text-white">
                         Kelas
                     </a>
                 </li>
@@ -75,7 +75,7 @@ $role = $_SESSION['role'];
 
 
         <!-- KONTEN -->
-        <main class="col-md-9 col-lg-10 p-4">
+        <main class="col-12 p-4" style="margin-left: 220px; width: calc(100% - 220px);">
 
             <h2>Dashboard</h2>
 
