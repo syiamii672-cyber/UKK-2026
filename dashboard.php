@@ -1,5 +1,5 @@
+```php
 <?php
-
 session_start();
 
 if (!isset($_SESSION['id'])) {
@@ -7,200 +7,135 @@ if (!isset($_SESSION['id'])) {
     exit;
 }
 
+include "config/koneksi.php";
+
 $nama = $_SESSION['name'];
 $role = $_SESSION['role'];
 
+$menuAktif = "dashboard";
+
+// Mengambil jumlah data dari database
+$querySiswa = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM t_siswa");
+$totalSiswa = $querySiswa ? mysqli_fetch_assoc($querySiswa)['total'] : 0;
+
+$queryGuru = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM t_guru");
+$totalGuru = $queryGuru ? mysqli_fetch_assoc($queryGuru)['total'] : 0;
+
+$queryKelas = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM t_kelas");
+$totalKelas = $queryKelas ? mysqli_fetch_assoc($queryKelas)['total'] : 0;
 ?>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-
-<div class="container-fluid">
-    <div class="row">
-
-        <!-- SIDEBAR -->
-        <div class="col-md-3 col-lg-2 bg-dark min-vh-100 p-3">
-
-            <h4 class="text-white mb-4">
-                My Website
-            </h4>
-
-            <ul class="nav nav-pills flex-column">
-
-                <li class="nav-item mb-2">
-                    <a href="#" class="nav-link active">
-                        Dashboard
-                    </a>
-                </li>
-
-                <li class="nav-item mb-2">
-                    <a href="siswa.php" class="nav-link text-white">
-                        Data Siswa
-                    </a>
-                </li>
-
-                <li class="nav-item mb-2">
-                    <a href="data_guru.php" class="nav-link text-white">
-                        Data Guru
-                    </a>
-                </li>
-
-                <li class="nav-item mb-2">
-                    <a href="kelas.php" class="nav-link text-white">
-                        Kelas
-                    </a>
-                </li>
-
-                <li class="nav-item mb-2">
-                    <a href="#" class="nav-link text-white">
-                        Laporan
-                    </a>
-                </li>
-
-                <li class="nav-item mb-2">
-                    <a href="about.php" class="nav-link text-white">
-                        About Me
-                    </a>
-                </li>
-
-                <hr class="text-secondary">
-
-                <li class="nav-item">
-                    <a href="logout.php" class="nav-link text-danger">
-                        Logout
-                    </a>
-                </li>
-
-            </ul>
-
-        </div>
-
-
-        <!-- KONTEN -->
-        <main class="col-12 p-4" style="margin-left: 220px; width: calc(100% - 220px);">
-
-            <h2>Dashboard</h2>
-
-            <p>
-                Selamat datang di halaman dashboard.
-            </p>
-
-            <div class="row">
-
-                <!-- CARD DATA SISWA -->
-                <div class="col-md-4 mb-3">
-                    <div class="card shadow-sm">
-
-                        <div class="card-body">
-
-                            <h5 class="card-title">
-                                Data Siswa
-                            </h5>
-
-                            <h2>
-                                120
-                            </h2>
-
-                        </div>
-
-                    </div>
-                </div>
-
-
-                <!-- CARD DATA GURU -->
-                <div class="col-md-4 mb-3">
-                    <div class="card shadow-sm">
-
-                        <div class="card-body">
-
-                            <h5 class="card-title">
-                                Data Guru
-                            </h5>
-
-                            <h2>
-                                25
-                            </h2>
-
-                        </div>
-
-                    </div>
-                </div>
-
-
-                <!-- CARD KELAS -->
-                <div class="col-md-4 mb-3">
-                    <div class="card shadow-sm">
-
-                        <div class="card-body">
-
-                            <h5 class="card-title">
-                                Kelas
-                            </h5>
-
-                            <h2>
-                                12
-                            </h2>
-
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-
-        </main>
-
-    </div>
-</div>
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Sistem Informasi Pelanggaran Siswa</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            background-color: #f8f9fa;
+        }
+
+        .konten-utama {
+            margin-left: 220px;
+            width: calc(100% - 220px);
+            min-height: 100vh;
+            padding: 24px;
+            box-sizing: border-box;
+        }
+
+        .kartu-dashboard {
+            border: none;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 575.98px) {
+            .konten-utama {
+                margin-left: 180px;
+                width: calc(100% - 180px);
+                padding: 15px;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-    <h2>Dashboard</h2>
+<?php include "includes/sidebar.php"; ?>
 
-    <p>
-        Selamat datang, <?php echo $nama; ?>
+<main class="konten-utama">
+
+    <h2 class="mb-1">Dashboard</h2>
+
+    <p class="text-secondary mb-4">
+        Selamat datang, <?= htmlspecialchars($nama); ?>!
+        Kamu login sebagai <?= htmlspecialchars(ucfirst($role)); ?>.
     </p>
 
-    <p>
-        Role: <?php echo ucfirst($role); ?>
-    </p>
+    <div class="row g-3">
 
-    <hr>
+        <?php if ($role == "admin") { ?>
 
-    <h3>Menu</h3>
+            <div class="col-12 col-lg-4">
+                <div class="card kartu-dashboard shadow-sm h-100">
+                    <div class="card-body">
+                        <h6 class="text-secondary">Data Siswa</h6>
+                        <h2><?= $totalSiswa; ?></h2>
+                        <a href="siswa.php" class="btn btn-primary btn-sm">
+                            Kelola Siswa
+                        </a>
+                    </div>
+                </div>
+            </div>
 
-    <?php if ($role == "admin") { ?>
+            <div class="col-12 col-lg-4">
+                <div class="card kartu-dashboard shadow-sm h-100">
+                    <div class="card-body">
+                        <h6 class="text-secondary">Data Guru</h6>
+                        <h2><?= $totalGuru; ?></h2>
+                        <a href="data_guru.php" class="btn btn-primary btn-sm">
+                            Kelola Guru
+                        </a>
+                    </div>
+                </div>
+            </div>
 
-        <h4>Menu 1 - Kelola Data</h4>
-        <p>
-            <a href="#">Kelola Data</a>
-        </p>
+            <div class="col-12 col-lg-4">
+                <div class="card kartu-dashboard shadow-sm h-100">
+                    <div class="card-body">
+                        <h6 class="text-secondary">Data Kelas</h6>
+                        <h2><?= $totalKelas; ?></h2>
+                        <a href="kelas.php" class="btn btn-primary btn-sm">
+                            Kelola Kelas
+                        </a>
+                    </div>
+                </div>
+            </div>
 
-        <h4>Menu 2 - Data Pelanggaran</h4>
-        <p>
-            <a href="#">Data Pelanggaran</a>
-        </p>
+        <?php } else { ?>
 
-    <?php } ?>
+            <div class="col-12">
+                <div class="card kartu-dashboard shadow-sm">
+                    <div class="card-body">
+                        <h5>Menu Guru</h5>
+                        <p class="text-secondary mb-0">
+                            Silakan gunakan menu yang tersedia untuk menjalankan tugas guru.
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-    <h4>Menu 3 - Catat Pelanggaran</h4>
-    <p>
-        <a href="#">Catat Pelanggaran</a>
-    </p>
+        <?php } ?>
 
-    <h4>Menu 4 - Laporan</h4>
-    <p>
-        <a href="#">Laporan</a>
-    </p>
+    </div>
 
-    <hr>
-
-    <p>
-        <a href="logout.php">Logout</a>
-    </p>
+</main>
 
 </body>
 </html>
+```

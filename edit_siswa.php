@@ -117,81 +117,112 @@ $menuAktif = "siswa";
     <title>Edit Data Siswa</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
           rel="stylesheet">
+
+<style>
+    body {
+        margin: 0;
+        background-color: #f8f9fa;
+    }
+
+    .konten-utama {
+        margin-left: 220px;
+        width: calc(100% - 220px);
+        min-height: 100vh;
+        padding: 24px;
+        box-sizing: border-box;
+    }
+
+    @media (max-width: 575.98px) {
+        .konten-utama {
+            margin-left: 180px;
+            width: calc(100% - 180px);
+            padding: 15px;
+        }
+    }
+</style>
 </head>
-<body>
-<div class="container-fluid">
-    <div class="row">
 
-        <?php include "includes/sidebar.php"; ?>
+<?php include "includes/sidebar.php"; ?>
 
-        <main class="col-md-9 col-lg-10 p-4">
-            <h2>Edit Data Siswa</h2>
-            <p class="text-muted">Ubah informasi siswa yang dipilih.</p>
+<main class="konten-utama">
 
-            <?php if ($error != '') { ?>
-                <div class="alert alert-danger">
-                    <?php echo htmlspecialchars($error); ?>
+    <h2>Edit Data Siswa</h2>
+    <p class="text-muted mb-4">Ubah informasi siswa yang dipilih.</p>
+
+    <?php if ($error != '') { ?>
+        <div class="alert alert-danger">
+            <?= htmlspecialchars($error); ?>
+        </div>
+    <?php } ?>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+
+            <form method="POST">
+
+                <div class="mb-3">
+                    <label class="form-label">NIS</label>
+                    <input type="text" name="nis" class="form-control"
+                           maxlength="30" required
+                           value="<?= htmlspecialchars($siswa['nis']); ?>">
                 </div>
-            <?php } ?>
 
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <form method="POST">
-                        <div class="mb-3">
-                            <label class="form-label">NIS</label>
-                            <input type="text" name="nis" class="form-control"
-                                   maxlength="30" required
-                                   value="<?php echo htmlspecialchars($siswa['nis']); ?>">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">NISN</label>
-                            <input type="text" name="nisn" class="form-control"
-                                   maxlength="20" required
-                                   value="<?php echo htmlspecialchars($siswa['nisn']); ?>">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Nama Lengkap</label>
-                            <input type="text" name="nama" class="form-control"
-                                   maxlength="150" required
-                                   value="<?php echo htmlspecialchars($siswa['nama']); ?>">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Jenis Kelamin</label>
-                            <select name="jenis_kelamin" class="form-select" required>
-                                <option value="L" <?php echo $siswa['jenis_kelamin'] == 'L' ? 'selected' : ''; ?>>Laki-laki</option>
-                                <option value="P" <?php echo $siswa['jenis_kelamin'] == 'P' ? 'selected' : ''; ?>>Perempuan</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Tanggal Lahir</label>
-                            <input type="date" name="tanggal_lahir" class="form-control"
-                                   required value="<?php echo htmlspecialchars($siswa['tanggal_lahir']); ?>">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Alamat</label>
-                            <textarea name="alamat" class="form-control" rows="3" required><?php echo htmlspecialchars($siswa['alamat']); ?></textarea>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Status</label>
-                            <select name="status_aktif" class="form-select" required>
-                                <option value="1" <?php echo $siswa['status_aktif'] == '1' ? 'selected' : ''; ?>>Aktif</option>
-                                <option value="0" <?php echo $siswa['status_aktif'] == '0' ? 'selected' : ''; ?>>Tidak Aktif</option>
-                            </select>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                        <a href="siswa.php" class="btn btn-secondary">Batal</a>
-                    </form>
+                <div class="mb-3">
+                    <label class="form-label">NISN</label>
+                    <input type="text" name="nisn" class="form-control"
+                           maxlength="20" required
+                           value="<?= htmlspecialchars($siswa['nisn']); ?>">
                 </div>
-            </div>
-        </main>
+
+                <div class="mb-3">
+                    <label class="form-label">Nama Lengkap</label>
+                    <input type="text" name="nama" class="form-control"
+                           maxlength="150" required
+                           value="<?= htmlspecialchars($siswa['nama']); ?>">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Jenis Kelamin</label>
+                    <select name="jenis_kelamin" class="form-select" required>
+                        <option value="L" <?= $siswa['jenis_kelamin'] == 'L' ? 'selected' : ''; ?>>Laki-laki</option>
+                        <option value="P" <?= $siswa['jenis_kelamin'] == 'P' ? 'selected' : ''; ?>>Perempuan</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Tanggal Lahir</label>
+                    <input type="date" name="tanggal_lahir" class="form-control"
+                           required value="<?= htmlspecialchars($siswa['tanggal_lahir']); ?>">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Alamat</label>
+                    <textarea name="alamat" class="form-control"
+                              rows="3" required><?= htmlspecialchars($siswa['alamat']); ?></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Status</label>
+                    <select name="status_aktif" class="form-select" required>
+                        <option value="1" <?= $siswa['status_aktif'] == '1' ? 'selected' : ''; ?>>Aktif</option>
+                        <option value="0" <?= $siswa['status_aktif'] == '0' ? 'selected' : ''; ?>>Tidak Aktif</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Simpan Perubahan
+                </button>
+
+                <a href="siswa.php" class="btn btn-secondary">Batal</a>
+
+            </form>
+
+        </div>
     </div>
-</div>
+
+</main>
+
+</body>
+</html>
 </body>
 </html>
