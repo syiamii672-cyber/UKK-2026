@@ -12,7 +12,7 @@ $menuAktif = "guru";
 
 // Pengaturan pencarian dan pagination
 $kataKunci = trim($_GET['cari'] ?? '');
-$batas = 20;
+$batas = 10;
 $halaman = max(1, (int)($_GET['halaman'] ?? 1));
 
 // Hitung jumlah data sesuai pencarian
@@ -139,31 +139,44 @@ function urlHalamanGuru($nomorHalaman, $kataKunci) {
 
     </div>
 
-    <?php if (isset($_GET['pesan'])) { ?>
 
-        <?php if ($_GET['pesan'] == 'tambah') { ?>
-            <div class="alert alert-success">
-                Data guru berhasil ditambahkan.
-            </div>
+<?php if (isset($_GET['pesan'])) { ?>
 
-        <?php } elseif ($_GET['pesan'] == 'edit') { ?>
-            <div class="alert alert-success">
-                Data guru berhasil diperbarui.
-            </div>
+    <?php if ($_GET['pesan'] == 'tambah') { ?>
 
-        <?php } elseif ($_GET['pesan'] == 'hapus') { ?>
-            <div class="alert alert-success">
-                Data guru berhasil dihapus.
-            </div>
+        <div class="alert alert-success">
+            Data guru berhasil ditambahkan.
+        </div>
 
-        <?php } elseif ($_GET['pesan'] == 'gagal_hapus') { ?>
-            <div class="alert alert-danger">
-                Data guru gagal dihapus. Data mungkin masih digunakan
-                oleh tabel lain.
-            </div>
-        <?php } ?>
+    <?php } elseif ($_GET['pesan'] == 'edit') { ?>
+
+        <div class="alert alert-success">
+            Data guru berhasil diperbarui.
+        </div>
+
+    <?php } elseif ($_GET['pesan'] == 'hapus') { ?>
+
+        <div class="alert alert-success">
+            Data guru berhasil dihapus.
+        </div>
+
+    <?php } elseif ($_GET['pesan'] == 'gagal_hapus') { ?>
+
+        <div class="alert alert-danger">
+            Data guru gagal dihapus.
+        </div>
+
+    <?php } elseif ($_GET['pesan'] == 'guru_digunakan') { ?>
+
+        <div class="alert alert-warning">
+            Data guru tidak dapat dihapus karena masih memiliki
+            riwayat pelanggaran atau masih terhubung dengan data lain.
+        </div>
 
     <?php } ?>
+
+<?php } ?>
+
 
     <div class="card shadow-sm border-0">
         <div class="card-body">

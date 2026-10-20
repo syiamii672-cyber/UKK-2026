@@ -1,6 +1,31 @@
-```php
+
 <?php
 $menuAktif = $menuAktif ?? "";
+$role = $_SESSION['role'] ?? "";
+
+$menuAdmin = [
+    ["Dashboard", "dashboard.php", "dashboard"],
+    ["Kelola Guru", "data_guru.php", "guru"],
+    ["Kelola Siswa", "siswa.php", "siswa"],
+    ["Kelola Kelas", "kelas.php", "kelas"],
+    ["Kelola Tahun Ajaran", "tahun_ajaran.php", "tahun_ajaran"],
+    ["Penempatan Siswa", "penempatan_siswa.php", "penempatan"],
+    ["Kelola Wali Kelas", "wali_kelas.php", "wali_kelas"],
+    ["Kategori Pelanggaran", "kategori_pelanggaran.php", "kategori"],
+    ["Jenis Pelanggaran", "jenis_pelanggaran.php", "jenis"],
+    ["Laporan", "laporan.php", "laporan"],
+];
+
+$menuGuru = [
+    ["Dashboard", "dashboard.php", "dashboard"],
+    ["Catat Pelanggaran", "catat_pelanggaran.php", "catat_pelanggaran"],
+    ["Tindakan", "tindakan.php", "tindakan"],
+    ["Rekap Poin", "rekap_poin.php", "rekap_poin"],
+    ["Riwayat", "riwayat_pelanggaran.php", "riwayat"],
+    ["Laporan", "laporan.php", "laporan"],
+];
+
+$daftarMenu = ($role === "admin") ? $menuAdmin : $menuGuru;
 ?>
 
 <style>
@@ -21,6 +46,8 @@ $menuAktif = $menuAktif ?? "";
     .sidebar-ukk .nav-link {
         border-radius: 6px;
         padding: 10px 12px;
+        color: white;
+        font-size: 14px;
     }
 
     .sidebar-ukk .nav-link.active {
@@ -28,11 +55,7 @@ $menuAktif = $menuAktif ?? "";
         color: white;
     }
 
-    .sidebar-ukk .nav-link:not(.active) {
-        color: white;
-    }
-
-    .sidebar-ukk .nav-link:hover {
+    .sidebar-ukk .nav-link:not(.active):hover {
         background-color: #343a40;
         color: white;
     }
@@ -45,48 +68,28 @@ $menuAktif = $menuAktif ?? "";
 <div class="sidebar-ukk">
     <h5 class="text-white mb-4">Sistem Pelanggaran</h5>
 
+    <div class="text-secondary small mb-3">
+        <?= $role === "admin" ? "Administrator" : "Guru" ?>
+    </div>
+
     <ul class="nav nav-pills flex-column">
-        <li class="nav-item mb-2">
-            <a href="dashboard.php"
-               class="nav-link <?= $menuAktif == 'dashboard' ? 'active' : '' ?>">
-                Dashboard
-            </a>
-        </li>
-
-        <li class="nav-item mb-2">
-            <a href="siswa.php"
-               class="nav-link <?= $menuAktif == 'siswa' ? 'active' : '' ?>">
-                Data Siswa
-            </a>
-        </li>
-
-        <li class="nav-item mb-2">
-            <a href="data_guru.php"
-               class="nav-link <?= $menuAktif == 'guru' ? 'active' : '' ?>">
-                Data Guru
-            </a>
-        </li>
-
-        <li class="nav-item mb-2">
-            <a href="kelas.php"
-               class="nav-link <?= $menuAktif == 'kelas' ? 'active' : '' ?>">
-                Kelas
-            </a>
-        </li>
-
-        <li class="nav-item mb-2">
-            <a href="#" class="nav-link">Laporan</a>
-        </li>
-
-        <li class="nav-item mb-2">
-            <a href="about.php" class="nav-link">About Me</a>
-        </li>
+        <?php foreach ($daftarMenu as $menu): ?>
+            <li class="nav-item mb-2">
+                <a
+                    href="<?= htmlspecialchars($menu[1]) ?>"
+                    class="nav-link <?= $menuAktif === $menu[2] ? 'active' : '' ?>"
+                >
+                    <?= htmlspecialchars($menu[0]) ?>
+                </a>
+            </li>
+        <?php endforeach; ?>
 
         <hr class="text-secondary">
 
         <li class="nav-item">
-            <a href="logout.php" class="nav-link logout">Logout</a>
+            <a href="logout.php" class="nav-link logout">
+                Logout
+            </a>
         </li>
     </ul>
 </div>
-```
