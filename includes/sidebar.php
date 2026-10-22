@@ -13,6 +13,7 @@ $menuAdmin = [
     ["Kelola Wali Kelas", "wali_kelas.php", "wali_kelas"],
     ["Kategori Pelanggaran", "kategori_pelanggaran.php", "kategori"],
     ["Jenis Pelanggaran", "jenis_pelanggaran.php", "jenis"],
+    ["About Me", "about.php", "about"],
     ["Laporan", "laporan.php", "laporan"],
 ];
 

@@ -1,4 +1,3 @@
-```php
 <?php
 session_start();
 
@@ -138,4 +137,3 @@ $totalKelas = $queryKelas ? mysqli_fetch_assoc($queryKelas)['total'] : 0;
 
 </body>
 </html>
-```
