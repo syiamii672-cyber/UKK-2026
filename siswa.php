@@ -1,4 +1,4 @@
-```php
+
 <?php
 include "includes/cek_session.php";
 include "config/koneksi.php";
@@ -225,17 +225,20 @@ function urlHalamanSiswa($nomorHalaman, $cari)
             <div class="table-responsive">
                 <table class="table table-bordered table-hover align-middle mb-0">
 
-                    <thead class="table-dark">
-                        <tr>
-                            <th>No</th>
-                            <th>NIS</th>
-                            <th>NISN</th>
-                            <th>Nama</th>
-                            <th>Jenis Kelamin</th>
-                            <th>Status</th>
-                            <th style="min-width: 140px;">Aksi</th>
-                        </tr>
-                    </thead>
+                  
+            <thead class="table-dark">
+                <tr>
+                    <th>No</th>
+                    <th>NIS</th>
+                    <th>NISN</th>
+                    <th>Nama</th>
+                    <th>Jenis Kelamin</th>
+                    <th>Alamat</th>
+                    <th>Status</th>
+                    <th style="min-width: 140px;">Aksi</th>
+                </tr>
+            </thead>
+
 
                     <tbody>
 
@@ -269,6 +272,12 @@ function urlHalamanSiswa($nomorHalaman, $cari)
                                     }
                                     ?>
                                 </td>
+
+                                
+                                    <td style="min-width: 200px; white-space: normal;">
+                                        <?= htmlspecialchars($siswa['alamat'] ?? '-', ENT_QUOTES, 'UTF-8'); ?>
+                                    </td>
+
 
                                 <td>
                                     <?php if ($siswa['status_aktif'] == 1) { ?>
@@ -306,7 +315,7 @@ function urlHalamanSiswa($nomorHalaman, $cari)
                     <?php } else { ?>
 
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-4">
+                            <td colspan="8" class="text-center text-muted py-4">
                                 <?php if ($cari !== '') { ?>
                                     Siswa yang kamu cari tidak ditemukan.
                                 <?php } else { ?>
@@ -368,4 +377,3 @@ function urlHalamanSiswa($nomorHalaman, $cari)
 
 </body>
 </html>
-```

@@ -23,15 +23,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = $_POST['password'] ?? '';
     $status_aktif = $_POST['status_aktif'] ?? '';
 
-    if (
-        $nip == '' ||
+    // NIP wajib tepat 18 digit angka.
+    if (!preg_match('/^[0-9]{18}$/', $nip)) {
+        $error = "NIP harus tepat 18 digit angka. Periksa kembali NIP yang dimasukkan.";
+    } elseif (
         $nama == '' ||
         $email == '' ||
         !filter_var($email, FILTER_VALIDATE_EMAIL) ||
         strlen($password) < 8 ||
         !in_array($status_aktif, ['0', '1'], true)
     ) {
-        $error = "Periksa kembali data. Password minimal 8 karakter.";
+        $error = "Periksa kembali data. Email harus valid dan password minimal 8 karakter.";
     } else {
         try {
             // Cek NIP yang sudah digunakan.
@@ -77,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     PASSWORD_DEFAULT
                 );
 
-                // Buat akun login guru terlebih dahulu.
+                // Buat akun login guru.
                 $stmtUser = mysqli_prepare(
                     $koneksi,
                     "INSERT INTO t_users
@@ -94,13 +96,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 );
 
                 mysqli_stmt_execute($stmtUser);
-
-                // Ambil ID akun yang baru dibuat.
                 $user_id = mysqli_insert_id($koneksi);
-
                 mysqli_stmt_close($stmtUser);
 
-                // Hubungkan data guru dengan akun tersebut.
+                // Simpan data guru dan hubungkan dengan akun.
                 $status = (int) $status_aktif;
 
                 $stmtGuru = mysqli_prepare(
@@ -124,18 +123,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 mysqli_stmt_execute($stmtGuru);
                 mysqli_stmt_close($stmtGuru);
 
-                // Simpan kedua data jika semuanya berhasil.
                 mysqli_commit($koneksi);
 
                 header("Location: data_guru.php?pesan=tambah");
                 exit;
             }
         } catch (Throwable $e) {
-            // Batalkan kedua penyimpanan jika ada kegagalan.
             mysqli_rollback($koneksi);
 
-            $error = "Data guru gagal disimpan. Periksa struktur "
-                   . "database dan pastikan email belum digunakan.";
+            $error = "Data guru gagal disimpan. Periksa struktur database dan pastikan email belum digunakan.";
         }
     }
 }
@@ -147,6 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tambah Guru</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
           rel="stylesheet">
 
@@ -183,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <?php if ($error != '') { ?>
         <div class="alert alert-danger">
-            <?= htmlspecialchars($error); ?>
+            <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?>
         </div>
     <?php } ?>
 
@@ -193,33 +190,58 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 <div class="mb-3">
                     <label class="form-label">NIP</label>
-                    <input type="text" name="nip"
-                           class="form-control" maxlength="50"
-                           required
-                           value="<?= htmlspecialchars($nip); ?>">
+                    <input
+                        type="text"
+                        name="nip"
+                        class="form-control"
+                        minlength="18"
+                        maxlength="18"
+                        pattern="[0-9]{18}"
+                        inputmode="numeric"
+                        title="NIP harus tepat 18 digit angka."
+                        placeholder="Masukkan 18 digit NIP"
+                        required
+                        value="<?= htmlspecialchars($nip, ENT_QUOTES, 'UTF-8'); ?>"
+                    >
+                    <small class="text-muted">
+                        NIP wajib terdiri dari tepat 18 digit angka.
+                    </small>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Nama Guru</label>
-                    <input type="text" name="nama"
-                           class="form-control" maxlength="150"
-                           required
-                           value="<?= htmlspecialchars($nama); ?>">
+                    <input
+                        type="text"
+                        name="nama"
+                        class="form-control"
+                        maxlength="150"
+                        required
+                        value="<?= htmlspecialchars($nama, ENT_QUOTES, 'UTF-8'); ?>"
+                    >
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Email</label>
-                    <input type="email" name="email"
-                           class="form-control" maxlength="150"
-                           required
-                           value="<?= htmlspecialchars($email); ?>">
+                    <input
+                        type="email"
+                        name="email"
+                        class="form-control"
+                        maxlength="150"
+                        required
+                        value="<?= htmlspecialchars($email, ENT_QUOTES, 'UTF-8'); ?>"
+                    >
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Password Akun</label>
-                    <input type="password" name="password"
-                           class="form-control" minlength="8"
-                           autocomplete="new-password" required>
+                    <input
+                        type="password"
+                        name="password"
+                        class="form-control"
+                        minlength="8"
+                        autocomplete="new-password"
+                        required
+                    >
                     <small class="text-muted">
                         Minimal 8 karakter. Password disimpan dalam bentuk hash.
                     </small>
@@ -227,14 +249,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 <div class="mb-3">
                     <label class="form-label">Status</label>
-                    <select name="status_aktif"
-                            class="form-select" required>
-                        <option value="1"
-                            <?= $status_aktif == '1' ? 'selected' : ''; ?>>
+                    <select name="status_aktif" class="form-select" required>
+                        <option value="1" <?= $status_aktif == '1' ? 'selected' : ''; ?>>
                             Aktif
                         </option>
-                        <option value="0"
-                            <?= $status_aktif == '0' ? 'selected' : ''; ?>>
+                        <option value="0" <?= $status_aktif == '0' ? 'selected' : ''; ?>>
                             Tidak Aktif
                         </option>
                     </select>
@@ -243,6 +262,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <button type="submit" class="btn btn-primary">
                     Simpan
                 </button>
+
                 <a href="data_guru.php" class="btn btn-secondary">
                     Batal
                 </a>

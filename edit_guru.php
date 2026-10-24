@@ -1,4 +1,4 @@
-```php
+
 <?php
 include "includes/cek_session.php";
 include "config/koneksi.php";
@@ -21,10 +21,12 @@ $stmt = mysqli_prepare(
     "SELECT nip, nama, email, status_aktif
      FROM t_guru WHERE id = ?"
 );
+
 mysqli_stmt_bind_param($stmt, "i", $id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $guru = mysqli_fetch_assoc($result);
+mysqli_stmt_close($stmt);
 
 if (!$guru) {
     header("Location: data_guru.php");
@@ -39,8 +41,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = trim($_POST['email'] ?? '');
     $status_aktif = $_POST['status_aktif'] ?? '';
 
-    if (
-        $nip == '' || $nama == '' || $email == '' ||
+    // NIP wajib tepat 18 digit angka.
+    if (!preg_match('/^[0-9]{18}$/', $nip)) {
+        $error = "NIP harus tepat 18 digit angka. Periksa kembali NIP yang dimasukkan.";
+    } elseif (
+        $nama == '' ||
+        $email == '' ||
         !filter_var($email, FILTER_VALIDATE_EMAIL) ||
         !in_array($status_aktif, ['0', '1'], true)
     ) {
@@ -58,8 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if (mysqli_num_rows($hasil) > 0) {
             $error = "NIP atau email sudah digunakan guru lain.";
-        } else {
-            $status = (int)$status_aktif;
+        }
+
+        mysqli_stmt_close($cek);
+
+        if ($error == '') {
+            $status = (int) $status_aktif;
 
             $update = mysqli_prepare(
                 $koneksi,
@@ -70,19 +80,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             );
 
             mysqli_stmt_bind_param(
-                $update, "sssii",
-                $nip, $nama, $email, $status, $id
+                $update,
+                "sssii",
+                $nip,
+                $nama,
+                $email,
+                $status,
+                $id
             );
 
             if (mysqli_stmt_execute($update)) {
+                mysqli_stmt_close($update);
                 header("Location: data_guru.php?pesan=edit");
                 exit;
             } else {
                 $error = "Data guru gagal diperbarui.";
             }
+
+            mysqli_stmt_close($update);
         }
     }
 
+    // Pertahankan isian saat validasi gagal.
     $guru = [
         'nip' => $nip,
         'nama' => $nama,
@@ -98,11 +117,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Data Guru</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
           rel="stylesheet">
 
     <style>
-        body { margin: 0; background: #f8f9fa; }
+        body {
+            margin: 0;
+            background: #f8f9fa;
+        }
+
         .konten-utama {
             margin-left: 220px;
             width: calc(100% - 220px);
@@ -110,6 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             padding: 24px;
             box-sizing: border-box;
         }
+
         @media (max-width: 575.98px) {
             .konten-utama {
                 margin-left: 180px;
@@ -129,7 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <?php if ($error != '') { ?>
         <div class="alert alert-danger">
-            <?= htmlspecialchars($error); ?>
+            <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?>
         </div>
     <?php } ?>
 
@@ -139,32 +164,55 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 <div class="mb-3">
                     <label class="form-label">NIP</label>
-                    <input type="text" name="nip" class="form-control"
-                           maxlength="50" required
-                           value="<?= htmlspecialchars($guru['nip'] ?? ''); ?>">
+                    <input
+                        type="text"
+                        name="nip"
+                        class="form-control"
+                        minlength="18"
+                        maxlength="18"
+                        pattern="[0-9]{18}"
+                        inputmode="numeric"
+                        title="NIP harus tepat 18 digit angka."
+                        placeholder="Masukkan 18 digit NIP"
+                        required
+                        value="<?= htmlspecialchars($guru['nip'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                    >
+                    <small class="text-muted">
+                        NIP wajib terdiri dari tepat 18 digit angka.
+                    </small>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Nama Guru</label>
-                    <input type="text" name="nama" class="form-control"
-                           maxlength="150" required
-                           value="<?= htmlspecialchars($guru['nama'] ?? ''); ?>">
+                    <input
+                        type="text"
+                        name="nama"
+                        class="form-control"
+                        maxlength="150"
+                        required
+                        value="<?= htmlspecialchars($guru['nama'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                    >
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Email</label>
-                    <input type="email" name="email" class="form-control"
-                           maxlength="150" required
-                           value="<?= htmlspecialchars($guru['email'] ?? ''); ?>">
+                    <input
+                        type="email"
+                        name="email"
+                        class="form-control"
+                        maxlength="150"
+                        required
+                        value="<?= htmlspecialchars($guru['email'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                    >
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Status</label>
                     <select name="status_aktif" class="form-select" required>
-                        <option value="1" <?= $guru['status_aktif'] == '1' ? 'selected' : ''; ?>>
+                        <option value="1" <?= (string)$guru['status_aktif'] === '1' ? 'selected' : ''; ?>>
                             Aktif
                         </option>
-                        <option value="0" <?= $guru['status_aktif'] == '0' ? 'selected' : ''; ?>>
+                        <option value="0" <?= (string)$guru['status_aktif'] === '0' ? 'selected' : ''; ?>>
                             Tidak Aktif
                         </option>
                     </select>
@@ -174,12 +222,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     Simpan Perubahan
                 </button>
 
-                <a href="data_guru.php" class="btn btn-secondary">Batal</a>
+                <a href="data_guru.php" class="btn btn-secondary">
+                    Batal
+                </a>
 
             </form>
         </div>
     </div>
 </main>
+
 </body>
 </html>
-```
