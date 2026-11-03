@@ -1,7 +1,29 @@
-
 <?php
 $menuAktif = $menuAktif ?? "";
 $role = $_SESSION['role'] ?? "";
+$idUser = (int) ($_SESSION['id'] ?? 0);
+
+$isWaliKelas = false;
+
+// Cek apakah guru memiliki penugasan wali kelas yang aktif
+if ($role === "guru" && isset($koneksi)) {
+    $queryWali = mysqli_query($koneksi, "
+        SELECT w.id
+        FROM t_guru g
+        JOIN t_wali_kelas w ON g.id = w.guru_id
+        JOIN t_kelas k ON w.kelas_id = k.id
+        JOIN t_tahun_ajaran ta ON w.tahun_ajaran_id = ta.id
+        WHERE g.user_id = $idUser
+        AND w.status_aktif = 1
+        AND k.status_aktif = 1
+        AND ta.status_aktif = 1
+        LIMIT 1
+    ");
+
+    if ($queryWali && mysqli_num_rows($queryWali) > 0) {
+        $isWaliKelas = true;
+    }
+}
 
 $menuAdmin = [
     ["Dashboard", "dashboard.php", "dashboard"],
@@ -26,7 +48,23 @@ $menuGuru = [
     ["Laporan", "laporan.php", "laporan"],
 ];
 
-$daftarMenu = ($role === "admin") ? $menuAdmin : $menuGuru;
+$menuWaliKelas = [
+    ["Dashboard", "dashboard.php", "dashboard"],
+    ["Rekap Poin", "rekap_poin.php", "rekap_poin"],
+    ["Riwayat", "riwayat_pelanggaran.php", "riwayat"],
+    ["Laporan", "laporan.php", "laporan"],
+];
+
+if ($role === "admin") {
+    $daftarMenu = $menuAdmin;
+    $labelRole = "Administrator";
+} elseif ($isWaliKelas) {
+    $daftarMenu = $menuWaliKelas;
+    $labelRole = "Wali Kelas";
+} else {
+    $daftarMenu = $menuGuru;
+    $labelRole = "Guru";
+}
 ?>
 
 <style>
@@ -70,7 +108,7 @@ $daftarMenu = ($role === "admin") ? $menuAdmin : $menuGuru;
     <h5 class="text-white mb-4">Sistem Pelanggaran</h5>
 
     <div class="text-secondary small mb-3">
-        <?= $role === "admin" ? "Administrator" : "Guru" ?>
+        <?= htmlspecialchars($labelRole) ?>
     </div>
 
     <ul class="nav nav-pills flex-column">

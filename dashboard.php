@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 
@@ -10,10 +11,36 @@ include "config/koneksi.php";
 
 $nama = $_SESSION['name'];
 $role = $_SESSION['role'];
+$idUser = (int) $_SESSION['id'];
 
 $menuAktif = "dashboard";
 
-// Mengambil jumlah data dari database
+$isWaliKelas = false;
+$kelasWali = "";
+
+// Cek penugasan wali kelas
+if ($role === "guru") {
+    $queryWali = mysqli_query($koneksi, "
+        SELECT k.nama AS nama_kelas
+        FROM t_guru g
+        JOIN t_wali_kelas w ON g.id = w.guru_id
+        JOIN t_kelas k ON w.kelas_id = k.id
+        JOIN t_tahun_ajaran ta ON w.tahun_ajaran_id = ta.id
+        WHERE g.user_id = $idUser
+        AND w.status_aktif = 1
+        AND k.status_aktif = 1
+        AND ta.status_aktif = 1
+        LIMIT 1
+    ");
+
+    if ($queryWali && mysqli_num_rows($queryWali) > 0) {
+        $dataWali = mysqli_fetch_assoc($queryWali);
+        $isWaliKelas = true;
+        $kelasWali = $dataWali['nama_kelas'];
+    }
+}
+
+// Mengambil jumlah data
 $querySiswa = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM t_siswa");
 $totalSiswa = $querySiswa ? mysqli_fetch_assoc($querySiswa)['total'] : 0;
 
@@ -73,12 +100,13 @@ $totalKelas = $queryKelas ? mysqli_fetch_assoc($queryKelas)['total'] : 0;
 
     <p class="text-secondary mb-4">
         Selamat datang, <?= htmlspecialchars($nama); ?>!
-        Kamu login sebagai <?= htmlspecialchars(ucfirst($role)); ?>.
+        Kamu login sebagai
+        <?= $role === "admin" ? "Administrator" : ($isWaliKelas ? "Wali Kelas" : "Guru"); ?>.
     </p>
 
     <div class="row g-3">
 
-        <?php if ($role == "admin") { ?>
+        <?php if ($role === "admin") { ?>
 
             <div class="col-12 col-lg-4">
                 <div class="card kartu-dashboard shadow-sm h-100">
@@ -111,6 +139,34 @@ $totalKelas = $queryKelas ? mysqli_fetch_assoc($queryKelas)['total'] : 0;
                         <h2><?= $totalKelas; ?></h2>
                         <a href="kelas.php" class="btn btn-primary btn-sm">
                             Kelola Kelas
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        <?php } elseif ($isWaliKelas) { ?>
+
+            <div class="col-12 col-md-6">
+                <div class="card kartu-dashboard shadow-sm h-100">
+                    <div class="card-body">
+                        <h6 class="text-secondary">Penugasan Wali Kelas</h6>
+                        <h4><?= htmlspecialchars($kelasWali); ?></h4>
+                        <p class="text-secondary mb-0">
+                            Kamu bertugas sebagai wali kelas.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <div class="card kartu-dashboard shadow-sm h-100">
+                    <div class="card-body">
+                        <h5>Menu Wali Kelas</h5>
+                        <p class="text-secondary">
+                            Silakan kelola rekap poin, riwayat, dan laporan pelanggaran siswa.
+                        </p>
+                        <a href="rekap_poin.php" class="btn btn-primary btn-sm">
+                            Lihat Rekap Poin
                         </a>
                     </div>
                 </div>

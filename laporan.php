@@ -10,6 +10,34 @@ if (!in_array($_SESSION['role'] ?? '', ['admin', 'guru'], true)) {
 
 $menuAktif = "laporan";
 
+$idUser = (int) $_SESSION['id'];
+
+$isWaliKelas = false;
+$kelasWali = 0;
+$tahunWali = 0;
+
+if ($_SESSION['role'] === "guru") {
+    $queryWali = mysqli_query($koneksi, "
+        SELECT w.kelas_id, w.tahun_ajaran_id
+        FROM t_guru g
+        JOIN t_wali_kelas w ON g.id = w.guru_id
+        JOIN t_kelas k ON w.kelas_id = k.id
+        JOIN t_tahun_ajaran ta ON w.tahun_ajaran_id = ta.id
+        WHERE g.user_id = $idUser
+        AND w.status_aktif = 1
+        AND k.status_aktif = 1
+        AND ta.status_aktif = 1
+        LIMIT 1
+    ");
+
+    if ($queryWali && mysqli_num_rows($queryWali) > 0) {
+        $dataWali = mysqli_fetch_assoc($queryWali);
+        $isWaliKelas = true;
+        $kelasWali = (int) $dataWali['kelas_id'];
+        $tahunWali = (int) $dataWali['tahun_ajaran_id'];
+    }
+}
+
 function e($nilai) {
     return htmlspecialchars((string)($nilai ?? ''), ENT_QUOTES, 'UTF-8');
 }
@@ -43,19 +71,51 @@ if (
     $pesanFilter = "Tanggal mulai tidak boleh melebihi tanggal selesai.";
 }
 
-$daftarKelas = mysqli_query(
-    $koneksi,
-    "SELECT id, nama FROM t_kelas ORDER BY nama ASC"
-);
+// $daftarKelas = mysqli_query(
+//     $koneksi,
+//     "SELECT id, nama FROM t_kelas ORDER BY nama ASC"
+// );
+
+if ($isWaliKelas) {
+    $daftarKelas = mysqli_query($koneksi, "
+        SELECT id, nama
+        FROM t_kelas
+        WHERE id = $kelasWali
+    ");
+
+    // Wali Kelas tidak boleh memilih kelas lain
+    $kelasId = $kelasWali;
+} else {
+    $daftarKelas = mysqli_query(
+        $koneksi,
+        "SELECT id, nama FROM t_kelas ORDER BY nama ASC"
+    );
+}
 
 if (!$daftarKelas) {
     die("Gagal mengambil data kelas.");
 }
 
+// // Susun filter SQL
+// $where = [];
+// $parameter = [];
+// $tipe = '';
+
 // Susun filter SQL
 $where = [];
 $parameter = [];
 $tipe = '';
+
+// Pembatasan khusus Wali Kelas
+if ($isWaliKelas) {
+    $where[] = "kelas_id = ?";
+    $parameter[] = $kelasWali;
+    $tipe .= 'i';
+
+    $where[] = "tahun_ajaran_id = ?";
+    $parameter[] = $tahunWali;
+    $tipe .= 'i';
+}
 
 if ($tanggalMulai !== '') {
     $where[] = "tanggal >= ?";
@@ -69,7 +129,7 @@ if ($tanggalSelesai !== '') {
     $tipe .= 's';
 }
 
-if ($kelasId > 0) {
+if (!$isWaliKelas && $kelasId > 0) {
     $where[] = "kelas_id = ?";
     $parameter[] = $kelasId;
     $tipe .= 'i';
