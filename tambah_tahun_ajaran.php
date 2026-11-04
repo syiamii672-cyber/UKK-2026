@@ -1,4 +1,4 @@
-```php
+
 <?php
 include "includes/cek_session.php";
 include "config/koneksi.php";
@@ -252,4 +252,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </body>
 </html>
-```

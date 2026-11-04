@@ -11,15 +11,23 @@ if (!in_array($role, ["admin", "guru"], true)) {
 }
 
 $menuAktif = "laporan";
+$idUser = (int)($_SESSION['id'] ?? 0);
 
-<<<<<<< HEAD
-$idUser = (int) $_SESSION['id'];
+// Fungsi keamanan output
+function e($nilai) {
+    return htmlspecialchars((string)($nilai ?? ''), ENT_QUOTES, 'UTF-8');
+}
+
+
+ // ==========================================
+ // CEK WALI KELAS
+ // ==========================================
 
 $isWaliKelas = false;
 $kelasWali = 0;
 $tahunWali = 0;
 
-if ($_SESSION['role'] === "guru") {
+if ($role === "guru") {
     $queryWali = mysqli_query($koneksi, "
         SELECT w.kelas_id, w.tahun_ajaran_id
         FROM t_guru g
@@ -27,6 +35,7 @@ if ($_SESSION['role'] === "guru") {
         JOIN t_kelas k ON w.kelas_id = k.id
         JOIN t_tahun_ajaran ta ON w.tahun_ajaran_id = ta.id
         WHERE g.user_id = $idUser
+        AND g.status_aktif = 1
         AND w.status_aktif = 1
         AND k.status_aktif = 1
         AND ta.status_aktif = 1
@@ -35,78 +44,174 @@ if ($_SESSION['role'] === "guru") {
 
     if ($queryWali && mysqli_num_rows($queryWali) > 0) {
         $dataWali = mysqli_fetch_assoc($queryWali);
+
         $isWaliKelas = true;
         $kelasWali = (int) $dataWali['kelas_id'];
         $tahunWali = (int) $dataWali['tahun_ajaran_id'];
+    } else {
+        // Guru biasa tidak memiliki akses laporan
+        header("Location: dashboard.php");
+        exit;
     }
-=======
+}
+
+// ==========================================
+// FILTER LAPORAN
+// ==========================================
+
 $cari = trim($_GET['cari'] ?? '');
 $tanggalAwal = $_GET['tanggal_awal'] ?? '';
 $tanggalAkhir = $_GET['tanggal_akhir'] ?? '';
 $kelasFilter = $_GET['kelas'] ?? '';
+
+$statusValid = [
+    "Belum ditangani",
+    "Sedang diproses",
+    "Selesai"
+];
+
 $statusFilter = $_GET['status'] ?? '';
 
+// Tahun ajaran aktif sebagai pilihan default admin
 $queryAktif = mysqli_query($koneksi, "
-    SELECT id FROM t_tahun_ajaran
-    WHERE status_aktif = 1 LIMIT 1
+    SELECT id
+    FROM t_tahun_ajaran
+    WHERE status_aktif = 1
+    LIMIT 1
 ");
-$tahunAktif = mysqli_fetch_assoc($queryAktif);
-$tahunDefault = $tahunAktif ? (string)$tahunAktif['id'] : "semua";
+
+$tahunAktif = $queryAktif
+    ? mysqli_fetch_assoc($queryAktif)
+    : null;
+
+$tahunDefault = $tahunAktif
+    ? (string)$tahunAktif['id']
+    : "semua";
 
 $tahunFilter = $_GET['tahun'] ?? $tahunDefault;
 
-if ($tahunFilter !== "semua" && !ctype_digit((string)$tahunFilter)) {
-    $tahunFilter = $tahunDefault;
+// Wali kelas dikunci pada kelas dan tahun ajarannya sendiri
+if ($isWaliKelas) {
+    $kelasFilter = (string)$kelasWali;
+    $tahunFilter = (string)$tahunWali;
+} else {
+    if (
+        $tahunFilter !== "semua" &&
+        !ctype_digit((string)$tahunFilter)
+    ) {
+        $tahunFilter = $tahunDefault;
+    }
+
+    if (
+        $kelasFilter !== "" &&
+        !ctype_digit((string)$kelasFilter)
+    ) {
+        $kelasFilter = "";
+    }
 }
 
-$queryTahun = mysqli_query($koneksi, "
-    SELECT id, nama FROM t_tahun_ajaran
-    ORDER BY tanggal_mulai DESC
-");
+// Validasi tanggal
+$pesanFilter = '';
 
-$queryKelas = mysqli_query($koneksi, "
-    SELECT id, nama FROM t_kelas
-    ORDER BY nama ASC
-");
+foreach (['tanggalAwal', 'tanggalAkhir'] as $namaTanggal) {
+    if ($$namaTanggal !== '') {
+        $tanggal = $$namaTanggal;
+
+        $valid = preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggal)
+            && checkdate(
+                (int)substr($tanggal, 5, 2),
+                (int)substr($tanggal, 8, 2),
+                (int)substr($tanggal, 0, 4)
+            );
+
+        if (!$valid) {
+            $$namaTanggal = '';
+            $pesanFilter = "Format tanggal tidak valid.";
+        }
+    }
+}
+
+if (
+    $tanggalAwal !== '' &&
+    $tanggalAkhir !== '' &&
+    $tanggalAwal > $tanggalAkhir
+) {
+    $pesanFilter = "Tanggal awal tidak boleh melebihi tanggal akhir.";
+}
+
+// Validasi status
+if (!in_array($statusFilter, $statusValid, true)) {
+    $statusFilter = '';
+}
+
+// ==========================================
+// DATA PILIHAN FILTER
+// ==========================================
+
+if ($isWaliKelas) {
+    $queryTahun = mysqli_query($koneksi, "
+        SELECT id, nama
+        FROM t_tahun_ajaran
+        WHERE id = $tahunWali
+    ");
+
+    $queryKelas = mysqli_query($koneksi, "
+        SELECT id, nama
+        FROM t_kelas
+        WHERE id = $kelasWali
+    ");
+} else {
+    $queryTahun = mysqli_query($koneksi, "
+        SELECT id, nama
+        FROM t_tahun_ajaran
+        ORDER BY tanggal_mulai DESC
+    ");
+
+    $queryKelas = mysqli_query($koneksi, "
+        SELECT id, nama
+        FROM t_kelas
+        ORDER BY nama ASC
+    ");
+}
+
+// ==========================================
+// SUSUN FILTER SQL
+// ==========================================
 
 $where = "WHERE 1=1";
 
-if ($tahunFilter !== "semua") {
-    $tahunId = (int)$tahunFilter;
-    $where .= " AND ps.tahun_ajaran_id = $tahunId";
-}
-
-if ($kelasFilter !== "" && ctype_digit((string)$kelasFilter)) {
-    $kelasId = (int)$kelasFilter;
-    $where .= " AND ps.kelas_id = $kelasId";
+if ($isWaliKelas) {
+    // Pembatasan wajib untuk Wali Kelas
+    $where .= " AND ps.kelas_id = $kelasWali";
+    $where .= " AND ps.tahun_ajaran_id = $tahunWali";
 } else {
-    $kelasFilter = "";
+    if ($tahunFilter !== "semua") {
+        $tahunId = (int)$tahunFilter;
+        $where .= " AND ps.tahun_ajaran_id = $tahunId";
+    }
+
+    if ($kelasFilter !== '') {
+        $kelasId = (int)$kelasFilter;
+        $where .= " AND ps.kelas_id = $kelasId";
+    }
 }
 
-if ($tanggalAwal !== "" && preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggalAwal)) {
+if ($tanggalAwal !== '') {
     $awal = mysqli_real_escape_string($koneksi, $tanggalAwal);
     $where .= " AND ps.tanggal >= '$awal'";
-} else {
-    $tanggalAwal = "";
 }
 
-if ($tanggalAkhir !== "" && preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggalAkhir)) {
+if ($tanggalAkhir !== '') {
     $akhir = mysqli_real_escape_string($koneksi, $tanggalAkhir);
     $where .= " AND ps.tanggal <= '$akhir'";
-} else {
-    $tanggalAkhir = "";
 }
 
-$statusValid = ["Belum ditangani", "Sedang diproses", "Selesai"];
-
-if (in_array($statusFilter, $statusValid, true)) {
+if ($statusFilter !== '') {
     $statusAman = mysqli_real_escape_string($koneksi, $statusFilter);
     $where .= " AND ps.status = '$statusAman'";
-} else {
-    $statusFilter = "";
 }
 
-if ($cari !== "") {
+if ($cari !== '') {
     $kata = mysqli_real_escape_string($koneksi, $cari);
 
     $where .= " AND (
@@ -115,13 +220,22 @@ if ($cari !== "") {
         OR ps.nama_pelanggaran LIKE '%$kata%'
         OR ps.nama_guru LIKE '%$kata%'
         OR ps.siswa_id IN (
-            SELECT id FROM t_siswa
+            SELECT id
+            FROM t_siswa
             WHERE nis LIKE '%$kata%'
         )
     )";
 }
 
-// Ringkasan laporan berdasarkan seluruh hasil filter
+// Jika tanggal tidak valid, jangan tampilkan data
+if ($pesanFilter !== '') {
+    $where .= " AND 1=0";
+}
+
+// ==========================================
+// RINGKASAN LAPORAN
+// ==========================================
+
 $queryRingkasan = mysqli_query($koneksi, "
     SELECT
         COUNT(*) AS jumlah,
@@ -130,289 +244,59 @@ $queryRingkasan = mysqli_query($koneksi, "
     $where
 ");
 
+if (!$queryRingkasan) {
+    die("Gagal mengambil ringkasan: " . mysqli_error($koneksi));
+}
+
 $ringkasan = mysqli_fetch_assoc($queryRingkasan);
+
 $jumlahPelanggaran = (int)$ringkasan['jumlah'];
 $totalPoin = (int)$ringkasan['total_poin'];
 
-// Export Excel (CSV)
-if (isset($_GET['export']) && $_GET['export'] === "excel") {
+// ==========================================
+// PAGINATION DAN DATA LAPORAN
+// ==========================================
 
-    $queryExport = mysqli_query($koneksi, "
-        SELECT ps.*, s.nis
-        FROM t_pelanggaran_siswa ps
-        LEFT JOIN t_siswa s ON ps.siswa_id = s.id
-        $where
-        ORDER BY ps.tanggal DESC, ps.id DESC
-    ");
-
-    if (!$queryExport) {
-        die("Gagal mengambil data export: " . mysqli_error($koneksi));
-    }
-
-    header("Content-Type: text/csv; charset=UTF-8");
-    header("Content-Disposition: attachment; filename=laporan_pelanggaran.csv");
-
-    echo "\xEF\xBB\xBF";
-
-    $output = fopen("php://output", "w");
-
-    fputcsv($output, [
-        "No", "Tanggal", "Tahun Ajaran", "NIS",
-        "Nama Siswa", "Kelas", "Pelanggaran",
-        "Poin", "Guru", "Keterangan", "Tindakan", "Status"
-    ], ";");
-
-    $no = 1;
-
-    while ($data = mysqli_fetch_assoc($queryExport)) {
-        $tahunNama = "";
-
-        $idTahun = (int)$data['tahun_ajaran_id'];
-        $qTahunNama = mysqli_query($koneksi, "
-            SELECT nama FROM t_tahun_ajaran
-            WHERE id = $idTahun LIMIT 1
-        ");
-
-        if ($qTahunNama && mysqli_num_rows($qTahunNama) > 0) {
-            $tahunNama = mysqli_fetch_assoc($qTahunNama)['nama'];
-        }
-
-        fputcsv($output, [
-            $no++,
-            $data['tanggal'],
-            $tahunNama,
-            $data['nis'],
-            $data['nama_siswa'],
-            $data['nama_kelas'],
-            $data['nama_pelanggaran'],
-            $data['poin'],
-            $data['nama_guru'],
-            $data['keterangan'],
-            $data['tindakan'],
-            $data['status']
-        ], ";");
-    }
-
-    fclose($output);
-    exit;
-}
-
-// Pagination
 $batas = 10;
 $halaman = max(1, (int)($_GET['halaman'] ?? 1));
-$totalHalaman = max(1, (int)ceil($jumlahPelanggaran / $batas));
 
-if ($halaman > $totalHalaman) {
-    $halaman = $totalHalaman;
-}
+$totalHalaman = max(
+    1,
+    (int)ceil($jumlahPelanggaran / $batas)
+);
 
+$halaman = min($halaman, $totalHalaman);
 $offset = ($halaman - 1) * $batas;
 
-$query = mysqli_query($koneksi, "
+$isExcel = isset($_GET['export']) && $_GET['export'] === 'excel';
+$isCetak = isset($_GET['cetak']) && $_GET['cetak'] === '1';
+
+// Cetak dan Excel mengambil semua data hasil filter.
+// Tampilan biasa hanya mengambil 10 data per halaman.
+$sqlData = "
     SELECT ps.*, s.nis
     FROM t_pelanggaran_siswa ps
     LEFT JOIN t_siswa s ON ps.siswa_id = s.id
     $where
     ORDER BY ps.tanggal DESC, ps.id DESC
-    LIMIT $batas OFFSET $offset
-");
+";
+
+if (!$isExcel && !$isCetak) {
+    $sqlData .= " LIMIT $batas OFFSET $offset";
+}
+
+$query = mysqli_query($koneksi, $sqlData);
 
 if (!$query) {
     die("Gagal mengambil laporan: " . mysqli_error($koneksi));
->>>>>>> 553d5e7384eebb77e97b9d0d9edfc333d5e83b0f
 }
 
-function e($nilai) {
-    return htmlspecialchars((string)($nilai ?? ''), ENT_QUOTES, 'UTF-8');
-}
+$jumlahDitampilkan = mysqli_num_rows($query);
 
-// Parameter filter untuk tombol export dan pagination
-$parameter = [
-    "cari" => $cari,
-    "tahun" => $tahunFilter,
-    "kelas" => $kelasFilter,
-    "tanggal_awal" => $tanggalAwal,
-    "tanggal_akhir" => $tanggalAkhir,
-    "status" => $statusFilter
-];
+// ==========================================
+// EXPORT EXCEL
+// ==========================================
 
-<<<<<<< HEAD
-$pesanFilter = '';
-
-if (
-    ($tanggalMulai !== '' &&
-        (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggalMulai) ||
-         !checkdate((int)substr($tanggalMulai, 5, 2),
-                    (int)substr($tanggalMulai, 8, 2),
-                    (int)substr($tanggalMulai, 0, 4))))
-    ||
-    ($tanggalSelesai !== '' &&
-        (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggalSelesai) ||
-         !checkdate((int)substr($tanggalSelesai, 5, 2),
-                    (int)substr($tanggalSelesai, 8, 2),
-                    (int)substr($tanggalSelesai, 0, 4))))
-) {
-    $pesanFilter = "Format tanggal tidak valid.";
-} elseif (
-    $tanggalMulai !== '' &&
-    $tanggalSelesai !== '' &&
-    $tanggalMulai > $tanggalSelesai
-) {
-    $pesanFilter = "Tanggal mulai tidak boleh melebihi tanggal selesai.";
-}
-
-// $daftarKelas = mysqli_query(
-//     $koneksi,
-//     "SELECT id, nama FROM t_kelas ORDER BY nama ASC"
-// );
-
-if ($isWaliKelas) {
-    $daftarKelas = mysqli_query($koneksi, "
-        SELECT id, nama
-        FROM t_kelas
-        WHERE id = $kelasWali
-    ");
-
-    // Wali Kelas tidak boleh memilih kelas lain
-    $kelasId = $kelasWali;
-} else {
-    $daftarKelas = mysqli_query(
-        $koneksi,
-        "SELECT id, nama FROM t_kelas ORDER BY nama ASC"
-    );
-}
-
-if (!$daftarKelas) {
-    die("Gagal mengambil data kelas.");
-}
-
-// // Susun filter SQL
-// $where = [];
-// $parameter = [];
-// $tipe = '';
-
-// Susun filter SQL
-$where = [];
-$parameter = [];
-$tipe = '';
-
-// Pembatasan khusus Wali Kelas
-if ($isWaliKelas) {
-    $where[] = "kelas_id = ?";
-    $parameter[] = $kelasWali;
-    $tipe .= 'i';
-
-    $where[] = "tahun_ajaran_id = ?";
-    $parameter[] = $tahunWali;
-    $tipe .= 'i';
-}
-
-if ($tanggalMulai !== '') {
-    $where[] = "tanggal >= ?";
-    $parameter[] = $tanggalMulai;
-    $tipe .= 's';
-}
-
-if ($tanggalSelesai !== '') {
-    $where[] = "tanggal <= ?";
-    $parameter[] = $tanggalSelesai;
-    $tipe .= 's';
-}
-
-if (!$isWaliKelas && $kelasId > 0) {
-    $where[] = "kelas_id = ?";
-    $parameter[] = $kelasId;
-    $tipe .= 'i';
-}
-
-$sqlWhere = $where ? " WHERE " . implode(" AND ", $where) : "";
-
-// Filter tanggal tidak valid: jangan tampilkan data
-if ($pesanFilter !== '') {
-    $sqlWhere = " WHERE 1 = 0";
-    $parameter = [];
-    $tipe = '';
-}
-
-// Hitung total seluruh data hasil filter
-$sqlRingkasan = "
-    SELECT COUNT(*) AS total,
-           COALESCE(SUM(poin), 0) AS total_poin
-    FROM t_pelanggaran_siswa
-    $sqlWhere
-";
-
-$stmtRingkasan = mysqli_prepare($koneksi, $sqlRingkasan);
-
-if ($tipe !== '') {
-    mysqli_stmt_bind_param($stmtRingkasan, $tipe, ...$parameter);
-}
-
-mysqli_stmt_execute($stmtRingkasan);
-$ringkasan = mysqli_fetch_assoc(
-    mysqli_stmt_get_result($stmtRingkasan)
-);
-mysqli_stmt_close($stmtRingkasan);
-
-$totalData = (int)$ringkasan['total'];
-$totalPoin = (int)$ringkasan['total_poin'];
-
-// Pagination: 10 data per halaman
-$batas = 10;
-$totalHalaman = max(1, (int)ceil($totalData / $batas));
-$halaman = max(1, (int)($_GET['halaman'] ?? 1));
-$halaman = min($halaman, $totalHalaman);
-$offset = ($halaman - 1) * $batas;
-
-// Ambil data sesuai filter
-$sqlData = "
-    SELECT id, nama_siswa, nama_kelas, nama_pelanggaran,
-           nama_guru, tanggal, keterangan, poin, tindakan, status
-    FROM t_pelanggaran_siswa
-    $sqlWhere
-    ORDER BY tanggal DESC, id DESC
-";
-
-$isExcel = isset($_GET['export']) && $_GET['export'] === 'excel';
-$isCetak = isset($_GET['cetak']) && $_GET['cetak'] === '1';
-
-// Excel dan cetak mengambil semua data hasil filter.
-// Tampilan biasa hanya mengambil 10 data per halaman.
-if (!$isExcel && !$isCetak) {
-    $sqlData .= " LIMIT ? OFFSET ?";
-    $tipeData = $tipe . 'ii';
-    $parameterData = $parameter;
-    $parameterData[] = $batas;
-    $parameterData[] = $offset;
-} else {
-    $tipeData = $tipe;
-    $parameterData = $parameter;
-}
-
-$stmtData = mysqli_prepare($koneksi, $sqlData);
-
-if ($tipeData !== '') {
-    mysqli_stmt_bind_param($stmtData, $tipeData, ...$parameterData);
-}
-
-mysqli_stmt_execute($stmtData);
-$result = mysqli_stmt_get_result($stmtData);
-
-// Nama kelas untuk judul filter
-$namaKelasFilter = "Semua Kelas";
-
-if ($kelasId > 0) {
-    mysqli_data_seek($daftarKelas, 0);
-
-    while ($kelas = mysqli_fetch_assoc($daftarKelas)) {
-        if ((int)$kelas['id'] === $kelasId) {
-            $namaKelasFilter = $kelas['nama'];
-            break;
-        }
-    }
-}
-
-// Export Excel dalam format yang dapat dibuka Microsoft Excel
 if ($isExcel) {
     header("Content-Type: application/vnd.ms-excel; charset=UTF-8");
     header("Content-Disposition: attachment; filename=laporan_pelanggaran.xls");
@@ -422,56 +306,72 @@ if ($isExcel) {
     ?>
     <table border="1">
         <tr>
-            <th colspan="10">LAPORAN PELANGGARAN SISWA</th>
-        </tr>
-        <tr>
-            <td colspan="10">
-                Periode: <?= e($tanggalMulai ?: 'Semua tanggal') ?>
-                s.d. <?= e($tanggalSelesai ?: 'Semua tanggal') ?>
-                | Kelas: <?= e($namaKelasFilter) ?>
-            </td>
+            <th colspan="11">LAPORAN PELANGGARAN SISWA</th>
         </tr>
         <tr>
             <th>No</th>
+            <th>Tanggal</th>
+            <th>NIS</th>
             <th>Nama Siswa</th>
             <th>Kelas</th>
-            <th>Jenis Pelanggaran</th>
-            <th>Guru</th>
-            <th>Tanggal</th>
-            <th>Keterangan</th>
+            <th>Pelanggaran</th>
             <th>Poin</th>
+            <th>Guru</th>
+            <th>Keterangan</th>
             <th>Tindakan</th>
             <th>Status</th>
         </tr>
-        <?php $no = 1; while ($row = mysqli_fetch_assoc($result)) { ?>
+
+        <?php $no = 1; ?>
+        <?php while ($data = mysqli_fetch_assoc($query)): ?>
+            <tr>
+                <td><?= $no++ ?></td>
+                <td><?= e($data['tanggal']) ?></td>
+                <td><?= e($data['nis']) ?></td>
+                <td><?= e($data['nama_siswa']) ?></td>
+                <td><?= e($data['nama_kelas']) ?></td>
+                <td><?= e($data['nama_pelanggaran']) ?></td>
+                <td><?= (int)$data['poin'] ?></td>
+                <td><?= e($data['nama_guru']) ?></td>
+                <td><?= e($data['keterangan']) ?></td>
+                <td><?= e($data['tindakan']) ?></td>
+                <td><?= e($data['status']) ?></td>
+            </tr>
+        <?php endwhile; ?>
+
         <tr>
-            <td><?= $no++ ?></td>
-            <td><?= e($row['nama_siswa']) ?></td>
-            <td><?= e($row['nama_kelas']) ?></td>
-            <td><?= e($row['nama_pelanggaran']) ?></td>
-            <td><?= e($row['nama_guru']) ?></td>
-            <td><?= e($row['tanggal']) ?></td>
-            <td><?= e($row['keterangan']) ?></td>
-            <td><?= (int)$row['poin'] ?></td>
-            <td><?= e($row['tindakan']) ?></td>
-            <td><?= e($row['status']) ?></td>
-        </tr>
-        <?php } ?>
-        <tr>
-            <th colspan="7">Total</th>
+            <th colspan="6">Total</th>
             <th><?= $totalPoin ?></th>
-            <th colspan="2">Jumlah catatan: <?= $totalData ?></th>
+            <th colspan="4">
+                Jumlah pelanggaran: <?= $jumlahPelanggaran ?>
+            </th>
         </tr>
     </table>
     <?php
-    mysqli_stmt_close($stmtData);
     exit;
 }
 
-$jumlahDitampilkan = $isCetak ? 0 : min($offset + $batas, $totalData);
-=======
-$linkExport = "?" . http_build_query(array_merge($parameter, ["export" => "excel"]));
->>>>>>> 553d5e7384eebb77e97b9d0d9edfc333d5e83b0f
+// ==========================================
+// LINK FILTER, EXPORT, DAN CETAK
+// ==========================================
+
+$parameter = [
+    "cari" => $cari,
+    "tahun" => $tahunFilter,
+    "kelas" => $kelasFilter,
+    "tanggal_awal" => $tanggalAwal,
+    "tanggal_akhir" => $tanggalAkhir,
+    "status" => $statusFilter
+];
+
+$linkExport = "?" . http_build_query(
+    array_merge($parameter, ["export" => "excel"])
+);
+
+$linkCetak = "?" . http_build_query(
+    array_merge($parameter, ["cetak" => "1"])
+);
+
 ?>
 
 <!DOCTYPE html>
@@ -530,13 +430,18 @@ $linkExport = "?" . http_build_query(array_merge($parameter, ["export" => "excel
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <div>
             <h3 class="fw-bold mb-1">Laporan Pelanggaran</h3>
-            <p class="text-muted mb-0">Rekap data pelanggaran siswa.</p>
+            <p class="text-muted mb-0">
+                Rekap data pelanggaran siswa.
+                <?php if ($isWaliKelas): ?>
+                    <br><small>Data kelas yang menjadi tanggung jawab Anda.</small>
+                <?php endif; ?>
+            </p>
         </div>
 
         <div class="d-flex gap-2 tombol-aksi">
-            <button onclick="window.print()" class="btn btn-primary">
+            <a href="<?= e($linkCetak) ?>" target="_blank" class="btn btn-primary">
                 Cetak Laporan
-            </button>
+            </a>
 
             <a href="<?= e($linkExport) ?>" class="btn btn-success">
                 Export Excel
@@ -572,6 +477,13 @@ $linkExport = "?" . http_build_query(array_merge($parameter, ["export" => "excel
     <!-- Filter -->
     <div class="card border-0 shadow-sm mb-4 filter-area">
         <div class="card-body">
+
+            <?php if ($pesanFilter !== ''): ?>
+                <div class="alert alert-warning">
+                    <?= e($pesanFilter) ?>
+                </div>
+            <?php endif; ?>
+
             <form method="GET" class="row g-3">
 
                 <div class="col-md-4">
@@ -583,30 +495,49 @@ $linkExport = "?" . http_build_query(array_merge($parameter, ["export" => "excel
 
                 <div class="col-md-2">
                     <label class="form-label">Tahun Ajaran</label>
-                    <select name="tahun" class="form-select">
-                        <option value="semua" <?= $tahunFilter === "semua" ? "selected" : "" ?>>
-                            Semua
-                        </option>
-                        <?php while ($ta = mysqli_fetch_assoc($queryTahun)): ?>
-                            <option value="<?= $ta['id'] ?>"
-                                <?= $tahunFilter == $ta['id'] ? "selected" : "" ?>>
-                                <?= e($ta['nama']) ?>
+
+                    <?php if ($isWaliKelas): ?>
+                        <?php $taWali = mysqli_fetch_assoc($queryTahun); ?>
+                        <input type="text" class="form-control"
+                               value="<?= e($taWali['nama'] ?? '-') ?>" disabled>
+                        <input type="hidden" name="tahun" value="<?= $tahunWali ?>">
+                    <?php else: ?>
+                        <select name="tahun" class="form-select">
+                            <option value="semua"
+                                <?= $tahunFilter === "semua" ? "selected" : "" ?>>
+                                Semua
                             </option>
-                        <?php endwhile; ?>
-                    </select>
+
+                            <?php while ($ta = mysqli_fetch_assoc($queryTahun)): ?>
+                                <option value="<?= $ta['id'] ?>"
+                                    <?= $tahunFilter == $ta['id'] ? "selected" : "" ?>>
+                                    <?= e($ta['nama']) ?>
+                                </option>
+                            <?php endwhile; ?>
+                        </select>
+                    <?php endif; ?>
                 </div>
 
                 <div class="col-md-2">
                     <label class="form-label">Kelas</label>
-                    <select name="kelas" class="form-select">
-                        <option value="">Semua Kelas</option>
-                        <?php while ($k = mysqli_fetch_assoc($queryKelas)): ?>
-                            <option value="<?= $k['id'] ?>"
-                                <?= $kelasFilter == $k['id'] ? "selected" : "" ?>>
-                                <?= e($k['nama']) ?>
-                            </option>
-                        <?php endwhile; ?>
-                    </select>
+
+                    <?php if ($isWaliKelas): ?>
+                        <?php $kelasWaliData = mysqli_fetch_assoc($queryKelas); ?>
+                        <input type="text" class="form-control"
+                               value="<?= e($kelasWaliData['nama'] ?? '-') ?>" disabled>
+                        <input type="hidden" name="kelas" value="<?= $kelasWali ?>">
+                    <?php else: ?>
+                        <select name="kelas" class="form-select">
+                            <option value="">Semua Kelas</option>
+
+                            <?php while ($k = mysqli_fetch_assoc($queryKelas)): ?>
+                                <option value="<?= $k['id'] ?>"
+                                    <?= $kelasFilter == $k['id'] ? "selected" : "" ?>>
+                                    <?= e($k['nama']) ?>
+                                </option>
+                            <?php endwhile; ?>
+                        </select>
+                    <?php endif; ?>
                 </div>
 
                 <div class="col-md-2">
@@ -625,6 +556,7 @@ $linkExport = "?" . http_build_query(array_merge($parameter, ["export" => "excel
                     <label class="form-label">Status Penanganan</label>
                     <select name="status" class="form-select">
                         <option value="">Semua Status</option>
+
                         <?php foreach ($statusValid as $st): ?>
                             <option value="<?= e($st) ?>"
                                 <?= $statusFilter === $st ? "selected" : "" ?>>
@@ -638,6 +570,7 @@ $linkExport = "?" . http_build_query(array_merge($parameter, ["export" => "excel
                     <button type="submit" class="btn btn-primary">
                         Terapkan Filter
                     </button>
+
                     <a href="laporan.php" class="btn btn-secondary">
                         Reset
                     </a>
@@ -671,22 +604,28 @@ $linkExport = "?" . http_build_query(array_merge($parameter, ["export" => "excel
                     </thead>
 
                     <tbody>
-                    <?php if (mysqli_num_rows($query) > 0): ?>
-                        <?php $no = $offset + 1; ?>
+                    <?php if ($jumlahDitampilkan > 0): ?>
+                        <?php $no = $isCetak ? 1 : $offset + 1; ?>
+
                         <?php while ($data = mysqli_fetch_assoc($query)): ?>
                             <tr>
                                 <td><?= $no++ ?></td>
-                                <td><?= e(date('d-m-Y', strtotime($data['tanggal']))) ?></td>
+                                <td>
+                                    <?= e(date('d-m-Y', strtotime($data['tanggal']))) ?>
+                                </td>
                                 <td><?= e($data['nis']) ?></td>
                                 <td><?= e($data['nama_siswa']) ?></td>
                                 <td><?= e($data['nama_kelas']) ?></td>
                                 <td><?= e($data['nama_pelanggaran']) ?></td>
-                                <td class="text-center"><?= e($data['poin']) ?></td>
+                                <td class="text-center">
+                                    <?= (int)$data['poin'] ?>
+                                </td>
                                 <td><?= e($data['nama_guru']) ?></td>
                                 <td><?= e($data['tindakan']) ?></td>
                                 <td><?= e($data['status']) ?></td>
                             </tr>
                         <?php endwhile; ?>
+
                     <?php else: ?>
                         <tr>
                             <td colspan="10" class="text-center text-muted py-4">
@@ -700,28 +639,43 @@ $linkExport = "?" . http_build_query(array_merge($parameter, ["export" => "excel
 
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3 footer-info">
                 <small class="text-muted">
-                    Menampilkan <?= mysqli_num_rows($query) ?>
-                    dari <?= $jumlahPelanggaran ?> data
+                    Menampilkan <?= $jumlahDitampilkan ?>
+                    dari <?= number_format($jumlahPelanggaran) ?> data
                 </small>
 
-                <nav class="pagination">
-                    <ul class="pagination pagination-sm mb-0">
-                        <?php for ($i = 1; $i <= $totalHalaman; $i++): ?>
-                            <li class="page-item <?= $halaman == $i ? 'active' : '' ?>">
-                                <a class="page-link"
-                                   href="?<?= e(http_build_query(array_merge($parameter, ["halaman" => $i]))) ?>">
-                                    <?= $i ?>
-                                </a>
-                            </li>
-                        <?php endfor; ?>
-                    </ul>
-                </nav>
+                <?php if (!$isCetak && $totalHalaman > 1): ?>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+
+                            <?php for ($i = 1; $i <= $totalHalaman; $i++): ?>
+                                <li class="page-item <?= $halaman == $i ? 'active' : '' ?>">
+                                    <a class="page-link"
+                                       href="?<?= e(http_build_query(array_merge(
+                                           $parameter,
+                                           ["halaman" => $i]
+                                       ))) ?>">
+                                        <?= $i ?>
+                                    </a>
+                                </li>
+                            <?php endfor; ?>
+
+                        </ul>
+                    </nav>
+                <?php endif; ?>
             </div>
 
         </div>
     </div>
 
 </div>
+
+<?php if ($isCetak): ?>
+<script>
+    window.onload = function () {
+        window.print();
+    };
+</script>
+<?php endif; ?>
 
 </body>
 </html>

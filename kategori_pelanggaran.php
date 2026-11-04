@@ -3,12 +3,14 @@
 include "includes/cek_session.php";
 include "config/koneksi.php";
 
+$menuAktif = "kategori";
+
 if ($_SESSION['role'] !== "admin") {
     header("Location: dashboard.php");
     exit;
 }
 
-$menuAktif = "kategori_pelanggaran";
+// $menuAktif = "kategori_pelanggaran";
 
 $cari = trim($_GET['cari'] ?? '');
 $batas = 10;

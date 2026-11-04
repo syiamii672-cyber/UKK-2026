@@ -3,7 +3,9 @@
 include "includes/cek_session.php";
 include "config/koneksi.php";
 
-if ($_SESSION['role'] !== "guru") {
+$role = strtolower(trim($_SESSION['role'] ?? ''));
+
+if ($role !== "guru") {
     header("Location: dashboard.php");
     exit;
 }

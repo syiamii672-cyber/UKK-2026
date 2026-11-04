@@ -9,18 +9,18 @@ if (!isset($_SESSION['id'])) {
 
 include "config/koneksi.php";
 
-$nama = $_SESSION['name'];
-$role = $_SESSION['role'];
-<<<<<<< HEAD
+$nama = $_SESSION['name'] ?? '';
+$role = $_SESSION['role'] ?? '';
 $idUser = (int) $_SESSION['id'];
 
 $menuAktif = "dashboard";
 
 $isWaliKelas = false;
-$kelasWali = "";
+$namaKelasWali = "";
 
-// Cek penugasan wali kelas
+// Cek penugasan Wali Kelas
 if ($role === "guru") {
+
     $queryWali = mysqli_query($koneksi, "
         SELECT k.nama AS nama_kelas
         FROM t_guru g
@@ -28,77 +28,44 @@ if ($role === "guru") {
         JOIN t_kelas k ON w.kelas_id = k.id
         JOIN t_tahun_ajaran ta ON w.tahun_ajaran_id = ta.id
         WHERE g.user_id = $idUser
-        AND w.status_aktif = 1
-        AND k.status_aktif = 1
-        AND ta.status_aktif = 1
+          AND g.status_aktif = 1
+          AND w.status_aktif = 1
+          AND k.status_aktif = 1
+          AND ta.status_aktif = 1
         LIMIT 1
     ");
 
     if ($queryWali && mysqli_num_rows($queryWali) > 0) {
         $dataWali = mysqli_fetch_assoc($queryWali);
         $isWaliKelas = true;
-        $kelasWali = $dataWali['nama_kelas'];
+        $namaKelasWali = $dataWali['nama_kelas'];
     }
 }
-=======
-$menuAktif = "dashboard";
 
-$isWaliKelas = false;
-$namaKelasWali = "";
->>>>>>> 553d5e7384eebb77e97b9d0d9edfc333d5e83b0f
+// Mengambil jumlah data untuk Dashboard Admin
+$querySiswa = mysqli_query(
+    $koneksi,
+    "SELECT COUNT(*) AS total FROM t_siswa"
+);
+$totalSiswa = $querySiswa
+    ? mysqli_fetch_assoc($querySiswa)['total']
+    : 0;
 
-// Mengambil jumlah data
-$querySiswa = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM t_siswa");
-$totalSiswa = $querySiswa ? mysqli_fetch_assoc($querySiswa)['total'] : 0;
+$queryGuru = mysqli_query(
+    $koneksi,
+    "SELECT COUNT(*) AS total FROM t_guru"
+);
+$totalGuru = $queryGuru
+    ? mysqli_fetch_assoc($queryGuru)['total']
+    : 0;
 
-$queryGuru = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM t_guru");
-$totalGuru = $queryGuru ? mysqli_fetch_assoc($queryGuru)['total'] : 0;
-
-$queryKelas = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM t_kelas");
-$totalKelas = $queryKelas ? mysqli_fetch_assoc($queryKelas)['total'] : 0;
-
-// Mengecek penugasan Wali Kelas
-if ($role === "guru") {
-
-    $idUser = (int)$_SESSION['id'];
-
-    $queryGuruLogin = mysqli_query($koneksi, "
-        SELECT id FROM t_guru
-        WHERE user_id = $idUser
-        AND status_aktif = 1
-        LIMIT 1
-    ");
-
-    $guruLogin = $queryGuruLogin
-        ? mysqli_fetch_assoc($queryGuruLogin)
-        : null;
-
-    if ($guruLogin) {
-
-        $idGuru = (int)$guruLogin['id'];
-
-        $queryWali = mysqli_query($koneksi, "
-            SELECT k.nama AS nama_kelas
-            FROM t_wali_kelas wk
-            JOIN t_kelas k ON wk.kelas_id = k.id
-            JOIN t_tahun_ajaran ta ON wk.tahun_ajaran_id = ta.id
-            WHERE wk.guru_id = $idGuru
-            AND wk.status_aktif = 1
-            AND k.status_aktif = 1
-            AND ta.status_aktif = 1
-            LIMIT 1
-        ");
-
-        $dataWali = $queryWali
-            ? mysqli_fetch_assoc($queryWali)
-            : null;
-
-        if ($dataWali) {
-            $isWaliKelas = true;
-            $namaKelasWali = $dataWali['nama_kelas'];
-        }
-    }
-}
+$queryKelas = mysqli_query(
+    $koneksi,
+    "SELECT COUNT(*) AS total FROM t_kelas"
+);
+$totalKelas = $queryKelas
+    ? mysqli_fetch_assoc($queryKelas)['total']
+    : 0;
 ?>
 
 <!DOCTYPE html>
@@ -106,6 +73,7 @@ if ($role === "guru") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Dashboard - Sistem Informasi Pelanggaran Siswa</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
@@ -144,8 +112,8 @@ if ($role === "guru") {
 
         @media (max-width: 575.98px) {
             .konten-utama {
-                margin-left: 180px;
-                width: calc(100% - 180px);
+                margin-left: 220px;
+                width: calc(100% - 220px);
                 padding: 15px;
             }
         }
@@ -163,17 +131,16 @@ if ($role === "guru") {
     <p class="text-secondary mb-4">
         Selamat datang, <?= htmlspecialchars($nama); ?>!
         Kamu login sebagai
-        <?= $role === "admin" ? "Administrator" : ($isWaliKelas ? "Wali Kelas" : "Guru"); ?>.
+        <?= $role === "admin"
+            ? "Administrator"
+            : ($isWaliKelas ? "Guru / Wali Kelas" : "Guru"); ?>.
     </p>
 
     <div class="row g-3">
 
-<<<<<<< HEAD
-        <?php if ($role === "admin") { ?>
-=======
         <?php if ($role === "admin"): ?>
->>>>>>> 553d5e7384eebb77e97b9d0d9edfc333d5e83b0f
 
+            <!-- Dashboard Admin -->
             <div class="col-12 col-lg-4">
                 <div class="card kartu-dashboard shadow-sm h-100">
                     <div class="card-body">
@@ -210,109 +177,108 @@ if ($role === "guru") {
                 </div>
             </div>
 
-<<<<<<< HEAD
-        <?php } elseif ($isWaliKelas) { ?>
+        <?php elseif ($role === "guru"): ?>
 
-            <div class="col-12 col-md-6">
-                <div class="card kartu-dashboard shadow-sm h-100">
-                    <div class="card-body">
-                        <h6 class="text-secondary">Penugasan Wali Kelas</h6>
-                        <h4><?= htmlspecialchars($kelasWali); ?></h4>
-                        <p class="text-secondary mb-0">
-                            Kamu bertugas sebagai wali kelas.
-                        </p>
-=======
-        <?php elseif ($role === "guru" && $isWaliKelas): ?>
-
+            <!-- Dashboard Semua Guru -->
             <div class="col-12 mb-2">
                 <div class="card kartu-dashboard shadow-sm">
                     <div class="card-body">
-                        <h5 class="fw-bold">Menu Wali Kelas</h5>
+                        <h5 class="fw-bold">
+                            <?= $isWaliKelas
+                                ? "Menu Guru / Wali Kelas"
+                                : "Menu Guru"; ?>
+                        </h5>
+
                         <p class="text-secondary mb-2">
-                            Silakan gunakan menu berikut untuk memantau
-                            poin dan riwayat pelanggaran siswa di kelas Anda.
+                            Silakan gunakan menu berikut untuk menjalankan
+                            tugas dan memantau pelanggaran siswa.
                         </p>
-                        <span class="badge bg-primary">
-                            Wali Kelas <?= htmlspecialchars($namaKelasWali); ?>
-                        </span>
->>>>>>> 553d5e7384eebb77e97b9d0d9edfc333d5e83b0f
+
+                        <?php if ($isWaliKelas): ?>
+                            <span class="badge bg-primary">
+                                Wali Kelas <?= htmlspecialchars($namaKelasWali); ?>
+                            </span>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
 
-<<<<<<< HEAD
-            <div class="col-12 col-md-6">
-                <div class="card kartu-dashboard shadow-sm h-100">
-                    <div class="card-body">
-                        <h5>Menu Wali Kelas</h5>
-                        <p class="text-secondary">
-                            Silakan kelola rekap poin, riwayat, dan laporan pelanggaran siswa.
-                        </p>
-                        <a href="rekap_poin.php" class="btn btn-primary btn-sm">
-                            Lihat Rekap Poin
-                        </a>
+            <!-- Catat Pelanggaran -->
+            <div class="col-12 col-md-6 col-lg-4">
+                <a href="catat_pelanggaran.php" class="kartu-menu">
+                    <div class="card kartu-dashboard shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="text-secondary">Catat Pelanggaran</h6>
+                            <h5 class="fw-bold mt-3">Catat Pelanggaran Siswa</h5>
+                            <p class="text-muted small mb-0">
+                                Masukkan catatan pelanggaran siswa.
+                            </p>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
 
-        <?php } else { ?>
-=======
-            <div class="col-12 col-md-4">
+            <!-- Tindakan -->
+            <div class="col-12 col-md-6 col-lg-4">
+                <a href="tindakan.php" class="kartu-menu">
+                    <div class="card kartu-dashboard shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="text-secondary">Tindakan</h6>
+                            <h5 class="fw-bold mt-3">Kelola Tindakan</h5>
+                            <p class="text-muted small mb-0">
+                                Lihat dan kelola tindak lanjut pelanggaran.
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Rekap Poin -->
+            <div class="col-12 col-md-6 col-lg-4">
                 <a href="rekap_poin.php" class="kartu-menu">
                     <div class="card kartu-dashboard shadow-sm h-100">
                         <div class="card-body">
                             <h6 class="text-secondary">Rekap Poin</h6>
                             <h5 class="fw-bold mt-3">Lihat Rekap Poin</h5>
                             <p class="text-muted small mb-0">
-                                Pantau poin pelanggaran siswa kelas Anda.
+                                Pantau akumulasi poin pelanggaran siswa.
                             </p>
                         </div>
                     </div>
                 </a>
             </div>
 
-            <div class="col-12 col-md-4">
+            <!-- Riwayat -->
+            <div class="col-12 col-md-6 col-lg-4">
                 <a href="riwayat_pelanggaran.php" class="kartu-menu">
                     <div class="card kartu-dashboard shadow-sm h-100">
                         <div class="card-body">
-                            <h6 class="text-secondary">Riwayat Pelanggaran</h6>
+                            <h6 class="text-secondary">Riwayat</h6>
                             <h5 class="fw-bold mt-3">Lihat Riwayat</h5>
                             <p class="text-muted small mb-0">
-                                Lihat catatan pelanggaran siswa kelas Anda.
+                                Lihat catatan riwayat pelanggaran siswa.
                             </p>
                         </div>
                     </div>
                 </a>
             </div>
 
-            <div class="col-12 col-md-4">
-                <a href="laporan.php" class="kartu-menu">
-                    <div class="card kartu-dashboard shadow-sm h-100">
-                        <div class="card-body">
-                            <h6 class="text-secondary">Laporan</h6>
-                            <h5 class="fw-bold mt-3">Lihat Laporan</h5>
-                            <p class="text-muted small mb-0">
-                                Lihat dan cetak laporan pelanggaran kelas Anda.
-                            </p>
+            <!-- Laporan khusus Wali Kelas -->
+            <?php if ($isWaliKelas): ?>
+                <div class="col-12 col-md-6 col-lg-4">
+                    <a href="laporan.php" class="kartu-menu">
+                        <div class="card kartu-dashboard shadow-sm h-100">
+                            <div class="card-body">
+                                <h6 class="text-secondary">Laporan</h6>
+                                <h5 class="fw-bold mt-3">Lihat Laporan</h5>
+                                <p class="text-muted small mb-0">
+                                    Lihat laporan pelanggaran kelas Anda.
+                                </p>
+                            </div>
                         </div>
-                    </div>
-                </a>
-            </div>
-
-        <?php else: ?>
->>>>>>> 553d5e7384eebb77e97b9d0d9edfc333d5e83b0f
-
-            <div class="col-12">
-                <div class="card kartu-dashboard shadow-sm">
-                    <div class="card-body">
-                        <h5 class="fw-bold">Menu Guru</h5>
-                        <p class="text-secondary mb-0">
-                            Silakan gunakan menu yang tersedia untuk
-                            menjalankan tugas guru.
-                        </p>
-                    </div>
+                    </a>
                 </div>
-            </div>
+            <?php endif; ?>
 
         <?php endif; ?>
 

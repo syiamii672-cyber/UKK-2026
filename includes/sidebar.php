@@ -1,71 +1,37 @@
+
 <?php
 $menuAktif = $menuAktif ?? "";
 $role = $_SESSION['role'] ?? "";
 $idUser = (int) ($_SESSION['id'] ?? 0);
 
 $isWaliKelas = false;
+$namaKelasWali = "";
 
-// Cek apakah guru memiliki penugasan wali kelas yang aktif
+// Cek apakah guru memiliki penugasan Wali Kelas aktif
 if ($role === "guru" && isset($koneksi)) {
+
     $queryWali = mysqli_query($koneksi, "
-        SELECT w.id
+        SELECT k.nama AS nama_kelas
         FROM t_guru g
         JOIN t_wali_kelas w ON g.id = w.guru_id
         JOIN t_kelas k ON w.kelas_id = k.id
         JOIN t_tahun_ajaran ta ON w.tahun_ajaran_id = ta.id
         WHERE g.user_id = $idUser
-        AND w.status_aktif = 1
-        AND k.status_aktif = 1
-        AND ta.status_aktif = 1
+          AND g.status_aktif = 1
+          AND w.status_aktif = 1
+          AND k.status_aktif = 1
+          AND ta.status_aktif = 1
         LIMIT 1
     ");
 
     if ($queryWali && mysqli_num_rows($queryWali) > 0) {
+        $dataWali = mysqli_fetch_assoc($queryWali);
         $isWaliKelas = true;
+        $namaKelasWali = $dataWali['nama_kelas'];
     }
 }
 
-$isWaliKelas = false;
-$namaKelasWali = "";
-
-// Mengecek penugasan Wali Kelas
-if ($role === "guru" && isset($koneksi)) {
-
-    $idUser = (int)$_SESSION['id'];
-
-    $queryGuru = mysqli_query($koneksi, "
-        SELECT id FROM t_guru
-        WHERE user_id = $idUser
-        AND status_aktif = 1
-        LIMIT 1
-    ");
-
-    $dataGuru = $queryGuru ? mysqli_fetch_assoc($queryGuru) : null;
-
-    if ($dataGuru) {
-        $idGuru = (int)$dataGuru['id'];
-
-        $queryWali = mysqli_query($koneksi, "
-            SELECT k.nama AS nama_kelas
-            FROM t_wali_kelas wk
-            JOIN t_kelas k ON wk.kelas_id = k.id
-            JOIN t_tahun_ajaran ta ON wk.tahun_ajaran_id = ta.id
-            WHERE wk.guru_id = $idGuru
-            AND wk.status_aktif = 1
-            AND k.status_aktif = 1
-            AND ta.status_aktif = 1
-            LIMIT 1
-        ");
-
-        $dataWali = $queryWali ? mysqli_fetch_assoc($queryWali) : null;
-
-        if ($dataWali) {
-            $isWaliKelas = true;
-            $namaKelasWali = $dataWali['nama_kelas'];
-        }
-    }
-}
-
+// Menu Admin
 $menuAdmin = [
     ["Dashboard", "dashboard.php", "dashboard"],
     ["Kelola Guru", "data_guru.php", "guru"],
@@ -80,43 +46,35 @@ $menuAdmin = [
     ["Laporan", "laporan.php", "laporan"]
 ];
 
+// Menu dasar untuk SEMUA guru
 $menuGuru = [
     ["Dashboard", "dashboard.php", "dashboard"],
     ["Catat Pelanggaran", "catat_pelanggaran.php", "catat_pelanggaran"],
     ["Tindakan", "tindakan.php", "tindakan"],
     ["Rekap Poin", "rekap_poin.php", "rekap_poin"],
-    ["Riwayat", "riwayat_pelanggaran.php", "riwayat"],
-    ["Laporan", "laporan.php", "laporan"]
+    ["Riwayat", "riwayat_pelanggaran.php", "riwayat"]
 ];
 
-$menuWaliKelas = [
-    ["Dashboard", "dashboard.php", "dashboard"],
-    ["Rekap Poin", "rekap_poin.php", "rekap_poin"],
-<<<<<<< HEAD
-    ["Riwayat", "riwayat_pelanggaran.php", "riwayat"],
-    ["Laporan", "laporan.php", "laporan"],
-=======
-    ["Riwayat Pelanggaran", "riwayat_pelanggaran.php", "riwayat"],
-    ["Laporan", "laporan.php", "laporan"]
->>>>>>> 553d5e7384eebb77e97b9d0d9edfc333d5e83b0f
-];
-
+// Menentukan menu
 if ($role === "admin") {
+
     $daftarMenu = $menuAdmin;
-<<<<<<< HEAD
     $labelRole = "Administrator";
-} elseif ($isWaliKelas) {
-    $daftarMenu = $menuWaliKelas;
-    $labelRole = "Wali Kelas";
-} else {
+
+} elseif ($role === "guru") {
+
     $daftarMenu = $menuGuru;
     $labelRole = "Guru";
-=======
-} elseif ($isWaliKelas) {
-    $daftarMenu = $menuWaliKelas;
+
+    // Laporan hanya untuk guru yang ditugaskan sebagai Wali Kelas
+    if ($isWaliKelas) {
+        $daftarMenu[] = ["Laporan", "laporan.php", "laporan"];
+        $labelRole = "Guru / Wali Kelas";
+    }
+
 } else {
-    $daftarMenu = $menuGuru;
->>>>>>> 553d5e7384eebb77e97b9d0d9edfc333d5e83b0f
+    $daftarMenu = [];
+    $labelRole = "Pengguna";
 }
 ?>
 
@@ -162,19 +120,7 @@ if ($role === "admin") {
     <h5 class="text-white mb-4">Sistem Pelanggaran</h5>
 
     <div class="text-secondary small mb-3">
-<<<<<<< HEAD
-        <?= htmlspecialchars($labelRole) ?>
-=======
-        <?php
-        if ($role === "admin") {
-            echo "Administrator";
-        } elseif ($isWaliKelas) {
-            echo "Wali Kelas";
-        } else {
-            echo "Guru";
-        }
-        ?>
->>>>>>> 553d5e7384eebb77e97b9d0d9edfc333d5e83b0f
+        <?= htmlspecialchars($labelRole); ?>
     </div>
 
     <?php if ($isWaliKelas): ?>
@@ -197,7 +143,9 @@ if ($role === "admin") {
         <hr class="text-secondary">
 
         <li class="nav-item">
-            <a href="logout.php" class="nav-link logout">Logout</a>
+            <a href="logout.php" class="nav-link logout">
+                Logout
+            </a>
         </li>
 
     </ul>

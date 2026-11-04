@@ -21,22 +21,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nama = trim($_POST['nama'] ?? '');
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
+    $konfirmasiPassword = $_POST['konfirmasi_password'] ?? '';
     $status_aktif = $_POST['status_aktif'] ?? '';
 
-    // NIP wajib tepat 18 digit angka.
+    // Validasi NIP
     if (!preg_match('/^[0-9]{18}$/', $nip)) {
-        $error = "NIP harus tepat 18 digit angka. Periksa kembali NIP yang dimasukkan.";
+        $error = "NIP harus tepat 18 digit angka.";
+
     } elseif (
         $nama == '' ||
         $email == '' ||
         !filter_var($email, FILTER_VALIDATE_EMAIL) ||
-        strlen($password) < 8 ||
         !in_array($status_aktif, ['0', '1'], true)
     ) {
-        $error = "Periksa kembali data. Email harus valid dan password minimal 8 karakter.";
+        $error = "Periksa kembali data guru yang dimasukkan.";
+
+    } elseif (strlen($password) < 8) {
+        $error = "Password minimal 8 karakter.";
+
+    } elseif ($password !== $konfirmasiPassword) {
+        $error = "Konfirmasi password tidak sama.";
+
     } else {
         try {
-            // Cek NIP yang sudah digunakan.
+            // Cek NIP
             $cekNip = mysqli_prepare(
                 $koneksi,
                 "SELECT id FROM t_guru WHERE nip = ? LIMIT 1"
@@ -52,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             mysqli_stmt_close($cekNip);
 
-            // Email harus unik di akun pengguna.
+            // Cek email
             if ($error == '') {
                 $cekEmail = mysqli_prepare(
                     $koneksi,
@@ -70,16 +78,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 mysqli_stmt_close($cekEmail);
             }
 
+            // Simpan akun dan data guru
             if ($error == '') {
                 mysqli_begin_transaction($koneksi);
 
-                // Hash password sebelum disimpan.
+                // Hash password
                 $passwordHash = password_hash(
                     $password,
                     PASSWORD_DEFAULT
                 );
 
-                // Buat akun login guru.
+                // Buat akun login
                 $stmtUser = mysqli_prepare(
                     $koneksi,
                     "INSERT INTO t_users
@@ -99,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $user_id = mysqli_insert_id($koneksi);
                 mysqli_stmt_close($stmtUser);
 
-                // Simpan data guru dan hubungkan dengan akun.
+                // Simpan data guru
                 $status = (int) $status_aktif;
 
                 $stmtGuru = mysqli_prepare(
@@ -128,10 +137,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 header("Location: data_guru.php?pesan=tambah");
                 exit;
             }
+
         } catch (Throwable $e) {
             mysqli_rollback($koneksi);
 
-            $error = "Data guru gagal disimpan. Periksa struktur database dan pastikan email belum digunakan.";
+            $error = "Data guru gagal disimpan. Periksa kembali data dan database.";
         }
     }
 }
@@ -170,22 +180,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     </style>
 </head>
+
 <body>
 
 <?php include "includes/sidebar.php"; ?>
 
 <main class="konten-utama">
+
     <h2>Tambah Data Guru</h2>
     <p class="text-muted mb-4">Masukkan informasi guru baru.</p>
 
-    <?php if ($error != '') { ?>
+    <?php if ($error != ''): ?>
         <div class="alert alert-danger">
             <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?>
         </div>
-    <?php } ?>
+    <?php endif; ?>
 
     <div class="card shadow-sm border-0">
         <div class="card-body">
+
             <form method="POST">
 
                 <div class="mb-3">
@@ -198,7 +211,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         maxlength="18"
                         pattern="[0-9]{18}"
                         inputmode="numeric"
-                        title="NIP harus tepat 18 digit angka."
                         placeholder="Masukkan 18 digit NIP"
                         required
                         value="<?= htmlspecialchars($nip, ENT_QUOTES, 'UTF-8'); ?>"
@@ -243,17 +255,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         required
                     >
                     <small class="text-muted">
-                        Minimal 8 karakter. Password disimpan dalam bentuk hash.
+                        Minimal 8 karakter.
+                    </small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Konfirmasi Password</label>
+                    <input
+                        type="password"
+                        name="konfirmasi_password"
+                        class="form-control"
+                        minlength="8"
+                        autocomplete="new-password"
+                        required
+                    >
+                    <small class="text-muted">
+                        Masukkan kembali password yang sama.
                     </small>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Status</label>
                     <select name="status_aktif" class="form-select" required>
-                        <option value="1" <?= $status_aktif == '1' ? 'selected' : ''; ?>>
+                        <option value="1"
+                            <?= $status_aktif == '1' ? 'selected' : ''; ?>>
                             Aktif
                         </option>
-                        <option value="0" <?= $status_aktif == '0' ? 'selected' : ''; ?>>
+
+                        <option value="0"
+                            <?= $status_aktif == '0' ? 'selected' : ''; ?>>
                             Tidak Aktif
                         </option>
                     </select>
@@ -268,8 +298,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </a>
 
             </form>
+
         </div>
     </div>
+
 </main>
 
 </body>
