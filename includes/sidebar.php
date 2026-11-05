@@ -69,6 +69,7 @@ if ($role === "admin") {
     // Laporan hanya untuk guru yang ditugaskan sebagai Wali Kelas
     if ($isWaliKelas) {
         $daftarMenu[] = ["Laporan", "laporan.php", "laporan"];
+        $daftarMenu[] = ["Rekap Poin", "rekap_poin.php", "rekap_poin"];
         $labelRole = "Guru / Wali Kelas";
     }
 
