@@ -81,9 +81,9 @@ if ($data) {
     }
 }
 
-echo "Email atau password tidak sesuai.";
-
 mysqli_stmt_close($stmt);
 mysqli_close($koneksi);
 
+header("Location: login.php?error=1");
+exit;
 ?>

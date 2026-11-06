@@ -309,6 +309,12 @@ if (isset($_SESSION['id'])) {
                 untuk melanjutkan.
             </p>
 
+            <?php if (isset($_GET['error'])): ?>
+            <div class="alert alert-danger">
+                Email atau password tidak sesuai.
+            </div>
+             <?php endif; ?>
+
             <form action="proses_login.php" method="POST">
 
                 <div class="mb-4">

@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 23 Sep 2026 pada 07.25
--- Versi server: 10.4.25-MariaDB
--- Versi PHP: 8.0.23
+-- Generation Time: Nov 05, 2026 at 05:28 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,7 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `t_guru`
+-- Table structure for table `t_guru`
 --
 
 CREATE TABLE `t_guru` (
@@ -36,68 +36,73 @@ CREATE TABLE `t_guru` (
   `user_id` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `t_guru`
+-- Dumping data for table `t_guru`
 --
 
 INSERT INTO `t_guru` (`id`, `nip`, `nama`, `email`, `status_aktif`, `user_id`, `created_at`, `updated_at`) VALUES
-(1, '1980010001', 'Ahmad Hidayat', 'guru1@sekolah.sch.id', 1, 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(2, '1980020002', 'Bambang Setiawan', 'guru2@sekolah.sch.id', 1, 2, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(3, '1980030003', 'Cahya Permana', 'guru3@sekolah.sch.id', 1, 3, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(4, '1980040004', 'Dewi Anggraini', 'guru4@sekolah.sch.id', 1, 4, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(5, '1980050005', 'Eko Pratama', 'guru5@sekolah.sch.id', 1, 5, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(6, '1980060006', 'Fitri Lestari', 'guru6@sekolah.sch.id', 1, 6, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(7, '1980070007', 'Gilang Ramadhan', 'guru7@sekolah.sch.id', 1, 7, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(8, '1980080008', 'Hana Sari', 'guru8@sekolah.sch.id', 1, 8, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(9, '1980090009', 'Indra Wijaya', 'guru9@sekolah.sch.id', 1, 9, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(10, '1980100010', 'Jajang Nurjaman', 'guru10@sekolah.sch.id', 1, 10, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(11, '1980110011', 'Kiki Amelia', 'guru11@sekolah.sch.id', 1, 11, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(12, '1980120012', 'Lilis Kurniasih', 'guru12@sekolah.sch.id', 1, 12, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(13, '1980130013', 'Maman Suherman', 'guru13@sekolah.sch.id', 1, 13, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(14, '1980140014', 'Novi Oktavia', 'guru14@sekolah.sch.id', 1, 14, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(15, '1980150015', 'Oman Saputra', 'guru15@sekolah.sch.id', 1, 15, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(16, '1980160016', 'Pipit Maharani', 'guru16@sekolah.sch.id', 1, 16, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(17, '1980170017', 'Rizal Fauzi', 'guru17@sekolah.sch.id', 1, 17, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(18, '1980180018', 'Sinta Nirmala', 'guru18@sekolah.sch.id', 1, 18, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(19, '1980190019', 'Taufik Hidayat', 'guru19@sekolah.sch.id', 1, 19, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(20, '1980200020', 'Ujang Kurnia', 'guru20@sekolah.sch.id', 1, 20, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(21, '1980210021', 'Vina Aprilia', 'guru21@sekolah.sch.id', 1, 21, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(22, '1980220022', 'Wawan Hermawan', 'guru22@sekolah.sch.id', 1, 22, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(23, '1980230023', 'Yulia Safitri', 'guru23@sekolah.sch.id', 1, 23, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(24, '1980240024', 'Zainal Abidin', 'guru24@sekolah.sch.id', 1, 24, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(25, '1980250025', 'Asep Firmansyah', 'guru25@sekolah.sch.id', 1, 25, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(26, '1980260026', 'Beni Kurnia', 'guru26@sekolah.sch.id', 1, 26, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(27, '1980270027', 'Cici Puspita', 'guru27@sekolah.sch.id', 1, 27, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(28, '1980280028', 'Dadan Maulana', 'guru28@sekolah.sch.id', 1, 28, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(29, '1980290029', 'Euis Kartika', 'guru29@sekolah.sch.id', 1, 29, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(30, '1980300030', 'Feri Irawan', 'guru30@sekolah.sch.id', 1, 30, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(31, '1980310031', 'Galih Setiawan', 'guru31@sekolah.sch.id', 1, 31, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(32, '1980320032', 'Hesti Wulandari', 'guru32@sekolah.sch.id', 1, 32, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(33, '1980330033', 'Imam Fauzan', 'guru33@sekolah.sch.id', 1, 33, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(34, '1980340034', 'Joko Haryanto', 'guru34@sekolah.sch.id', 1, 34, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(35, '1980350035', 'Kurnia Sari', 'guru35@sekolah.sch.id', 1, 35, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(36, '1980360036', 'Lukman Hakim', 'guru36@sekolah.sch.id', 1, 36, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(37, '1980370037', 'Mira Oktaviani', 'guru37@sekolah.sch.id', 1, 37, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(38, '1980380038', 'Nana Sujana', 'guru38@sekolah.sch.id', 1, 38, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(39, '1980390039', 'Oki Firmansyah', 'guru39@sekolah.sch.id', 1, 39, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(40, '1980400040', 'Prita Lestari', 'guru40@sekolah.sch.id', 1, 40, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(41, '1980410041', 'Rudi Hartono', 'guru41@sekolah.sch.id', 1, 41, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(42, '1980420042', 'Sari Ningsih', 'guru42@sekolah.sch.id', 1, 42, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(43, '1980430043', 'Tedi Setiawan', 'guru43@sekolah.sch.id', 1, 43, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(44, '1980440044', 'Umi Rahma', 'guru44@sekolah.sch.id', 1, 44, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(45, '1980450045', 'Vicky Pratama', 'guru45@sekolah.sch.id', 1, 45, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(46, '1980460046', 'Widi Astuti', 'guru46@sekolah.sch.id', 1, 46, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(47, '1980470047', 'Yani Mulyani', 'guru47@sekolah.sch.id', 1, 47, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(48, '1980480048', 'Yudi Kurniawan', 'guru48@sekolah.sch.id', 1, 48, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(49, '1980490049', 'Zulfa Aulia', 'guru49@sekolah.sch.id', 1, 49, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(50, '1980500050', 'Rina Marlina', 'guru50@sekolah.sch.id', 1, 50, '2026-01-01 01:00:00', '2026-09-23 01:00:00');
+(1, '900000000000000001', 'Wawan Kurniawan, S.Pd.I', 'wawan@gmail.com', 1, 51, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(2, '900000000000000002', 'Ai Nuryaidah, S.Pd', 'ai@gmail.com', 1, 52, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(3, '900000000000000003', 'Maya Permata Endah, S.Pd', 'maya@gmail.com', 1, 53, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(4, '900000000000000004', 'Dody Jaenudin, S.Pd.', 'dody@gmail.com', 1, 54, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(5, '900000000000000005', 'Dedi Kardiman, S.Pd', 'dedi@gmail.com', 1, 55, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(6, '900000000000000006', 'Uca Musa Yusenda, S.Pd', 'uca@gmail.com', 1, 56, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(7, '900000000000000007', 'Drs. Ahmad Nur Mukhlis', 'ahmad@gmail.com', 1, 57, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(8, '900000000000000008', 'Drs. Heri', 'heri@gmail.com', 1, 58, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(9, '900000000000000009', 'Asep Bastaman', 'asep@gmail.com', 1, 59, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(10, '900000000000000010', 'H. Encep Maemun, S.T., M.Pd', 'encep@gmail.com', 1, 60, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(11, '900000000000000011', 'Opik', 'opik@gmail.com', 1, 61, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(12, '900000000000000012', 'Ida Farida, S.Pd', 'ida@gmail.com', 1, 62, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(13, '900000000000000013', 'Idah Mahmudah, S.Pd', 'idah@gmail.com', 1, 63, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(14, '900000000000000014', 'Drs. Muhamad Ali', 'muhamad@gmail.com', 1, 64, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(15, '900000000000000015', 'Helmi Ali Akbar, S.Pd.I', 'helmi@gmail.com', 1, 65, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(16, '900000000000000016', 'Syeni Suswarini, S.Pd', 'syeni@gmail.com', 1, 66, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(17, '900000000000000017', 'Wiwid Yulianti, S.Pd', 'wiwid@gmail.com', 1, 67, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(18, '900000000000000018', 'Ansor Muhajir, S.T', 'ansor@gmail.com', 1, 68, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(19, '900000000000000019', 'Ogi Gaosun Gias, S.Pd.I', 'ogi@gmail.com', 1, 69, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(20, '900000000000000020', 'Sandi Mulyana, S.Pd', 'sandi@gmail.com', 1, 70, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(21, '900000000000000021', 'Erna Suryani, S.Pd', 'erna@gmail.com', 1, 71, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(22, '900000000000000022', 'Ai Wahidah, S.Ag', 'ai.wahidah@gmail.com', 1, 72, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(23, '900000000000000023', 'Chandra Aditya Yusuf, S.Pd', 'chandra@gmail.com', 1, 73, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(24, '900000000000000024', 'Arif Kusmawan, S.Pd', 'arif@gmail.com', 1, 74, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(25, '900000000000000025', 'Asep Taufiq Hidayat, S.Kom', 'asep.hidayat@gmail.com', 1, 75, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(26, '900000000000000026', 'Rendy Ichsan Kusumah, S.T', 'rendy@gmail.com', 1, 76, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(27, '900000000000000027', 'Feri Rahmawan, S.Pd', 'feri@gmail.com', 1, 77, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(28, '900000000000000028', 'Ari Sandriana, S.Kom', 'ari@gmail.com', 1, 78, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(29, '900000000000000029', 'Yaneu Nurdian, S.Pd., M.Pd', 'yaneu@gmail.com', 1, 79, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(30, '900000000000000030', 'Ucu Muhammad Khoer N, S.Pd', 'ucu@gmail.com', 1, 80, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(31, '900000000000000031', 'Mira Dwi Rahmawati, S.Ag', 'mira@gmail.com', 1, 81, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(32, '900000000000000032', 'Aldi Maulana, S.Pd', 'aldi@gmail.com', 1, 82, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(33, '900000000000000033', 'Eli Rosliah, S.Pd', 'eli@gmail.com', 1, 83, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(34, '900000000000000034', 'Isni Nur Fitriani, S.Pd', 'isni@gmail.com', 1, 84, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(35, '900000000000000035', 'Aanisah Putri Nur Aini, S.Pd', 'aanisah@gmail.com', 1, 85, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(36, '900000000000000036', 'Yusi Luthfiani, S.Sos.I', 'yusi@gmail.com', 1, 86, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(37, '900000000000000037', 'Lilis Rustandy Mawardi, S.Pd., M.Pd', 'lilis@gmail.com', 1, 87, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(38, '900000000000000038', 'Yusrin Noer Sabrina, S.Pd', 'yusrin@gmail.com', 1, 88, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(39, '900000000000000039', 'Senny Indayani, S.Pd', 'senny@gmail.com', 1, 89, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(40, '900000000000000040', 'Ilma Amalia, S.Pd', 'ilma@gmail.com', 1, 90, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(41, '900000000000000041', 'Alvira Sofwatunnisa, S.Pd', 'alvira@gmail.com', 1, 91, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(42, '900000000000000042', 'Risna Andriyani, S.Pd', 'risna@gmail.com', 1, 92, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(43, '900000000000000043', 'Dra. Tintin Noerhayati', 'tintin@gmail.com', 1, 93, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(44, '900000000000000044', 'Rizkia Fahira, S.Pd', 'rizkia@gmail.com', 1, 94, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(45, '900000000000000045', 'Frasetio', 'frasetio@gmail.com', 1, 95, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(46, '900000000000000046', 'Ratnaningsih Hatil Aeni, S.Pd.', 'ratnaningsih@gmail.com', 1, 96, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(47, '900000000000000047', 'Dheny Darajatul Hasani, S.Pd.', 'dheny@gmail.com', 1, 97, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(48, '900000000000000048', 'Fahrullah, S.Pd', 'fahrullah@gmail.com', 1, 98, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(49, '900000000000000049', 'Aan Andriana, S.T', 'aan@gmail.com', 1, 99, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(50, '900000000000000050', 'Fitri Fauziah, S.T', 'fitri@gmail.com', 1, 100, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(51, '900000000000000051', 'Nida Aulia, S.Pd', 'nida@gmail.com', 1, 101, '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(52, '900000000000000052', 'Sri Nurrizki Putri Krisnadi, S.Pd', 'sri@gmail.com', 1, 102, '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(53, '900000000000000053', 'Riesy Putri Navia, S.Kom', 'riesy@gmail.com', 1, 103, '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(54, '900000000000000054', 'Rurry Febriani Maryadi, S.Pd', 'rurry@gmail.com', 1, 104, '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(55, '900000000000000055', 'Irvan Rizal, S.Pd', 'irvan@gmail.com', 1, 105, '2026-11-05 02:25:35', '2026-11-05 02:25:35');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `t_kelas`
+-- Table structure for table `t_kelas`
 --
 
 CREATE TABLE `t_kelas` (
@@ -108,68 +113,68 @@ CREATE TABLE `t_kelas` (
   `status_aktif` tinyint(1) NOT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `t_kelas`
+-- Dumping data for table `t_kelas`
 --
 
 INSERT INTO `t_kelas` (`id`, `nama`, `tingkat`, `jurusan`, `status_aktif`, `created_at`, `updated_at`) VALUES
 (1, '10 RPL 1', '10', 'RPL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(2, '11 TKJ 1', '11', 'TKJ', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(3, '12 AKL 1', '12', 'AKL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(4, '10 BD 1', '10', 'BD', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(5, '11 MPLB 1', '11', 'MPLB', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(2, '10 RPL 2', '10', 'RPL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(3, '10 TKJ 1', '10', 'TKJ', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(4, '10 TKJ 2', '10', 'TKJ', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(5, '10 TKJ 3', '10', 'TKJ', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
 (6, '12 RPL 2', '12', 'RPL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(7, '10 TKJ 2', '10', 'TKJ', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(8, '11 AKL 2', '11', 'AKL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(9, '12 BD 2', '12', 'BD', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(10, '10 MPLB 2', '10', 'MPLB', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(11, '11 RPL 3', '11', 'RPL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(12, '12 TKJ 3', '12', 'TKJ', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(13, '10 AKL 3', '10', 'AKL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(14, '11 BD 3', '11', 'BD', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(15, '12 MPLB 3', '12', 'MPLB', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(16, '10 RPL 4', '10', 'RPL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(17, '11 TKJ 4', '11', 'TKJ', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(18, '12 AKL 4', '12', 'AKL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(19, '10 BD 4', '10', 'BD', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(20, '11 MPLB 4', '11', 'MPLB', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(21, '12 RPL 5', '12', 'RPL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(22, '10 TKJ 5', '10', 'TKJ', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(23, '11 AKL 5', '11', 'AKL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(24, '12 BD 5', '12', 'BD', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(25, '10 MPLB 5', '10', 'MPLB', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(26, '11 RPL 6', '11', 'RPL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(27, '12 TKJ 6', '12', 'TKJ', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(28, '10 AKL 6', '10', 'AKL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(29, '11 BD 6', '11', 'BD', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(30, '12 MPLB 6', '12', 'MPLB', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(31, '10 RPL 7', '10', 'RPL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(32, '11 TKJ 7', '11', 'TKJ', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(33, '12 AKL 7', '12', 'AKL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(34, '10 BD 7', '10', 'BD', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(35, '11 MPLB 7', '11', 'MPLB', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(36, '12 RPL 8', '12', 'RPL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(37, '10 TKJ 8', '10', 'TKJ', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(38, '11 AKL 8', '11', 'AKL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(39, '12 BD 8', '12', 'BD', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(40, '10 MPLB 8', '10', 'MPLB', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(41, '11 RPL 9', '11', 'RPL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(42, '12 TKJ 9', '12', 'TKJ', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(43, '10 AKL 9', '10', 'AKL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(44, '11 BD 9', '11', 'BD', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(45, '12 MPLB 9', '12', 'MPLB', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(46, '10 RPL 10', '10', 'RPL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(47, '11 TKJ 10', '11', 'TKJ', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(48, '12 AKL 10', '12', 'AKL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(49, '10 BD 10', '10', 'BD', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(50, '11 MPLB 10', '11', 'MPLB', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00');
+(7, '10 TKJ 4', '10', 'TKJ', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(8, '10 TSM 1', '10', 'TSM', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(9, '10 TSM 2', '10', 'TSM', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(10, '10 TSM 3', '10', 'TSM', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(11, '10 TSM 4', '10', 'TSM', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(12, '10 TKR 1', '10', 'TKR', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(13, '10 TKR 2', '10', 'TKR', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(14, '10 TKR 3', '10', 'TKR', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(15, '10 TKR 4', '10', 'TKR', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(16, '10 TKR 5', '10', 'TKR', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(17, '10 BD 1', '10', 'BD', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(18, '11 RPL 1', '11', 'RPL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(19, '11 RPL 2', '11', 'RPL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(20, '11 TKJ 1', '11', 'TKJ', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(21, '11 TKJ 2', '11', 'TKJ', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(22, '11 TKJ 3', '11', 'TKJ', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(23, '11 TKJ 4', '11', 'TKJ', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(24, '11 TSM 1', '11', 'TSM', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(25, '11 TSM 2', '11', 'TSM', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(26, '11 TSM 3', '11', 'TSM', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(27, '11 TSM 4', '11', 'TSM', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(28, '11 TKR 1', '11', 'TKR', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(29, '11 TKR 2', '11', 'TKR', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(30, '11 TKR 3', '11', 'TKR', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(31, '11 TKR 4', '11', 'TKR', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(32, '11 TKR 5', '11', 'TKR', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(33, '11 BD 1', '11', 'BD', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(34, '12 RPL 1', '12', 'RPL', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(35, '12 TKJ 1', '12', 'TKJ', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(36, '12 TKJ 2', '12', 'TKJ', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(37, '12 TKJ 3', '12', 'TKJ', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(38, '12 TKJ 4', '12', 'TKJ', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(39, '12 TSM 1', '12', 'TSM', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(40, '12 TSM 2', '12', 'TSM', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(41, '12 TSM 3', '12', 'TSM', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(42, '12 TSM 4', '12', 'TSM', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(43, '12 TKR 1', '12', 'TKR', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(44, '12 TKR 2', '12', 'TKR', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(45, '12 TKR 3', '12', 'TKR', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(46, '12 TKR 4', '12', 'TKR', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(47, '12 TKR 5', '12', 'TKR', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(48, '12 BD 1', '12', 'BD', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(49, '10 BD 10', '10', 'BD', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(50, '11 MPLB 10', '11', 'MPLB', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `t_kelas_siswa`
+-- Table structure for table `t_kelas_siswa`
 --
 
 CREATE TABLE `t_kelas_siswa` (
@@ -182,10 +187,10 @@ CREATE TABLE `t_kelas_siswa` (
   `status_aktif` tinyint(1) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `t_kelas_siswa`
+-- Dumping data for table `t_kelas_siswa`
 --
 
 INSERT INTO `t_kelas_siswa` (`id`, `siswa_id`, `tahun_ajaran_id`, `kelas_id`, `tanggal_mulai`, `tanggal_selesai`, `status_aktif`, `created_at`, `updated_at`) VALUES
@@ -243,7 +248,7 @@ INSERT INTO `t_kelas_siswa` (`id`, `siswa_id`, `tahun_ajaran_id`, `kelas_id`, `t
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `t_pelanggaran`
+-- Table structure for table `t_pelanggaran`
 --
 
 CREATE TABLE `t_pelanggaran` (
@@ -256,10 +261,10 @@ CREATE TABLE `t_pelanggaran` (
   `status_aktif` tinyint(1) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `t_pelanggaran`
+-- Dumping data for table `t_pelanggaran`
 --
 
 INSERT INTO `t_pelanggaran` (`id`, `pelanggaran_kategori_id`, `kode`, `nama`, `poin`, `deskripsi`, `status_aktif`, `created_at`, `updated_at`) VALUES
@@ -317,7 +322,7 @@ INSERT INTO `t_pelanggaran` (`id`, `pelanggaran_kategori_id`, `kode`, `nama`, `p
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `t_pelanggaran_kategori`
+-- Table structure for table `t_pelanggaran_kategori`
 --
 
 CREATE TABLE `t_pelanggaran_kategori` (
@@ -327,10 +332,10 @@ CREATE TABLE `t_pelanggaran_kategori` (
   `status_aktif` tinyint(1) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `t_pelanggaran_kategori`
+-- Dumping data for table `t_pelanggaran_kategori`
 --
 
 INSERT INTO `t_pelanggaran_kategori` (`id`, `nama`, `deskripsi`, `status_aktif`, `created_at`, `updated_at`) VALUES
@@ -388,7 +393,7 @@ INSERT INTO `t_pelanggaran_kategori` (`id`, `nama`, `deskripsi`, `status_aktif`,
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `t_pelanggaran_siswa`
+-- Table structure for table `t_pelanggaran_siswa`
 --
 
 CREATE TABLE `t_pelanggaran_siswa` (
@@ -410,68 +415,12 @@ CREATE TABLE `t_pelanggaran_siswa` (
   `status` varchar(30) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data untuk tabel `t_pelanggaran_siswa`
---
-
-INSERT INTO `t_pelanggaran_siswa` (`id`, `tahun_ajaran_id`, `siswa_id`, `nama_siswa`, `kelas_id`, `nama_kelas`, `pelanggaran_id`, `nama_pelanggaran`, `pelanggaran_kategori_id`, `guru_id`, `nama_guru`, `tanggal`, `keterangan`, `poin`, `tindakan`, `status`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 'Andi Saputra', 1, '10 RPL 1', 1, 'Pelanggaran 1', 1, 1, 'Ahmad Hidayat', '2026-01-01', 'Keterangan pelanggaran siswa 1', 7, 'Tindakan pembinaan 1', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(2, 1, 2, 'Budi Santoso', 2, '11 TKJ 1', 2, 'Pelanggaran 2', 2, 2, 'Bambang Setiawan', '2026-02-02', 'Keterangan pelanggaran siswa 2', 9, 'Tindakan pembinaan 2', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(3, 1, 3, 'Citra Lestari', 3, '12 AKL 1', 3, 'Pelanggaran 3', 3, 3, 'Cahya Permana', '2026-03-03', 'Keterangan pelanggaran siswa 3', 11, 'Tindakan pembinaan 3', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(4, 1, 4, 'Deni Kurniawan', 4, '10 BD 1', 4, 'Pelanggaran 4', 4, 4, 'Dewi Anggraini', '2026-04-04', 'Keterangan pelanggaran siswa 4', 13, 'Tindakan pembinaan 4', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(5, 1, 5, 'Eka Putri', 5, '11 MPLB 1', 5, 'Pelanggaran 5', 5, 5, 'Eko Pratama', '2026-05-05', 'Keterangan pelanggaran siswa 5', 15, 'Tindakan pembinaan 5', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(6, 1, 6, 'Fajar Nugraha', 6, '12 RPL 2', 6, 'Pelanggaran 6', 6, 6, 'Fitri Lestari', '2026-06-06', 'Keterangan pelanggaran siswa 6', 17, 'Tindakan pembinaan 6', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(7, 1, 7, 'Gina Maharani', 7, '10 TKJ 2', 7, 'Pelanggaran 7', 7, 7, 'Gilang Ramadhan', '2026-07-07', 'Keterangan pelanggaran siswa 7', 19, 'Tindakan pembinaan 7', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(8, 1, 8, 'Hendra Wijaya', 8, '11 AKL 2', 8, 'Pelanggaran 8', 8, 8, 'Hana Sari', '2026-08-08', 'Keterangan pelanggaran siswa 8', 21, 'Tindakan pembinaan 8', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(9, 1, 9, 'Intan Permata', 9, '12 BD 2', 9, 'Pelanggaran 9', 9, 9, 'Indra Wijaya', '2026-09-09', 'Keterangan pelanggaran siswa 9', 23, 'Tindakan pembinaan 9', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(10, 1, 10, 'Joko Susanto', 10, '10 MPLB 2', 10, 'Pelanggaran 10', 10, 10, 'Jajang Nurjaman', '2026-10-10', 'Keterangan pelanggaran siswa 10', 25, 'Tindakan pembinaan 10', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(11, 1, 11, 'Karina Sari', 11, '11 RPL 3', 11, 'Pelanggaran 11', 11, 11, 'Kiki Amelia', '2026-11-11', 'Keterangan pelanggaran siswa 11', 27, 'Tindakan pembinaan 11', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(12, 1, 12, 'Lukman Hakim', 12, '12 TKJ 3', 12, 'Pelanggaran 12', 12, 12, 'Lilis Kurniasih', '2026-12-12', 'Keterangan pelanggaran siswa 12', 29, 'Tindakan pembinaan 12', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(13, 1, 13, 'Maya Anggraini', 13, '10 AKL 3', 13, 'Pelanggaran 13', 13, 13, 'Maman Suherman', '2026-01-13', 'Keterangan pelanggaran siswa 13', 31, 'Tindakan pembinaan 13', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(14, 1, 14, 'Nanda Pratama', 14, '11 BD 3', 14, 'Pelanggaran 14', 14, 14, 'Novi Oktavia', '2026-02-14', 'Keterangan pelanggaran siswa 14', 33, 'Tindakan pembinaan 14', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(15, 1, 15, 'Oki Ramadhan', 15, '12 MPLB 3', 15, 'Pelanggaran 15', 15, 15, 'Oman Saputra', '2026-03-15', 'Keterangan pelanggaran siswa 15', 35, 'Tindakan pembinaan 15', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(16, 1, 16, 'Putri Amelia', 16, '10 RPL 4', 16, 'Pelanggaran 16', 16, 16, 'Pipit Maharani', '2026-04-16', 'Keterangan pelanggaran siswa 16', 37, 'Tindakan pembinaan 16', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(17, 1, 17, 'Qori Aulia', 17, '11 TKJ 4', 17, 'Pelanggaran 17', 17, 17, 'Rizal Fauzi', '2026-05-17', 'Keterangan pelanggaran siswa 17', 39, 'Tindakan pembinaan 17', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(18, 1, 18, 'Raka Firmansyah', 18, '12 AKL 4', 18, 'Pelanggaran 18', 18, 18, 'Sinta Nirmala', '2026-06-18', 'Keterangan pelanggaran siswa 18', 41, 'Tindakan pembinaan 18', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(19, 1, 19, 'Salsa Nabila', 19, '10 BD 4', 19, 'Pelanggaran 19', 19, 19, 'Taufik Hidayat', '2026-07-19', 'Keterangan pelanggaran siswa 19', 43, 'Tindakan pembinaan 19', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(20, 1, 20, 'Tegar Maulana', 20, '11 MPLB 4', 20, 'Pelanggaran 20', 20, 20, 'Ujang Kurnia', '2026-08-20', 'Keterangan pelanggaran siswa 20', 45, 'Tindakan pembinaan 20', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(21, 1, 21, 'Umi Kalsum', 21, '12 RPL 5', 21, 'Pelanggaran 21', 21, 21, 'Vina Aprilia', '2026-09-21', 'Keterangan pelanggaran siswa 21', 47, 'Tindakan pembinaan 21', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(22, 1, 22, 'Vino Akbar', 22, '10 TKJ 5', 22, 'Pelanggaran 22', 22, 22, 'Wawan Hermawan', '2026-10-22', 'Keterangan pelanggaran siswa 22', 49, 'Tindakan pembinaan 22', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(23, 1, 23, 'Wahyu Hidayat', 23, '11 AKL 5', 23, 'Pelanggaran 23', 23, 23, 'Yulia Safitri', '2026-11-23', 'Keterangan pelanggaran siswa 23', 51, 'Tindakan pembinaan 23', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(24, 1, 24, 'Xenia Oktaviani', 24, '12 BD 5', 24, 'Pelanggaran 24', 24, 24, 'Zainal Abidin', '2026-12-24', 'Keterangan pelanggaran siswa 24', 53, 'Tindakan pembinaan 24', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(25, 1, 25, 'Yogi Prasetyo', 25, '10 MPLB 5', 25, 'Pelanggaran 25', 25, 25, 'Asep Firmansyah', '2026-01-25', 'Keterangan pelanggaran siswa 25', 55, 'Tindakan pembinaan 25', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(26, 1, 26, 'Zahra Fadillah', 26, '11 RPL 1', 26, 'Pelanggaran 26', 26, 26, 'Beni Kurnia', '2026-02-26', 'Keterangan pelanggaran siswa 26', 57, 'Tindakan pembinaan 26', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(27, 1, 27, 'Agus Setiawan', 27, '12 TKJ 1', 27, 'Pelanggaran 27', 27, 27, 'Cici Puspita', '2026-03-27', 'Keterangan pelanggaran siswa 27', 59, 'Tindakan pembinaan 27', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(28, 1, 28, 'Bella Novitasari', 28, '10 AKL 1', 28, 'Pelanggaran 28', 28, 28, 'Dadan Maulana', '2026-04-01', 'Keterangan pelanggaran siswa 28', 61, 'Tindakan pembinaan 28', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(29, 1, 29, 'Cahyo Ramadhan', 29, '11 BD 1', 29, 'Pelanggaran 29', 29, 29, 'Euis Kartika', '2026-05-02', 'Keterangan pelanggaran siswa 29', 63, 'Tindakan pembinaan 29', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(30, 1, 30, 'Dinda Safitri', 30, '12 MPLB 1', 30, 'Pelanggaran 30', 30, 30, 'Feri Irawan', '2026-06-03', 'Keterangan pelanggaran siswa 30', 65, 'Tindakan pembinaan 30', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(31, 1, 31, 'Erwin Maulana', 31, '10 RPL 2', 31, 'Pelanggaran 31', 31, 31, 'Galih Setiawan', '2026-07-04', 'Keterangan pelanggaran siswa 31', 67, 'Tindakan pembinaan 31', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(32, 1, 32, 'Fani Azzahra', 32, '11 TKJ 2', 32, 'Pelanggaran 32', 32, 32, 'Hesti Wulandari', '2026-08-05', 'Keterangan pelanggaran siswa 32', 69, 'Tindakan pembinaan 32', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(33, 1, 33, 'Galih Permana', 33, '12 AKL 2', 33, 'Pelanggaran 33', 33, 33, 'Imam Fauzan', '2026-09-06', 'Keterangan pelanggaran siswa 33', 71, 'Tindakan pembinaan 33', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(34, 1, 34, 'Hani Rahmawati', 34, '10 BD 2', 34, 'Pelanggaran 34', 34, 34, 'Joko Haryanto', '2026-10-07', 'Keterangan pelanggaran siswa 34', 73, 'Tindakan pembinaan 34', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(35, 1, 35, 'Ilham Fauzi', 35, '11 MPLB 2', 35, 'Pelanggaran 35', 35, 35, 'Kurnia Sari', '2026-11-08', 'Keterangan pelanggaran siswa 35', 75, 'Tindakan pembinaan 35', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(36, 1, 36, 'Jihan Nuraini', 36, '12 RPL 3', 36, 'Pelanggaran 36', 36, 36, 'Lukman Hakim', '2026-12-09', 'Keterangan pelanggaran siswa 36', 77, 'Tindakan pembinaan 36', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(37, 1, 37, 'Kevin Alfarizi', 37, '10 TKJ 3', 37, 'Pelanggaran 37', 37, 37, 'Mira Oktaviani', '2026-01-10', 'Keterangan pelanggaran siswa 37', 79, 'Tindakan pembinaan 37', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(38, 1, 38, 'Laila Mutiara', 38, '11 AKL 3', 38, 'Pelanggaran 38', 38, 38, 'Nana Sujana', '2026-02-11', 'Keterangan pelanggaran siswa 38', 81, 'Tindakan pembinaan 38', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(39, 1, 39, 'Miko Aditya', 39, '12 BD 3', 39, 'Pelanggaran 39', 39, 39, 'Oki Firmansyah', '2026-03-12', 'Keterangan pelanggaran siswa 39', 83, 'Tindakan pembinaan 39', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(40, 1, 40, 'Nia Kartika', 40, '10 MPLB 3', 40, 'Pelanggaran 40', 40, 40, 'Prita Lestari', '2026-04-13', 'Keterangan pelanggaran siswa 40', 85, 'Tindakan pembinaan 40', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(41, 1, 41, 'Opik Firmansyah', 41, '11 RPL 4', 41, 'Pelanggaran 41', 41, 41, 'Rudi Hartono', '2026-05-14', 'Keterangan pelanggaran siswa 41', 87, 'Tindakan pembinaan 41', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(42, 1, 42, 'Puspa Sari', 42, '12 TKJ 4', 42, 'Pelanggaran 42', 42, 42, 'Sari Ningsih', '2026-06-15', 'Keterangan pelanggaran siswa 42', 89, 'Tindakan pembinaan 42', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(43, 1, 43, 'Rian Kurnia', 43, '10 AKL 4', 43, 'Pelanggaran 43', 43, 43, 'Tedi Setiawan', '2026-07-16', 'Keterangan pelanggaran siswa 43', 91, 'Tindakan pembinaan 43', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(44, 1, 44, 'Siti Aisyah', 44, '11 BD 4', 44, 'Pelanggaran 44', 44, 44, 'Umi Rahma', '2026-08-17', 'Keterangan pelanggaran siswa 44', 93, 'Tindakan pembinaan 44', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(45, 1, 45, 'Tio Ramadhan', 45, '12 MPLB 4', 45, 'Pelanggaran 45', 45, 45, 'Vicky Pratama', '2026-09-18', 'Keterangan pelanggaran siswa 45', 95, 'Tindakan pembinaan 45', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(46, 1, 46, 'Ulfa Nurfadilah', 46, '10 RPL 5', 46, 'Pelanggaran 46', 46, 46, 'Widi Astuti', '2026-10-19', 'Keterangan pelanggaran siswa 46', 97, 'Tindakan pembinaan 46', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(47, 1, 47, 'Vera Anjani', 47, '11 TKJ 5', 47, 'Pelanggaran 47', 47, 47, 'Yani Mulyani', '2026-11-20', 'Keterangan pelanggaran siswa 47', 99, 'Tindakan pembinaan 47', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(48, 1, 48, 'Wawan Gunawan', 48, '12 AKL 5', 48, 'Pelanggaran 48', 48, 48, 'Yudi Kurniawan', '2026-12-21', 'Keterangan pelanggaran siswa 48', 101, 'Tindakan pembinaan 48', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(49, 1, 49, 'Yuni Astuti', 49, '10 BD 5', 49, 'Pelanggaran 49', 49, 49, 'Zulfa Aulia', '2026-01-22', 'Keterangan pelanggaran siswa 49', 103, 'Tindakan pembinaan 49', 'Proses', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(50, 1, 50, 'Zaki Mubarak', 50, '11 MPLB 5', 50, 'Pelanggaran 50', 50, 50, 'Rina Marlina', '2026-02-23', 'Keterangan pelanggaran siswa 50', 105, 'Tindakan pembinaan 50', 'Selesai', '2026-01-01 01:00:00', '2026-09-23 01:00:00');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `t_siswa`
+-- Table structure for table `t_siswa`
 --
 
 CREATE TABLE `t_siswa` (
@@ -485,10 +434,10 @@ CREATE TABLE `t_siswa` (
   `status_aktif` tinyint(1) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `t_siswa`
+-- Dumping data for table `t_siswa`
 --
 
 INSERT INTO `t_siswa` (`id`, `nis`, `nisn`, `nama`, `jenis_kelamin`, `tanggal_lahir`, `alamat`, `status_aktif`, `created_at`, `updated_at`) VALUES
@@ -546,7 +495,7 @@ INSERT INTO `t_siswa` (`id`, `nis`, `nisn`, `nama`, `jenis_kelamin`, `tanggal_la
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `t_tahun_ajaran`
+-- Table structure for table `t_tahun_ajaran`
 --
 
 CREATE TABLE `t_tahun_ajaran` (
@@ -557,68 +506,68 @@ CREATE TABLE `t_tahun_ajaran` (
   `status_aktif` tinyint(1) NOT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `t_tahun_ajaran`
+-- Dumping data for table `t_tahun_ajaran`
 --
 
 INSERT INTO `t_tahun_ajaran` (`id`, `nama`, `tanggal_mulai`, `tanggal_selesai`, `status_aktif`, `created_at`, `updated_at`) VALUES
 (1, '2026/2027', '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(2, '2027/2028', '2027-07-01', '2028-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(3, '2028/2029', '2028-07-01', '2029-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(4, '2029/2030', '2029-07-01', '2030-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(5, '2030/2031', '2030-07-01', '2031-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(6, '2031/2032', '2031-07-01', '2032-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(7, '2032/2033', '2032-07-01', '2033-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(8, '2033/2034', '2033-07-01', '2034-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(9, '2034/2035', '2034-07-01', '2035-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(10, '2035/2036', '2035-07-01', '2036-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(11, '2036/2037', '2036-07-01', '2037-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(12, '2037/2038', '2037-07-01', '2038-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(13, '2038/2039', '2038-07-01', '2039-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(14, '2039/2040', '2039-07-01', '2040-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(15, '2040/2041', '2040-07-01', '2041-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(16, '2041/2042', '2041-07-01', '2042-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(17, '2042/2043', '2042-07-01', '2043-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(18, '2043/2044', '2043-07-01', '2044-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(19, '2044/2045', '2044-07-01', '2045-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(20, '2045/2046', '2045-07-01', '2046-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(21, '2046/2047', '2046-07-01', '2047-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(22, '2047/2048', '2047-07-01', '2048-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(23, '2048/2049', '2048-07-01', '2049-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(24, '2049/2050', '2049-07-01', '2050-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(25, '2050/2051', '2050-07-01', '2051-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(26, '2051/2052', '2051-07-01', '2052-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(27, '2052/2053', '2052-07-01', '2053-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(28, '2053/2054', '2053-07-01', '2054-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(29, '2054/2055', '2054-07-01', '2055-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(30, '2055/2056', '2055-07-01', '2056-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(31, '2056/2057', '2056-07-01', '2057-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(32, '2057/2058', '2057-07-01', '2058-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(33, '2058/2059', '2058-07-01', '2059-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(34, '2059/2060', '2059-07-01', '2060-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(35, '2060/2061', '2060-07-01', '2061-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(36, '2061/2062', '2061-07-01', '2062-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(37, '2062/2063', '2062-07-01', '2063-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(38, '2063/2064', '2063-07-01', '2064-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(39, '2064/2065', '2064-07-01', '2065-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(40, '2065/2066', '2065-07-01', '2066-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(41, '2066/2067', '2066-07-01', '2067-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(42, '2067/2068', '2067-07-01', '2068-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(43, '2068/2069', '2068-07-01', '2069-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(44, '2069/2070', '2069-07-01', '2070-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(45, '2070/2071', '2070-07-01', '2071-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(46, '2071/2072', '2071-07-01', '2072-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(47, '2072/2073', '2072-07-01', '2073-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(48, '2073/2074', '2073-07-01', '2074-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(49, '2074/2075', '2074-07-01', '2075-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(50, '2075/2076', '2075-07-01', '2076-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00');
+(2, '2027/2028', '2027-07-01', '2028-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(3, '2028/2029', '2028-07-01', '2029-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(4, '2029/2030', '2029-07-01', '2030-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(5, '2030/2031', '2030-07-01', '2031-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(6, '2031/2032', '2031-07-01', '2032-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(7, '2032/2033', '2032-07-01', '2033-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(8, '2033/2034', '2033-07-01', '2034-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(9, '2034/2035', '2034-07-01', '2035-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(10, '2035/2036', '2035-07-01', '2036-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(11, '2036/2037', '2036-07-01', '2037-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(12, '2037/2038', '2037-07-01', '2038-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(13, '2038/2039', '2038-07-01', '2039-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(14, '2039/2040', '2039-07-01', '2040-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(15, '2040/2041', '2040-07-01', '2041-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(16, '2041/2042', '2041-07-01', '2042-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(17, '2042/2043', '2042-07-01', '2043-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(18, '2043/2044', '2043-07-01', '2044-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(19, '2044/2045', '2044-07-01', '2045-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(20, '2045/2046', '2045-07-01', '2046-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(21, '2046/2047', '2046-07-01', '2047-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(22, '2047/2048', '2047-07-01', '2048-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(23, '2048/2049', '2048-07-01', '2049-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(24, '2049/2050', '2049-07-01', '2050-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(25, '2050/2051', '2050-07-01', '2051-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(26, '2051/2052', '2051-07-01', '2052-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(27, '2052/2053', '2052-07-01', '2053-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(28, '2053/2054', '2053-07-01', '2054-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(29, '2054/2055', '2054-07-01', '2055-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(30, '2055/2056', '2055-07-01', '2056-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(31, '2056/2057', '2056-07-01', '2057-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(32, '2057/2058', '2057-07-01', '2058-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(33, '2058/2059', '2058-07-01', '2059-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(34, '2059/2060', '2059-07-01', '2060-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(35, '2060/2061', '2060-07-01', '2061-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(36, '2061/2062', '2061-07-01', '2062-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(37, '2062/2063', '2062-07-01', '2063-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(38, '2063/2064', '2063-07-01', '2064-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(39, '2064/2065', '2064-07-01', '2065-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(40, '2065/2066', '2065-07-01', '2066-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(41, '2066/2067', '2066-07-01', '2067-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(42, '2067/2068', '2067-07-01', '2068-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(43, '2068/2069', '2068-07-01', '2069-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(44, '2069/2070', '2069-07-01', '2070-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(45, '2070/2071', '2070-07-01', '2071-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(46, '2071/2072', '2071-07-01', '2072-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(47, '2072/2073', '2072-07-01', '2073-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(48, '2073/2074', '2073-07-01', '2074-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(49, '2074/2075', '2074-07-01', '2075-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(50, '2075/2076', '2075-07-01', '2076-06-30', 0, '2026-01-01 01:00:00', '2026-09-23 01:00:00');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `t_users`
+-- Table structure for table `t_users`
 --
 
 CREATE TABLE `t_users` (
@@ -631,14 +580,14 @@ CREATE TABLE `t_users` (
   `role` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `t_users`
+-- Dumping data for table `t_users`
 --
 
 INSERT INTO `t_users` (`id`, `name`, `email`, `email_verified_at`, `password`, `remember_token`, `role`, `created_at`, `updated_at`) VALUES
-(1, 'Pengguna 1', 'user1@sekolah.sch.id', '2026-01-01 01:00:00', 'password1', 'token001', 'admin', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(1, 'Pengguna 1', 'user1@sekolah.sch.id', '2026-01-01 01:00:00', '$2y$10$JDRlxFXt4DKdgo.1lBajseotufFs4tFQKOqrmME.YJdI.Oi0.rQn6', 'token001', 'admin', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
 (2, 'Pengguna 2', 'user2@sekolah.sch.id', '2026-01-01 01:00:00', 'password2', 'token002', 'guru', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
 (3, 'Pengguna 3', 'user3@sekolah.sch.id', '2026-01-01 01:00:00', 'password3', 'token003', 'wali_kelas', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
 (4, 'Pengguna 4', 'user4@sekolah.sch.id', '2026-01-01 01:00:00', 'password4', 'token004', 'siswa', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
@@ -687,12 +636,67 @@ INSERT INTO `t_users` (`id`, `name`, `email`, `email_verified_at`, `password`, `
 (47, 'Pengguna 47', 'user47@sekolah.sch.id', '2026-01-01 01:00:00', 'password47', 'token047', 'guru', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
 (48, 'Pengguna 48', 'user48@sekolah.sch.id', '2026-01-01 01:00:00', 'password48', 'token048', 'wali_kelas', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
 (49, 'Pengguna 49', 'user49@sekolah.sch.id', '2026-01-01 01:00:00', 'password49', 'token049', 'siswa', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(50, 'Pengguna 50', 'user50@sekolah.sch.id', '2026-01-01 01:00:00', 'password50', 'token050', 'petugas', '2026-01-01 01:00:00', '2026-09-23 01:00:00');
+(50, 'Pengguna 50', 'user50@sekolah.sch.id', '2026-01-01 01:00:00', 'password50', 'token050', 'petugas', '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(51, 'Wawan Kurniawan, S.Pd.I', 'wawan@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(52, 'Ai Nuryaidah, S.Pd', 'ai@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(53, 'Maya Permata Endah, S.Pd', 'maya@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(54, 'Dody Jaenudin, S.Pd.', 'dody@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(55, 'Dedi Kardiman, S.Pd', 'dedi@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(56, 'Uca Musa Yusenda, S.Pd', 'uca@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(57, 'Drs. Ahmad Nur Mukhlis', 'ahmad@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(58, 'Drs. Heri', 'heri@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(59, 'Asep Bastaman', 'asep@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(60, 'H. Encep Maemun, S.T., M.Pd', 'encep@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(61, 'Opik', 'opik@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(62, 'Ida Farida, S.Pd', 'ida@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(63, 'Idah Mahmudah, S.Pd', 'idah@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(64, 'Drs. Muhamad Ali', 'muhamad@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(65, 'Helmi Ali Akbar, S.Pd.I', 'helmi@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(66, 'Syeni Suswarini, S.Pd', 'syeni@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(67, 'Wiwid Yulianti, S.Pd', 'wiwid@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(68, 'Ansor Muhajir, S.T', 'ansor@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(69, 'Ogi Gaosun Gias, S.Pd.I', 'ogi@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(70, 'Sandi Mulyana, S.Pd', 'sandi@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(71, 'Erna Suryani, S.Pd', 'erna@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(72, 'Ai Wahidah, S.Ag', 'ai.wahidah@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(73, 'Chandra Aditya Yusuf, S.Pd', 'chandra@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(74, 'Arif Kusmawan, S.Pd', 'arif@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(75, 'Asep Taufiq Hidayat, S.Kom', 'asep.hidayat@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(76, 'Rendy Ichsan Kusumah, S.T', 'rendy@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(77, 'Feri Rahmawan, S.Pd', 'feri@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(78, 'Ari Sandriana, S.Kom', 'ari@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(79, 'Yaneu Nurdian, S.Pd., M.Pd', 'yaneu@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(80, 'Ucu Muhammad Khoer N, S.Pd', 'ucu@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(81, 'Mira Dwi Rahmawati, S.Ag', 'mira@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(82, 'Aldi Maulana, S.Pd', 'aldi@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(83, 'Eli Rosliah, S.Pd', 'eli@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(84, 'Isni Nur Fitriani, S.Pd', 'isni@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(85, 'Aanisah Putri Nur Aini, S.Pd', 'aanisah@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(86, 'Yusi Luthfiani, S.Sos.I', 'yusi@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(87, 'Lilis Rustandy Mawardi, S.Pd., M.Pd', 'lilis@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(88, 'Yusrin Noer Sabrina, S.Pd', 'yusrin@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(89, 'Senny Indayani, S.Pd', 'senny@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(90, 'Ilma Amalia, S.Pd', 'ilma@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(91, 'Alvira Sofwatunnisa, S.Pd', 'alvira@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(92, 'Risna Andriyani, S.Pd', 'risna@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(93, 'Dra. Tintin Noerhayati', 'tintin@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(94, 'Rizkia Fahira, S.Pd', 'rizkia@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(95, 'Frasetio', 'frasetio@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(96, 'Ratnaningsih Hatil Aeni, S.Pd.', 'ratnaningsih@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(97, 'Dheny Darajatul Hasani, S.Pd.', 'dheny@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(98, 'Fahrullah, S.Pd', 'fahrullah@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(99, 'Aan Andriana, S.T', 'aan@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(100, 'Fitri Fauziah, S.T', 'fitri@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(101, 'Nida Aulia, S.Pd', 'nida@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(102, 'Sri Nurrizki Putri Krisnadi, S.Pd', 'sri@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(103, 'Riesy Putri Navia, S.Kom', 'riesy@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(104, 'Rurry Febriani Maryadi, S.Pd', 'rurry@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35'),
+(105, 'Irvan Rizal, S.Pd', 'irvan@gmail.com', '2026-11-05 02:25:35', '$2y$10$pmL249nXRnvI64WGjcjC0Oe9vZlZA7DtWunRiY0na.2RrO7AW10GW', '', 'guru', '2026-11-05 02:25:35', '2026-11-05 02:25:35');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `t_wali_kelas`
+-- Table structure for table `t_wali_kelas`
 --
 
 CREATE TABLE `t_wali_kelas` (
@@ -705,83 +709,35 @@ CREATE TABLE `t_wali_kelas` (
   `status_aktif` tinyint(1) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data untuk tabel `t_wali_kelas`
+-- Dumping data for table `t_wali_kelas`
 --
 
 INSERT INTO `t_wali_kelas` (`id`, `tahun_ajaran_id`, `kelas_id`, `guru_id`, `tanggal_mulai`, `tanggal_selesai`, `status_aktif`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 1, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(2, 2, 2, 2, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(3, 3, 3, 3, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(4, 4, 4, 4, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(5, 5, 5, 5, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(6, 6, 6, 6, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(7, 7, 7, 7, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(8, 8, 8, 8, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(9, 9, 9, 9, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(10, 10, 10, 10, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(11, 11, 11, 11, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(12, 12, 12, 12, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(13, 13, 13, 13, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(14, 14, 14, 14, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(15, 15, 15, 15, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(16, 16, 16, 16, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(17, 17, 17, 17, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(18, 18, 18, 18, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(19, 19, 19, 19, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(20, 20, 20, 20, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(21, 21, 21, 21, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(22, 22, 22, 22, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(23, 23, 23, 23, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(24, 24, 24, 24, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(25, 25, 25, 25, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(26, 26, 26, 26, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(27, 27, 27, 27, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(28, 28, 28, 28, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(29, 29, 29, 29, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(30, 30, 30, 30, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(31, 31, 31, 31, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(32, 32, 32, 32, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(33, 33, 33, 33, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(34, 34, 34, 34, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(35, 35, 35, 35, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(36, 36, 36, 36, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(37, 37, 37, 37, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(38, 38, 38, 38, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(39, 39, 39, 39, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(40, 40, 40, 40, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(41, 41, 41, 41, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(42, 42, 42, 42, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(43, 43, 43, 43, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(44, 44, 44, 44, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(45, 45, 45, 45, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(46, 46, 46, 46, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(47, 47, 47, 47, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(48, 48, 48, 48, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(49, 49, 49, 49, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(50, 50, 50, 50, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00');
+(1, 1, 6, 32, '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(52, 1, 34, 28, '2026-07-01', '2027-06-30', 1, '2026-11-05 04:26:18', '2026-11-05 04:26:18');
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indeks untuk tabel `t_guru`
+-- Indexes for table `t_guru`
 --
 ALTER TABLE `t_guru`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`);
 
 --
--- Indeks untuk tabel `t_kelas`
+-- Indexes for table `t_kelas`
 --
 ALTER TABLE `t_kelas`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `t_kelas_siswa`
+-- Indexes for table `t_kelas_siswa`
 --
 ALTER TABLE `t_kelas_siswa`
   ADD PRIMARY KEY (`id`),
@@ -790,20 +746,20 @@ ALTER TABLE `t_kelas_siswa`
   ADD KEY `kelas_id` (`kelas_id`);
 
 --
--- Indeks untuk tabel `t_pelanggaran`
+-- Indexes for table `t_pelanggaran`
 --
 ALTER TABLE `t_pelanggaran`
   ADD PRIMARY KEY (`id`),
   ADD KEY `pelanggaran_kategori_id` (`pelanggaran_kategori_id`);
 
 --
--- Indeks untuk tabel `t_pelanggaran_kategori`
+-- Indexes for table `t_pelanggaran_kategori`
 --
 ALTER TABLE `t_pelanggaran_kategori`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `t_pelanggaran_siswa`
+-- Indexes for table `t_pelanggaran_siswa`
 --
 ALTER TABLE `t_pelanggaran_siswa`
   ADD PRIMARY KEY (`id`),
@@ -817,25 +773,25 @@ ALTER TABLE `t_pelanggaran_siswa`
   ADD KEY `guru_id` (`guru_id`);
 
 --
--- Indeks untuk tabel `t_siswa`
+-- Indexes for table `t_siswa`
 --
 ALTER TABLE `t_siswa`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `t_tahun_ajaran`
+-- Indexes for table `t_tahun_ajaran`
 --
 ALTER TABLE `t_tahun_ajaran`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `t_users`
+-- Indexes for table `t_users`
 --
 ALTER TABLE `t_users`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `t_wali_kelas`
+-- Indexes for table `t_wali_kelas`
 --
 ALTER TABLE `t_wali_kelas`
   ADD PRIMARY KEY (`id`),
@@ -844,81 +800,81 @@ ALTER TABLE `t_wali_kelas`
   ADD KEY `guru_id` (`guru_id`);
 
 --
--- AUTO_INCREMENT untuk tabel yang dibuang
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT untuk tabel `t_guru`
+-- AUTO_INCREMENT for table `t_guru`
 --
 ALTER TABLE `t_guru`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
--- AUTO_INCREMENT untuk tabel `t_kelas`
+-- AUTO_INCREMENT for table `t_kelas`
 --
 ALTER TABLE `t_kelas`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
--- AUTO_INCREMENT untuk tabel `t_kelas_siswa`
+-- AUTO_INCREMENT for table `t_kelas_siswa`
 --
 ALTER TABLE `t_kelas_siswa`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
--- AUTO_INCREMENT untuk tabel `t_pelanggaran`
+-- AUTO_INCREMENT for table `t_pelanggaran`
 --
 ALTER TABLE `t_pelanggaran`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
--- AUTO_INCREMENT untuk tabel `t_pelanggaran_kategori`
+-- AUTO_INCREMENT for table `t_pelanggaran_kategori`
 --
 ALTER TABLE `t_pelanggaran_kategori`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
--- AUTO_INCREMENT untuk tabel `t_pelanggaran_siswa`
+-- AUTO_INCREMENT for table `t_pelanggaran_siswa`
 --
 ALTER TABLE `t_pelanggaran_siswa`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
--- AUTO_INCREMENT untuk tabel `t_siswa`
+-- AUTO_INCREMENT for table `t_siswa`
 --
 ALTER TABLE `t_siswa`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
--- AUTO_INCREMENT untuk tabel `t_tahun_ajaran`
+-- AUTO_INCREMENT for table `t_tahun_ajaran`
 --
 ALTER TABLE `t_tahun_ajaran`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
--- AUTO_INCREMENT untuk tabel `t_users`
+-- AUTO_INCREMENT for table `t_users`
 --
 ALTER TABLE `t_users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=106;
 
 --
--- AUTO_INCREMENT untuk tabel `t_wali_kelas`
+-- AUTO_INCREMENT for table `t_wali_kelas`
 --
 ALTER TABLE `t_wali_kelas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
--- Ketidakleluasaan untuk tabel pelimpahan (Dumped Tables)
+-- Constraints for dumped tables
 --
 
 --
--- Ketidakleluasaan untuk tabel `t_guru`
+-- Constraints for table `t_guru`
 --
 ALTER TABLE `t_guru`
   ADD CONSTRAINT `t_guru_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `t_users` (`id`);
 
 --
--- Ketidakleluasaan untuk tabel `t_kelas_siswa`
+-- Constraints for table `t_kelas_siswa`
 --
 ALTER TABLE `t_kelas_siswa`
   ADD CONSTRAINT `t_kelas_siswa_ibfk_1` FOREIGN KEY (`siswa_id`) REFERENCES `t_siswa` (`id`),
@@ -926,13 +882,13 @@ ALTER TABLE `t_kelas_siswa`
   ADD CONSTRAINT `t_kelas_siswa_ibfk_3` FOREIGN KEY (`tahun_ajaran_id`) REFERENCES `t_tahun_ajaran` (`id`);
 
 --
--- Ketidakleluasaan untuk tabel `t_pelanggaran`
+-- Constraints for table `t_pelanggaran`
 --
 ALTER TABLE `t_pelanggaran`
   ADD CONSTRAINT `t_pelanggaran_ibfk_1` FOREIGN KEY (`pelanggaran_kategori_id`) REFERENCES `t_pelanggaran_kategori` (`id`);
 
 --
--- Ketidakleluasaan untuk tabel `t_pelanggaran_siswa`
+-- Constraints for table `t_pelanggaran_siswa`
 --
 ALTER TABLE `t_pelanggaran_siswa`
   ADD CONSTRAINT `t_pelanggaran_siswa_ibfk_1` FOREIGN KEY (`guru_id`) REFERENCES `t_guru` (`id`),
@@ -943,7 +899,7 @@ ALTER TABLE `t_pelanggaran_siswa`
   ADD CONSTRAINT `t_pelanggaran_siswa_ibfk_6` FOREIGN KEY (`pelanggaran_kategori_id`) REFERENCES `t_pelanggaran_kategori` (`id`);
 
 --
--- Ketidakleluasaan untuk tabel `t_wali_kelas`
+-- Constraints for table `t_wali_kelas`
 --
 ALTER TABLE `t_wali_kelas`
   ADD CONSTRAINT `t_wali_kelas_ibfk_1` FOREIGN KEY (`tahun_ajaran_id`) REFERENCES `t_tahun_ajaran` (`id`),
