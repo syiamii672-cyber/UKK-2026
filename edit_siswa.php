@@ -15,6 +15,7 @@ if (!$id || $id < 1) {
     exit;
 }
 
+// Ambil data siswa berdasarkan ID.
 $stmt = mysqli_prepare(
     $koneksi,
     "SELECT nis, nisn, nama, jenis_kelamin, tanggal_lahir,
@@ -25,8 +26,10 @@ $stmt = mysqli_prepare(
 
 mysqli_stmt_bind_param($stmt, "i", $id);
 mysqli_stmt_execute($stmt);
+
 $result = mysqli_stmt_get_result($stmt);
 $siswa = mysqli_fetch_assoc($result);
+
 mysqli_stmt_close($stmt);
 
 if (!$siswa) {
@@ -36,7 +39,18 @@ if (!$siswa) {
 
 $error = "";
 
+// Ambil nilai awal dari database.
+$nis = $siswa['nis'];
+$nisn = $siswa['nisn'];
+$nama = $siswa['nama'];
+$jenis_kelamin = $siswa['jenis_kelamin'];
+$tanggal_lahir = $siswa['tanggal_lahir'];
+$alamat = $siswa['alamat'];
+$status_aktif = (string) $siswa['status_aktif'];
+
+// Proses ketika form disubmit.
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
     $nis = trim($_POST['nis'] ?? '');
     $nisn = trim($_POST['nisn'] ?? '');
     $nama = trim($_POST['nama'] ?? '');
@@ -52,10 +66,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         !in_array($status_aktif, ['0', '1'], true)
     ) {
         $error = "Semua kolom wajib diisi dengan benar.";
-    } elseif (!preg_match('/^[0-9]{10}$/', $nis)) {
-        $error = "NIS harus tepat 10 digit angka.";
+
+    } elseif (!preg_match('/^[0-9]{9}$/', $nis)) {
+        $error = "NIS harus tepat 9 digit angka.";
+
     } elseif (!preg_match('/^[0-9]{10}$/', $nisn)) {
         $error = "NISN harus tepat 10 digit angka.";
+
     } elseif (
         !preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggal_lahir) ||
         !checkdate(
@@ -65,16 +82,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         )
     ) {
         $error = "Tanggal lahir tidak valid.";
+
     } else {
+
         // Cek NIS atau NISN milik siswa lain.
         $cek = mysqli_prepare(
             $koneksi,
-            "SELECT id FROM t_siswa
-             WHERE (nis = ? OR nisn = ?) AND id != ?"
+            "SELECT id
+             FROM t_siswa
+             WHERE (nis = ? OR nisn = ?)
+             AND id != ?"
         );
 
         mysqli_stmt_bind_param($cek, "ssi", $nis, $nisn, $id);
         mysqli_stmt_execute($cek);
+
         $hasilCek = mysqli_stmt_get_result($cek);
 
         if (mysqli_num_rows($hasilCek) > 0) {
@@ -83,15 +105,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         mysqli_stmt_close($cek);
 
+        // Jika tidak ada duplikasi, lakukan update.
         if ($error == '') {
+
             $query = "UPDATE t_siswa
-                      SET nis = ?, nisn = ?, nama = ?,
-                          jenis_kelamin = ?, tanggal_lahir = ?,
-                          alamat = ?, status_aktif = ?,
+                      SET nis = ?,
+                          nisn = ?,
+                          nama = ?,
+                          jenis_kelamin = ?,
+                          tanggal_lahir = ?,
+                          alamat = ?,
+                          status_aktif = ?,
                           updated_at = CURRENT_TIMESTAMP
                       WHERE id = ?";
 
             $update = mysqli_prepare($koneksi, $query);
+
             $status = (int) $status_aktif;
 
             mysqli_stmt_bind_param(
@@ -108,10 +137,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             );
 
             if (mysqli_stmt_execute($update)) {
+
                 mysqli_stmt_close($update);
+
                 header("Location: siswa.php?pesan=edit");
                 exit;
+
             } else {
+
                 $error = "Data siswa gagal diperbarui.";
             }
 
@@ -136,9 +169,11 @@ $menuAktif = "siswa";
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Edit Data Siswa</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
@@ -167,13 +202,18 @@ $menuAktif = "siswa";
         }
     </style>
 </head>
+
 <body>
 
 <?php include "includes/sidebar.php"; ?>
 
 <main class="konten-utama">
+
     <h2>Edit Data Siswa</h2>
-    <p class="text-muted mb-4">Ubah informasi siswa yang dipilih.</p>
+
+    <p class="text-muted mb-4">
+        Ubah informasi siswa yang dipilih.
+    </p>
 
     <?php if ($error != '') { ?>
         <div class="alert alert-danger">
@@ -186,28 +226,33 @@ $menuAktif = "siswa";
 
             <form method="POST">
 
+                <!-- NIS -->
                 <div class="mb-3">
                     <label class="form-label">NIS</label>
+
                     <input
                         type="text"
                         name="nis"
                         class="form-control"
-                        minlength="10"
-                        maxlength="10"
-                        pattern="[0-9]{10}"
+                        minlength="9"
+                        maxlength="9"
+                        pattern="[0-9]{9}"
                         inputmode="numeric"
-                        title="NIS harus tepat 10 digit angka."
-                        placeholder="Masukkan 10 digit NIS"
+                        title="NIS harus tepat 9 digit angka."
+                        placeholder="Masukkan 9 digit NIS"
                         required
-                        value="<?= htmlspecialchars($siswa['nis'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                        value="<?= htmlspecialchars($nis, ENT_QUOTES, 'UTF-8'); ?>"
                     >
+
                     <small class="text-muted">
-                        NIS wajib tepat 10 digit angka.
+                        NIS wajib tepat 9 digit angka.
                     </small>
                 </div>
 
+                <!-- NISN -->
                 <div class="mb-3">
                     <label class="form-label">NISN</label>
+
                     <input
                         type="text"
                         name="nisn"
@@ -219,65 +264,78 @@ $menuAktif = "siswa";
                         title="NISN harus tepat 10 digit angka."
                         placeholder="Masukkan 10 digit NISN"
                         required
-                        value="<?= htmlspecialchars($siswa['nisn'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                        value="<?= htmlspecialchars($nisn, ENT_QUOTES, 'UTF-8'); ?>"
                     >
+
                     <small class="text-muted">
                         NISN wajib tepat 10 digit angka.
                     </small>
                 </div>
 
+                <!-- Nama -->
                 <div class="mb-3">
                     <label class="form-label">Nama Lengkap</label>
+
                     <input
                         type="text"
                         name="nama"
                         class="form-control"
                         maxlength="150"
                         required
-                        value="<?= htmlspecialchars($siswa['nama'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                        value="<?= htmlspecialchars($nama, ENT_QUOTES, 'UTF-8'); ?>"
                     >
                 </div>
 
+                <!-- Jenis Kelamin -->
                 <div class="mb-3">
                     <label class="form-label">Jenis Kelamin</label>
+
                     <select name="jenis_kelamin" class="form-select" required>
-                        <option value="L" <?= $siswa['jenis_kelamin'] == 'L' ? 'selected' : ''; ?>>
+                        <option value="L" <?= $jenis_kelamin == 'L' ? 'selected' : ''; ?>>
                             Laki-laki
                         </option>
-                        <option value="P" <?= $siswa['jenis_kelamin'] == 'P' ? 'selected' : ''; ?>>
+
+                        <option value="P" <?= $jenis_kelamin == 'P' ? 'selected' : ''; ?>>
                             Perempuan
                         </option>
                     </select>
                 </div>
 
+                <!-- Tanggal Lahir -->
                 <div class="mb-3">
                     <label class="form-label">Tanggal Lahir</label>
+
                     <input
                         type="date"
                         name="tanggal_lahir"
                         class="form-control"
                         required
-                        value="<?= htmlspecialchars($siswa['tanggal_lahir'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"
+                        value="<?= htmlspecialchars($tanggal_lahir, ENT_QUOTES, 'UTF-8'); ?>"
                     >
                 </div>
 
+                <!-- Alamat -->
                 <div class="mb-3">
                     <label class="form-label">Alamat</label>
+
                     <textarea
                         name="alamat"
                         class="form-control"
                         rows="3"
                         required
-                    ><?= htmlspecialchars($siswa['alamat'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
+                    ><?= htmlspecialchars($alamat, ENT_QUOTES, 'UTF-8'); ?></textarea>
                 </div>
 
+                <!-- Status -->
                 <div class="mb-3">
                     <label class="form-label">Status</label>
+
                     <select name="status_aktif" class="form-select" required>
-                        <option value="1" <?= (string)$siswa['status_aktif'] === '1' ? 'selected' : ''; ?>>
+                        <option value="1" <?= $status_aktif === '1' ? 'selected' : ''; ?>>
                             Aktif
                         </option>
-                        <option value="0" <?= (string)$siswa['status_aktif'] === '0' ? 'selected' : ''; ?>>
+
+                        <option value="0" <?= $status_aktif === '0' ? 'selected' : ''; ?>>
                             Tidak Aktif
                         </option>
                     </select>
@@ -292,8 +350,10 @@ $menuAktif = "siswa";
                 </a>
 
             </form>
+
         </div>
     </div>
+
 </main>
 
 </body>
