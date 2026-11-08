@@ -333,7 +333,7 @@ if (isset($_SESSION['id'])) {
                             id="email"
                             name="email"
                             placeholder="Masukkan email"
-                            autocomplete="username"
+                           autocomplete="email"
                             required
                             autofocus
                         >

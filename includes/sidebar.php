@@ -1,35 +1,9 @@
-
 <?php
+
+// Pastikan pemeriksaan Wali Kelas menggunakan aturan yang sama
+require_once __DIR__ . '/cek_wali_kelas.php';
+
 $menuAktif = $menuAktif ?? "";
-$role = $_SESSION['role'] ?? "";
-$idUser = (int) ($_SESSION['id'] ?? 0);
-
-$isWaliKelas = false;
-$namaKelasWali = "";
-
-// Cek apakah guru memiliki penugasan Wali Kelas aktif
-if ($role === "guru" && isset($koneksi)) {
-
-    $queryWali = mysqli_query($koneksi, "
-        SELECT k.nama AS nama_kelas
-        FROM t_guru g
-        JOIN t_wali_kelas w ON g.id = w.guru_id
-        JOIN t_kelas k ON w.kelas_id = k.id
-        JOIN t_tahun_ajaran ta ON w.tahun_ajaran_id = ta.id
-        WHERE g.user_id = $idUser
-          AND g.status_aktif = 1
-          AND w.status_aktif = 1
-          AND k.status_aktif = 1
-          AND ta.status_aktif = 1
-        LIMIT 1
-    ");
-
-    if ($queryWali && mysqli_num_rows($queryWali) > 0) {
-        $dataWali = mysqli_fetch_assoc($queryWali);
-        $isWaliKelas = true;
-        $namaKelasWali = $dataWali['nama_kelas'];
-    }
-}
 
 // Menu Admin
 $menuAdmin = [
@@ -46,34 +20,39 @@ $menuAdmin = [
     ["Laporan", "laporan.php", "laporan"]
 ];
 
-// Menu dasar untuk SEMUA guru
+// Menu Guru Biasa
 $menuGuru = [
     ["Dashboard", "dashboard.php", "dashboard"],
     ["Catat Pelanggaran", "catat_pelanggaran.php", "catat_pelanggaran"],
-    ["Tindakan", "tindakan.php", "tindakan"],
-    ["Rekap Poin", "rekap_poin.php", "rekap_poin"],
-    ["Riwayat", "riwayat_pelanggaran.php", "riwayat"]
+    ["Tindakan", "tindakan.php", "tindakan"]
 ];
 
-// Menentukan menu
+// Menu Wali Kelas
+$menuWaliKelas = [
+    ["Dashboard", "dashboard.php", "dashboard"],
+    ["Rekap Poin", "rekap_poin.php", "rekap_poin"],
+    ["Riwayat", "riwayat_pelanggaran.php", "riwayat"],
+    ["Laporan", "laporan.php", "laporan"]
+];
+
+// Menentukan menu berdasarkan role dan penugasan
 if ($role === "admin") {
 
     $daftarMenu = $menuAdmin;
     $labelRole = "Administrator";
+
+} elseif ($role === "guru" && $isWaliKelas) {
+
+    $daftarMenu = $menuWaliKelas;
+    $labelRole = "Guru / Wali Kelas";
 
 } elseif ($role === "guru") {
 
     $daftarMenu = $menuGuru;
     $labelRole = "Guru";
 
-    // Laporan hanya untuk guru yang ditugaskan sebagai Wali Kelas
-    if ($isWaliKelas) {
-        $daftarMenu[] = ["Laporan", "laporan.php", "laporan"];
-        $daftarMenu[] = ["Rekap Poin", "rekap_poin.php", "rekap_poin"];
-        $labelRole = "Guru / Wali Kelas";
-    }
-
 } else {
+
     $daftarMenu = [];
     $labelRole = "Pengguna";
 }
