@@ -1,21 +1,23 @@
+
 <?php
 include "includes/cek_session.php";
 include "config/koneksi.php";
 
-if ($_SESSION['role'] != "admin") {
+// Hanya admin yang boleh mengakses halaman ini.
+if ($_SESSION['role'] !== "admin") {
     header("Location: dashboard.php");
     exit;
 }
 
 $menuAktif = "jenis";
 
-// Pengaturan pencarian dan pagination
+// Pengaturan pencarian dan pagination.
 $cari = trim($_GET['cari'] ?? '');
 $batas = 10;
 $halaman = max(1, (int)($_GET['halaman'] ?? 1));
 
 $where = "";
-$kata = "%$cari%";
+$kata = "%" . $cari . "%";
 
 if ($cari !== '') {
     $where = " WHERE p.kode LIKE ?
@@ -23,23 +25,32 @@ if ($cari !== '') {
                OR k.nama LIKE ?";
 }
 
-// Menghitung total data
-if ($cari !== '') {
-    $sqlCount = "SELECT COUNT(*) AS total
-                 FROM t_pelanggaran p
-                 JOIN t_pelanggaran_kategori k
-                   ON k.id = p.pelanggaran_kategori_id
-                 $where";
+// Menghitung total data.
+$sqlCount = "SELECT COUNT(*) AS total
+             FROM t_pelanggaran p
+             JOIN t_pelanggaran_kategori k
+               ON k.id = p.pelanggaran_kategori_id
+             $where";
 
-    $stmt = mysqli_prepare($koneksi, $sqlCount);
-    mysqli_stmt_bind_param($stmt, "sss", $kata, $kata, $kata);
-    mysqli_stmt_execute($stmt);
-    $hasilCount = mysqli_stmt_get_result($stmt);
-} else {
-    $hasilCount = mysqli_query(
-        $koneksi,
-        "SELECT COUNT(*) AS total FROM t_pelanggaran"
+if ($cari !== '') {
+    $stmtCount = mysqli_prepare($koneksi, $sqlCount);
+
+    if (!$stmtCount) {
+        die("Gagal menyiapkan pencarian jumlah data.");
+    }
+
+    mysqli_stmt_bind_param(
+        $stmtCount,
+        "sss",
+        $kata,
+        $kata,
+        $kata
     );
+
+    mysqli_stmt_execute($stmtCount);
+    $hasilCount = mysqli_stmt_get_result($stmtCount);
+} else {
+    $hasilCount = mysqli_query($koneksi, $sqlCount);
 }
 
 if (!$hasilCount) {
@@ -51,7 +62,7 @@ $totalHalaman = max(1, (int) ceil($totalData / $batas));
 $halaman = min($halaman, $totalHalaman);
 $offset = ($halaman - 1) * $batas;
 
-// Mengambil data jenis pelanggaran
+// Mengambil data jenis pelanggaran.
 $sql = "SELECT
             p.id,
             p.kode,
@@ -69,7 +80,19 @@ $sql = "SELECT
 
 if ($cari !== '') {
     $stmt = mysqli_prepare($koneksi, $sql);
-    mysqli_stmt_bind_param($stmt, "sss", $kata, $kata, $kata);
+
+    if (!$stmt) {
+        die("Gagal menyiapkan data jenis pelanggaran.");
+    }
+
+    mysqli_stmt_bind_param(
+        $stmt,
+        "sss",
+        $kata,
+        $kata,
+        $kata
+    );
+
     mysqli_stmt_execute($stmt);
     $data = mysqli_stmt_get_result($stmt);
 } else {
@@ -82,11 +105,13 @@ if (!$data) {
 
 $pesan = $_GET['pesan'] ?? '';
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>Jenis Pelanggaran - Sistem Pelanggaran Siswa</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
@@ -99,11 +124,23 @@ $pesan = $_GET['pesan'] ?? '';
 
 <main style="margin-left:220px; padding:30px; min-height:100vh;">
 
+    <!-- Judul halaman -->
     <div class="mb-4">
         <h3 class="fw-bold mb-1">Jenis Pelanggaran</h3>
         <p class="text-secondary mb-0">
-            Kelola jenis pelanggaran, kategori, dan poin siswa.
+            Kelola jenis pelanggaran dan besaran pengurangan poin siswa.
         </p>
+    </div>
+
+    <!-- Informasi sistem poin -->
+    <div class="alert alert-info border-0 rounded-3 mb-4">
+        <div class="fw-semibold mb-1">
+            Informasi Sistem Poin
+        </div>
+        Setiap siswa memiliki saldo awal <strong>100 poin</strong>.
+        Setiap pelanggaran akan mengurangi saldo berdasarkan
+        besaran poin yang telah ditentukan.
+        Saldo poin tidak ditampilkan di bawah 0.
     </div>
 
     <!-- Pesan proses -->
@@ -113,25 +150,32 @@ $pesan = $_GET['pesan'] ?? '';
             <button type="button" class="btn-close"
                     data-bs-dismiss="alert"></button>
         </div>
+
     <?php elseif ($pesan == 'edit'): ?>
         <div class="alert alert-success alert-dismissible fade show">
             Jenis pelanggaran berhasil diperbarui.
             <button type="button" class="btn-close"
                     data-bs-dismiss="alert"></button>
         </div>
+
     <?php elseif ($pesan == 'hapus'): ?>
         <div class="alert alert-success alert-dismissible fade show">
             Jenis pelanggaran berhasil dihapus.
             <button type="button" class="btn-close"
                     data-bs-dismiss="alert"></button>
         </div>
+
     <?php elseif ($pesan == 'gagal_hapus'): ?>
         <div class="alert alert-danger alert-dismissible fade show">
             Jenis pelanggaran tidak dapat dihapus karena sudah digunakan
             dalam catatan pelanggaran siswa.
+            <br>
+            Jika masih dibutuhkan untuk riwayat, nonaktifkan jenis pelanggaran
+            melalui fitur edit.
             <button type="button" class="btn-close"
                     data-bs-dismiss="alert"></button>
         </div>
+
     <?php elseif ($pesan == 'gagal'): ?>
         <div class="alert alert-danger alert-dismissible fade show">
             Proses gagal. Periksa kembali data dan relasinya.
@@ -143,11 +187,12 @@ $pesan = $_GET['pesan'] ?? '';
     <div class="card border-0 shadow-sm rounded-4">
         <div class="card-body p-4">
 
+            <!-- Pencarian dan tombol tambah -->
             <div class="d-flex flex-wrap justify-content-between
                         align-items-center gap-3 mb-4">
 
-                <!-- Pencarian -->
-                <form method="GET" action="jenis_pelanggaran.php"
+                <form method="GET"
+                      action="jenis_pelanggaran.php"
                       class="d-flex flex-wrap gap-2">
 
                     <input type="text"
@@ -166,7 +211,6 @@ $pesan = $_GET['pesan'] ?? '';
                     </a>
                 </form>
 
-                <!-- Tambah data -->
                 <a href="tambah_pelanggaran.php"
                    class="btn btn-primary">
                     + Tambah Jenis Pelanggaran
@@ -183,7 +227,7 @@ $pesan = $_GET['pesan'] ?? '';
                             <th>Kode</th>
                             <th>Nama Pelanggaran</th>
                             <th>Kategori</th>
-                            <th>Poin</th>
+                            <th>Pengurangan Poin</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
@@ -191,6 +235,7 @@ $pesan = $_GET['pesan'] ?? '';
 
                     <tbody>
                     <?php if (mysqli_num_rows($data) > 0): ?>
+
                         <?php $no = $offset + 1; ?>
 
                         <?php while ($row = mysqli_fetch_assoc($data)): ?>
@@ -203,13 +248,13 @@ $pesan = $_GET['pesan'] ?? '';
                                     </span>
                                 </td>
 
-                                <td>
+                                <td style="min-width:220px;">
                                     <div class="fw-semibold">
                                         <?= htmlspecialchars($row['nama'], ENT_QUOTES, 'UTF-8') ?>
                                     </div>
 
                                     <small class="text-secondary">
-                                        <?= htmlspecialchars($row['deskripsi'] ?? '', ENT_QUOTES, 'UTF-8') ?>
+                                        <?= htmlspecialchars($row['deskripsi'], ENT_QUOTES, 'UTF-8') ?>
                                     </small>
                                 </td>
 
@@ -218,8 +263,8 @@ $pesan = $_GET['pesan'] ?? '';
                                 </td>
 
                                 <td>
-                                    <span class="badge text-bg-primary">
-                                        <?= (int) $row['poin'] ?> poin
+                                    <span class="badge text-bg-warning">
+                                        -<?= (int) $row['poin'] ?> poin
                                     </span>
                                 </td>
 
@@ -267,15 +312,18 @@ $pesan = $_GET['pesan'] ?? '';
                         <tr>
                             <td colspan="7"
                                 class="text-center text-secondary py-4">
+
                                 <?php if ($cari !== ''): ?>
                                     Data jenis pelanggaran tidak ditemukan.
                                 <?php else: ?>
                                     Data jenis pelanggaran belum tersedia.
                                 <?php endif; ?>
+
                             </td>
                         </tr>
                     <?php endif; ?>
                     </tbody>
+
                 </table>
             </div>
 
@@ -321,8 +369,10 @@ $pesan = $_GET['pesan'] ?? '';
             </div>
         </div>
     </div>
+
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

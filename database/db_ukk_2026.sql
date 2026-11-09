@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 09 Nov 2026 pada 11.18
--- Versi server: 10.4.25-MariaDB
--- Versi PHP: 8.0.23
+-- Waktu pembuatan: 10 Nov 2026 pada 00.17
+-- Versi server: 10.4.32-MariaDB
+-- Versi PHP: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -36,7 +36,7 @@ CREATE TABLE `t_guru` (
   `user_id` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `t_guru`
@@ -113,7 +113,7 @@ CREATE TABLE `t_kelas` (
   `status_aktif` tinyint(1) NOT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `t_kelas`
@@ -185,7 +185,7 @@ CREATE TABLE `t_kelas_siswa` (
   `status_aktif` tinyint(1) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `t_kelas_siswa`
@@ -355,63 +355,63 @@ CREATE TABLE `t_pelanggaran` (
   `status_aktif` tinyint(1) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `t_pelanggaran`
 --
 
 INSERT INTO `t_pelanggaran` (`id`, `pelanggaran_kategori_id`, `kode`, `nama`, `poin`, `deskripsi`, `status_aktif`, `created_at`, `updated_at`) VALUES
-(1, 1, 'P001', 'Pelanggaran 1', 7, 'Deskripsi pelanggaran nomor 1', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(2, 2, 'P002', 'Pelanggaran 2', 9, 'Deskripsi pelanggaran nomor 2', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(3, 3, 'P003', 'Pelanggaran 3', 11, 'Deskripsi pelanggaran nomor 3', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(4, 4, 'P004', 'Pelanggaran 4', 13, 'Deskripsi pelanggaran nomor 4', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(5, 5, 'P005', 'Pelanggaran 5', 15, 'Deskripsi pelanggaran nomor 5', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(6, 6, 'P006', 'Pelanggaran 6', 17, 'Deskripsi pelanggaran nomor 6', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(7, 7, 'P007', 'Pelanggaran 7', 19, 'Deskripsi pelanggaran nomor 7', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(8, 8, 'P008', 'Pelanggaran 8', 21, 'Deskripsi pelanggaran nomor 8', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(9, 9, 'P009', 'Pelanggaran 9', 23, 'Deskripsi pelanggaran nomor 9', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(10, 10, 'P010', 'Pelanggaran 10', 25, 'Deskripsi pelanggaran nomor 10', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(11, 11, 'P011', 'Pelanggaran 11', 27, 'Deskripsi pelanggaran nomor 11', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(12, 12, 'P012', 'Pelanggaran 12', 29, 'Deskripsi pelanggaran nomor 12', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(13, 13, 'P013', 'Pelanggaran 13', 31, 'Deskripsi pelanggaran nomor 13', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(14, 14, 'P014', 'Pelanggaran 14', 33, 'Deskripsi pelanggaran nomor 14', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(15, 15, 'P015', 'Pelanggaran 15', 35, 'Deskripsi pelanggaran nomor 15', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(16, 16, 'P016', 'Pelanggaran 16', 37, 'Deskripsi pelanggaran nomor 16', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(17, 17, 'P017', 'Pelanggaran 17', 39, 'Deskripsi pelanggaran nomor 17', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(18, 18, 'P018', 'Pelanggaran 18', 41, 'Deskripsi pelanggaran nomor 18', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(19, 19, 'P019', 'Pelanggaran 19', 43, 'Deskripsi pelanggaran nomor 19', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(20, 20, 'P020', 'Pelanggaran 20', 45, 'Deskripsi pelanggaran nomor 20', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(21, 21, 'P021', 'Pelanggaran 21', 47, 'Deskripsi pelanggaran nomor 21', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(22, 22, 'P022', 'Pelanggaran 22', 49, 'Deskripsi pelanggaran nomor 22', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(23, 23, 'P023', 'Pelanggaran 23', 51, 'Deskripsi pelanggaran nomor 23', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(24, 24, 'P024', 'Pelanggaran 24', 53, 'Deskripsi pelanggaran nomor 24', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(25, 25, 'P025', 'Pelanggaran 25', 55, 'Deskripsi pelanggaran nomor 25', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(26, 26, 'P026', 'Pelanggaran 26', 57, 'Deskripsi pelanggaran nomor 26', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(27, 27, 'P027', 'Pelanggaran 27', 59, 'Deskripsi pelanggaran nomor 27', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(28, 28, 'P028', 'Pelanggaran 28', 61, 'Deskripsi pelanggaran nomor 28', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(29, 29, 'P029', 'Pelanggaran 29', 63, 'Deskripsi pelanggaran nomor 29', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(30, 30, 'P030', 'Pelanggaran 30', 65, 'Deskripsi pelanggaran nomor 30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(31, 31, 'P031', 'Pelanggaran 31', 67, 'Deskripsi pelanggaran nomor 31', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(32, 32, 'P032', 'Pelanggaran 32', 69, 'Deskripsi pelanggaran nomor 32', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(33, 33, 'P033', 'Pelanggaran 33', 71, 'Deskripsi pelanggaran nomor 33', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(34, 34, 'P034', 'Pelanggaran 34', 73, 'Deskripsi pelanggaran nomor 34', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(35, 35, 'P035', 'Pelanggaran 35', 75, 'Deskripsi pelanggaran nomor 35', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(36, 36, 'P036', 'Pelanggaran 36', 77, 'Deskripsi pelanggaran nomor 36', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(37, 37, 'P037', 'Pelanggaran 37', 79, 'Deskripsi pelanggaran nomor 37', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(38, 38, 'P038', 'Pelanggaran 38', 81, 'Deskripsi pelanggaran nomor 38', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(39, 39, 'P039', 'Pelanggaran 39', 83, 'Deskripsi pelanggaran nomor 39', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(40, 40, 'P040', 'Pelanggaran 40', 85, 'Deskripsi pelanggaran nomor 40', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(41, 41, 'P041', 'Pelanggaran 41', 87, 'Deskripsi pelanggaran nomor 41', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(42, 42, 'P042', 'Pelanggaran 42', 89, 'Deskripsi pelanggaran nomor 42', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(43, 43, 'P043', 'Pelanggaran 43', 91, 'Deskripsi pelanggaran nomor 43', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(44, 44, 'P044', 'Pelanggaran 44', 93, 'Deskripsi pelanggaran nomor 44', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(45, 45, 'P045', 'Pelanggaran 45', 95, 'Deskripsi pelanggaran nomor 45', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(46, 46, 'P046', 'Pelanggaran 46', 97, 'Deskripsi pelanggaran nomor 46', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(47, 47, 'P047', 'Pelanggaran 47', 99, 'Deskripsi pelanggaran nomor 47', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(48, 48, 'P048', 'Pelanggaran 48', 101, 'Deskripsi pelanggaran nomor 48', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(49, 49, 'P049', 'Pelanggaran 49', 103, 'Deskripsi pelanggaran nomor 49', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(50, 50, 'P050', 'Pelanggaran 50', 105, 'Deskripsi pelanggaran nomor 50', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00');
+(1, 1, 'P001', 'Terlambat masuk sekolah', 3, 'Datang ke sekolah melewati waktu masuk yang telah ditentukan.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(2, 1, 'P002', 'Keluar kelas tanpa izin', 5, 'Meninggalkan ruang kelas saat pembelajaran tanpa izin guru.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(3, 1, 'P003', 'Tidak mengikuti upacara', 5, 'Tidak mengikuti upacara sekolah tanpa alasan yang dapat diterima.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(4, 1, 'P004', 'Bolos jam pelajaran', 15, 'Tidak mengikuti kegiatan pembelajaran tanpa keterangan atau izin.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(5, 1, 'P005', 'Meninggalkan sekolah tanpa izin', 20, 'Keluar dari lingkungan sekolah selama jam sekolah tanpa izin.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(6, 2, 'P006', 'Atribut seragam tidak lengkap', 2, 'Menggunakan seragam sekolah tanpa atribut yang diwajibkan.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(7, 2, 'P007', 'Seragam tidak sesuai ketentuan', 3, 'Menggunakan seragam yang tidak sesuai dengan ketentuan sekolah.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(8, 2, 'P008', 'Sepatu tidak sesuai ketentuan', 3, 'Menggunakan sepatu yang tidak sesuai dengan aturan sekolah.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(9, 2, 'P009', 'Rambut tidak sesuai ketentuan', 5, 'Memiliki potongan atau warna rambut yang tidak sesuai aturan sekolah.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(10, 2, 'P010', 'Kuku panjang atau kotor', 2, 'Memiliki kuku yang panjang atau tidak terjaga kebersihannya.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(11, 3, 'P011', 'Terlambat kembali setelah istirahat', 3, 'Kembali ke kelas melewati waktu berakhirnya jam istirahat.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(12, 3, 'P012', 'Tidak masuk tanpa keterangan', 10, 'Tidak hadir di sekolah tanpa memberikan keterangan.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(13, 3, 'P013', 'Tidak mengikuti kegiatan sekolah tanpa izin', 8, 'Tidak mengikuti kegiatan resmi sekolah tanpa izin.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(14, 3, 'P014', 'Pulang sebelum waktunya tanpa izin', 10, 'Meninggalkan sekolah sebelum waktu pulang tanpa izin.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(15, 3, 'P015', 'Memalsukan surat izin', 20, 'Menggunakan atau membuat surat izin dengan informasi yang tidak benar.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(16, 4, 'P016', 'Mengganggu proses pembelajaran', 5, 'Melakukan tindakan yang mengganggu kegiatan belajar mengajar.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(17, 4, 'P017', 'Tidak memperhatikan pembelajaran berulang kali', 3, 'Tidak memperhatikan penjelasan guru secara berulang saat pembelajaran.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(18, 4, 'P018', 'Berkata kasar kepada teman', 8, 'Menggunakan perkataan kasar atau menyakitkan kepada teman.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(19, 4, 'P019', 'Tidak menghormati guru', 10, 'Menunjukkan perilaku tidak menghormati guru.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(20, 4, 'P020', 'Melakukan perundungan', 25, 'Melakukan tindakan intimidasi, penghinaan, atau perundungan terhadap orang lain.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(21, 5, 'P021', 'Tidak mengerjakan tugas', 3, 'Tidak menyelesaikan tugas yang diberikan guru tanpa alasan yang jelas.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(22, 5, 'P022', 'Tidak membawa perlengkapan belajar', 2, 'Tidak membawa perlengkapan yang diperlukan untuk kegiatan pembelajaran.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(23, 5, 'P023', 'Menyontek saat ujian', 10, 'Melakukan kecurangan dengan menyontek saat ujian berlangsung.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(24, 5, 'P024', 'Melakukan plagiarisme', 10, 'Mengakui karya atau pekerjaan orang lain sebagai hasil karya sendiri.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(25, 5, 'P025', 'Tidak mengikuti ujian tanpa alasan', 15, 'Tidak mengikuti ujian tanpa alasan atau keterangan yang dapat diterima.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(26, 6, 'P026', 'Membuang sampah sembarangan', 3, 'Membuang sampah tidak pada tempat yang telah disediakan.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(27, 6, 'P027', 'Tidak melaksanakan piket', 3, 'Tidak melaksanakan tugas piket kebersihan sesuai jadwal.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(28, 6, 'P028', 'Mencoret meja atau dinding', 8, 'Mencoret meja, kursi, dinding, atau fasilitas sekolah lainnya.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(29, 6, 'P029', 'Mengotori fasilitas sekolah', 5, 'Mengotori fasilitas atau lingkungan sekolah.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(30, 6, 'P030', 'Merusak fasilitas kebersihan', 10, 'Merusak tempat sampah, alat kebersihan, atau fasilitas kebersihan lainnya.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(31, 7, 'P031', 'Membawa HP tanpa izin', 5, 'Membawa telepon genggam ke sekolah tanpa izin sesuai ketentuan.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(32, 7, 'P032', 'Menggunakan HP saat pembelajaran tanpa izin', 8, 'Menggunakan telepon genggam saat pembelajaran tanpa izin guru.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(33, 7, 'P033', 'Makan saat pembelajaran', 3, 'Makan di dalam kelas saat pembelajaran berlangsung tanpa izin.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(34, 7, 'P034', 'Memakai aksesori yang dilarang', 3, 'Menggunakan aksesori yang tidak diperbolehkan oleh aturan sekolah.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(35, 7, 'P035', 'Melanggar aturan laboratorium atau bengkel', 15, 'Tidak mematuhi tata tertib keselamatan dan penggunaan fasilitas praktik.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(36, 8, 'P036', 'Menyerobot antrean', 3, 'Tidak tertib dalam antrean dan mendahului orang lain.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(37, 8, 'P037', 'Berbicara tidak pantas', 8, 'Mengucapkan perkataan yang tidak pantas di lingkungan sekolah.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(38, 8, 'P038', 'Bersikap tidak sopan kepada warga sekolah', 8, 'Menunjukkan perilaku tidak sopan kepada guru, tenaga kependidikan, atau warga sekolah.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(39, 8, 'P039', 'Menghina teman', 10, 'Menghina atau merendahkan teman melalui perkataan maupun tindakan.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(40, 8, 'P040', 'Melakukan tindakan tidak pantas di sekolah', 20, 'Melakukan tindakan yang tidak sesuai dengan norma dan tata tertib sekolah.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(41, 9, 'P041', 'Berkelahi di sekolah', 25, 'Terlibat dalam perkelahian di lingkungan sekolah.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(42, 9, 'P042', 'Merokok di sekolah', 20, 'Merokok di dalam atau di sekitar lingkungan sekolah.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(43, 9, 'P043', 'Membawa benda berbahaya', 30, 'Membawa benda yang berpotensi membahayakan keselamatan warga sekolah.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(44, 9, 'P044', 'Mengambil barang milik orang lain', 25, 'Mengambil barang milik orang lain tanpa izin.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(45, 9, 'P045', 'Merusak fasilitas sekolah dengan sengaja', 15, 'Sengaja merusak fasilitas atau sarana prasarana sekolah.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(46, 10, 'P046', 'Merusak tanaman sekolah', 5, 'Merusak tanaman atau fasilitas penghijauan di lingkungan sekolah.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(47, 10, 'P047', 'Membuat kegaduhan di area umum', 3, 'Membuat keributan yang mengganggu ketertiban di area umum sekolah.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(48, 10, 'P048', 'Parkir kendaraan sembarangan', 3, 'Memarkir kendaraan tidak pada tempat yang telah ditentukan.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(49, 10, 'P049', 'Membuang limbah bengkel sembarangan', 10, 'Membuang limbah kegiatan praktik bengkel tidak sesuai prosedur.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32'),
+(50, 10, 'P050', 'Tidak menjaga kebersihan area praktik', 5, 'Tidak menjaga kebersihan ruang atau area kegiatan praktik.', 1, '2026-01-01 01:00:00', '2026-11-09 22:55:32');
 
 -- --------------------------------------------------------
 
@@ -426,63 +426,23 @@ CREATE TABLE `t_pelanggaran_kategori` (
   `status_aktif` tinyint(1) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `t_pelanggaran_kategori`
 --
 
 INSERT INTO `t_pelanggaran_kategori` (`id`, `nama`, `deskripsi`, `status_aktif`, `created_at`, `updated_at`) VALUES
-(1, 'Kedisiplinan 1', 'Kategori pelanggaran 1', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(2, 'Kerapian 1', 'Kategori pelanggaran 2', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(3, 'Kehadiran 1', 'Kategori pelanggaran 3', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(4, 'Sikap 1', 'Kategori pelanggaran 4', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(5, 'Akademik 1', 'Kategori pelanggaran 5', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(6, 'Kebersihan 1', 'Kategori pelanggaran 6', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(7, 'Tata Tertib 1', 'Kategori pelanggaran 7', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(8, 'Kesopanan 1', 'Kategori pelanggaran 8', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(9, 'Keamanan 1', 'Kategori pelanggaran 9', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(10, 'Lingkungan 1', 'Kategori pelanggaran 10', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(11, 'Kedisiplinan 2', 'Kategori pelanggaran 11', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(12, 'Kerapian 2', 'Kategori pelanggaran 12', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(13, 'Kehadiran 2', 'Kategori pelanggaran 13', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(14, 'Sikap 2', 'Kategori pelanggaran 14', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(15, 'Akademik 2', 'Kategori pelanggaran 15', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(16, 'Kebersihan 2', 'Kategori pelanggaran 16', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(17, 'Tata Tertib 2', 'Kategori pelanggaran 17', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(18, 'Kesopanan 2', 'Kategori pelanggaran 18', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(19, 'Keamanan 2', 'Kategori pelanggaran 19', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(20, 'Lingkungan 2', 'Kategori pelanggaran 20', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(21, 'Kedisiplinan 3', 'Kategori pelanggaran 21', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(22, 'Kerapian 3', 'Kategori pelanggaran 22', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(23, 'Kehadiran 3', 'Kategori pelanggaran 23', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(24, 'Sikap 3', 'Kategori pelanggaran 24', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(25, 'Akademik 3', 'Kategori pelanggaran 25', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(26, 'Kebersihan 3', 'Kategori pelanggaran 26', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(27, 'Tata Tertib 3', 'Kategori pelanggaran 27', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(28, 'Kesopanan 3', 'Kategori pelanggaran 28', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(29, 'Keamanan 3', 'Kategori pelanggaran 29', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(30, 'Lingkungan 3', 'Kategori pelanggaran 30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(31, 'Kedisiplinan 4', 'Kategori pelanggaran 31', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(32, 'Kerapian 4', 'Kategori pelanggaran 32', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(33, 'Kehadiran 4', 'Kategori pelanggaran 33', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(34, 'Sikap 4', 'Kategori pelanggaran 34', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(35, 'Akademik 4', 'Kategori pelanggaran 35', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(36, 'Kebersihan 4', 'Kategori pelanggaran 36', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(37, 'Tata Tertib 4', 'Kategori pelanggaran 37', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(38, 'Kesopanan 4', 'Kategori pelanggaran 38', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(39, 'Keamanan 4', 'Kategori pelanggaran 39', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(40, 'Lingkungan 4', 'Kategori pelanggaran 40', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(41, 'Kedisiplinan 5', 'Kategori pelanggaran 41', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(42, 'Kerapian 5', 'Kategori pelanggaran 42', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(43, 'Kehadiran 5', 'Kategori pelanggaran 43', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(44, 'Sikap 5', 'Kategori pelanggaran 44', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(45, 'Akademik 5', 'Kategori pelanggaran 45', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(46, 'Kebersihan 5', 'Kategori pelanggaran 46', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(47, 'Tata Tertib 5', 'Kategori pelanggaran 47', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(48, 'Kesopanan 5', 'Kategori pelanggaran 48', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(49, 'Keamanan 5', 'Kategori pelanggaran 49', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
-(50, 'Lingkungan 5', 'Kategori pelanggaran 50', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00');
+(1, 'Kedisiplinan', 'Pelanggaran terkait kedisiplinan siswa.', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(2, 'Kerapian', 'Pelanggaran terkait kerapian dan kelengkapan seragam.', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(3, 'Kehadiran', 'Pelanggaran terkait kehadiran siswa.', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(4, 'Sikap', 'Pelanggaran terkait sikap dan perilaku siswa.', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(5, 'Akademik', 'Pelanggaran terkait kegiatan akademik.', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(6, 'Kebersihan', 'Pelanggaran terkait kebersihan sekolah.', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(7, 'Tata Tertib', 'Pelanggaran terhadap tata tertib sekolah.', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(8, 'Kesopanan', 'Pelanggaran terkait etika dan kesopanan.', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(9, 'Keamanan', 'Pelanggaran terkait keamanan sekolah.', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00'),
+(10, 'Lingkungan', 'Pelanggaran terkait kepedulian lingkungan.', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00');
 
 -- --------------------------------------------------------
 
@@ -509,7 +469,7 @@ CREATE TABLE `t_pelanggaran_siswa` (
   `status` varchar(30) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `t_pelanggaran_siswa`
@@ -517,7 +477,10 @@ CREATE TABLE `t_pelanggaran_siswa` (
 
 INSERT INTO `t_pelanggaran_siswa` (`id`, `tahun_ajaran_id`, `siswa_id`, `nama_siswa`, `kelas_id`, `nama_kelas`, `pelanggaran_id`, `nama_pelanggaran`, `pelanggaran_kategori_id`, `guru_id`, `nama_guru`, `tanggal`, `keterangan`, `poin`, `tindakan`, `status`, `created_at`, `updated_at`) VALUES
 (51, 1, 223, 'MUHAMAD HAIKAL MUZAKI', 40, 'XII TSM 2', 1, 'Pelanggaran 1', 1, 32, 'Aldi Maulana, S.Pd', '2026-11-09', 'TIDAK MENGERJAKAN TUGAS', 7, 'SUDAH DI GABLOG', 'Selesai', '2026-11-09 09:33:11', '2026-11-09 09:33:11'),
-(52, 1, 159, 'ARFA DIESA OKMALELIZA', 6, 'XII RPL 2', 49, 'Pelanggaran 49', 49, 51, 'Nida Aulia, S.Pd', '2026-11-09', 'WADEDEDDD', 103, 'Belum ada tindakan', 'Belum ditangani', '2026-11-09 09:36:07', '2026-11-09 09:36:07');
+(52, 1, 159, 'ARFA DIESA OKMALELIZA', 6, 'XII RPL 2', 49, 'Pelanggaran 49', 9, 51, 'Nida Aulia, S.Pd', '2026-11-09', 'WADEDEDDD', 103, 'dfsfdssdf', 'Sedang diproses', '2026-11-09 09:36:07', '2026-11-09 09:36:07'),
+(53, 1, 206, 'SIFA AULIA', 48, 'XII BD 1', 11, 'Pelanggaran 11', 1, 1, 'Wawan Kurniawan, S.Pd.I', '2026-11-09', 'bvnvnmmmmmmmmmmvgfhfgfgdcfh', 27, 'digidaw', 'Selesai', '2026-11-09 22:01:43', '2026-11-09 22:01:43'),
+(54, 1, 191, 'KARISNA YULIA NOOR', 48, 'XII BD 1', 19, 'Pelanggaran 19', 9, 29, 'Yaneu Nurdian, S.Pd., M.Pd', '2026-10-11', 'dsssssssssss', 43, 'Belum ada tindakan', 'Belum ditangani', '2026-11-09 22:14:20', '2026-11-09 22:14:20'),
+(55, 1, 132, 'ALISA RAMADHANI', 34, 'XII RPL 1', 18, 'Berkata kasar kepada teman', 4, 32, 'Aldi Maulana, S.Pd', '2026-11-10', 'rgfdghghgghg', 8, 'sudah digidaw', 'Selesai', '2026-11-09 23:09:09', '2026-11-09 23:09:09');
 
 -- --------------------------------------------------------
 
@@ -536,7 +499,7 @@ CREATE TABLE `t_siswa` (
   `status_aktif` tinyint(1) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `t_siswa`
@@ -704,7 +667,7 @@ CREATE TABLE `t_tahun_ajaran` (
   `status_aktif` tinyint(1) NOT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `t_tahun_ajaran`
@@ -729,7 +692,7 @@ CREATE TABLE `t_users` (
   `role` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `t_users`
@@ -858,7 +821,7 @@ CREATE TABLE `t_wali_kelas` (
   `status_aktif` tinyint(1) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `t_wali_kelas`
@@ -989,7 +952,7 @@ ALTER TABLE `t_pelanggaran_kategori`
 -- AUTO_INCREMENT untuk tabel `t_pelanggaran_siswa`
 --
 ALTER TABLE `t_pelanggaran_siswa`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT untuk tabel `t_siswa`

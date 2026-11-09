@@ -14,6 +14,18 @@ if (!in_array($role, ['admin', 'guru'], true)) {
 $menuAktif = "rekap_poin";
 
 // ==========================================
+// FUNGSI
+// ==========================================
+
+function e($nilai) {
+    return htmlspecialchars(
+        (string)($nilai ?? ''),
+        ENT_QUOTES,
+        'UTF-8'
+    );
+}
+
+// ==========================================
 // CEK WALI KELAS
 // ==========================================
 
@@ -24,20 +36,29 @@ $tahunWali = 0;
 if ($role === "guru") {
 
     $queryWali = mysqli_query($koneksi, "
-        SELECT w.kelas_id, w.tahun_ajaran_id
+        SELECT
+            w.kelas_id,
+            w.tahun_ajaran_id
         FROM t_guru g
-        JOIN t_wali_kelas w ON g.id = w.guru_id
-        JOIN t_kelas k ON w.kelas_id = k.id
-        JOIN t_tahun_ajaran ta ON w.tahun_ajaran_id = ta.id
+        JOIN t_wali_kelas w
+            ON g.id = w.guru_id
+        JOIN t_kelas k
+            ON w.kelas_id = k.id
+        JOIN t_tahun_ajaran ta
+            ON w.tahun_ajaran_id = ta.id
         WHERE g.user_id = $idUser
-        AND g.status_aktif = 1
-        AND w.status_aktif = 1
-        AND k.status_aktif = 1
-        AND ta.status_aktif = 1
+            AND g.status_aktif = 1
+            AND w.status_aktif = 1
+            AND k.status_aktif = 1
+            AND ta.status_aktif = 1
         LIMIT 1
     ");
 
-    if ($queryWali && mysqli_num_rows($queryWali) > 0) {
+    if (!$queryWali) {
+        die("Gagal memeriksa wali kelas: " . mysqli_error($koneksi));
+    }
+
+    if (mysqli_num_rows($queryWali) > 0) {
 
         $dataWali = mysqli_fetch_assoc($queryWali);
 
@@ -56,10 +77,10 @@ $cari = isset($_GET['cari']) && is_scalar($_GET['cari'])
     : '';
 
 $tahunFilter = isset($_GET['tahun']) && is_scalar($_GET['tahun'])
-    ? (string)$_GET['tahun']
+    ? trim((string)$_GET['tahun'])
     : '';
 
-// Tahun ajaran aktif
+// Ambil tahun ajaran aktif
 $queryAktif = mysqli_query($koneksi, "
     SELECT id
     FROM t_tahun_ajaran
@@ -67,19 +88,22 @@ $queryAktif = mysqli_query($koneksi, "
     LIMIT 1
 ");
 
-$dataAktif = $queryAktif
-    ? mysqli_fetch_assoc($queryAktif)
-    : null;
+if (!$queryAktif) {
+    die("Gagal mengambil tahun ajaran: " . mysqli_error($koneksi));
+}
+
+$dataAktif = mysqli_fetch_assoc($queryAktif);
 
 $tahunDefault = $dataAktif
     ? (string)$dataAktif['id']
     : "semua";
 
+// Tahun default jika filter belum dipilih
 if ($tahunFilter === '') {
     $tahunFilter = $tahunDefault;
 }
 
-// Wali kelas dikunci pada tahun ajaran penugasannya
+// Wali kelas hanya boleh melihat tahun penugasannya
 if ($isWaliKelas) {
 
     $tahunFilter = (string)$tahunWali;
@@ -102,87 +126,124 @@ $queryTahun = mysqli_query($koneksi, "
     ORDER BY tanggal_mulai DESC
 ");
 
+if (!$queryTahun) {
+    die("Gagal mengambil daftar tahun ajaran: " . mysqli_error($koneksi));
+}
+
 // ==========================================
-// QUERY DASAR REKAP
+// QUERY REKAP POIN
 // ==========================================
+
+// Rekap pelanggaran dihitung berdasarkan
+// siswa, kelas, dan tahun ajaran.
+//
+// Poin pada t_pelanggaran_siswa digunakan
+// karena merupakan snapshot poin saat pelanggaran dicatat.
 
 $sqlRekap = "
     SELECT
-        ps.tahun_ajaran_id,
+        ks.tahun_ajaran_id,
         ta.nama AS tahun_ajaran,
-        ps.siswa_id,
+
+        ks.siswa_id,
         s.nis,
-        ps.nama_siswa,
-        ps.kelas_id,
-        ps.nama_kelas,
-        COUNT(ps.id) AS jumlah_pelanggaran,
-        COALESCE(SUM(ps.poin), 0) AS total_poin
+        s.nama AS nama_siswa,
 
-    FROM t_pelanggaran_siswa ps
+        ks.kelas_id,
+        k.nama AS nama_kelas,
 
-    LEFT JOIN t_siswa s
-        ON ps.siswa_id = s.id
+        COALESCE(p.jumlah_pelanggaran, 0) AS jumlah_pelanggaran,
 
-    LEFT JOIN t_tahun_ajaran ta
-        ON ps.tahun_ajaran_id = ta.id
+        COALESCE(p.total_pengurangan, 0) AS total_pengurangan,
+
+        GREATEST(
+            0,
+            100 - COALESCE(p.total_pengurangan, 0)
+        ) AS sisa_poin
+
+    FROM t_kelas_siswa ks
+
+    JOIN t_siswa s
+        ON ks.siswa_id = s.id
+
+    JOIN t_kelas k
+        ON ks.kelas_id = k.id
+
+    JOIN t_tahun_ajaran ta
+        ON ks.tahun_ajaran_id = ta.id
+
+    LEFT JOIN (
+        SELECT
+            tahun_ajaran_id,
+            siswa_id,
+            kelas_id,
+            COUNT(*) AS jumlah_pelanggaran,
+            SUM(poin) AS total_pengurangan
+        FROM t_pelanggaran_siswa
+        GROUP BY
+            tahun_ajaran_id,
+            siswa_id,
+            kelas_id
+    ) p
+        ON p.siswa_id = ks.siswa_id
+        AND p.kelas_id = ks.kelas_id
+        AND p.tahun_ajaran_id = ks.tahun_ajaran_id
+
+    WHERE
+        ks.status_aktif = 1
+        AND s.status_aktif = 1
+        AND k.status_aktif = 1
 ";
 
-// Wali kelas hanya melihat siswa kelasnya
+// ==========================================
+// PEMBATASAN WALI KELAS
+// ==========================================
+
 if ($isWaliKelas) {
 
     $sqlRekap .= "
-        WHERE ps.kelas_id = $kelasWali
-        AND ps.tahun_ajaran_id = $tahunWali
+        AND ks.kelas_id = $kelasWali
+        AND ks.tahun_ajaran_id = $tahunWali
     ";
 }
 
-$sqlRekap .= "
-    GROUP BY
-        ps.tahun_ajaran_id,
-        ta.nama,
-        ps.siswa_id,
-        s.nis,
-        ps.nama_siswa,
-        ps.kelas_id,
-        ps.nama_kelas
-";
-
 // ==========================================
-// FILTER HASIL REKAP
+// FILTER TAHUN AJARAN
 // ==========================================
-
-$where = "WHERE 1=1";
 
 if ($tahunFilter !== "semua") {
 
     $tahunId = (int)$tahunFilter;
 
-    $where .= "
-        AND rekap.tahun_ajaran_id = $tahunId
+    $sqlRekap .= "
+        AND ks.tahun_ajaran_id = $tahunId
     ";
 }
+
+// ==========================================
+// FILTER PENCARIAN
+// ==========================================
 
 if ($cari !== '') {
 
     $kata = mysqli_real_escape_string($koneksi, $cari);
 
-    $where .= "
+    $sqlRekap .= "
         AND (
-            rekap.nama_siswa LIKE '%$kata%'
-            OR rekap.nis LIKE '%$kata%'
-            OR rekap.nama_kelas LIKE '%$kata%'
+            s.nis LIKE '%$kata%'
+            OR s.nama LIKE '%$kata%'
+            OR k.nama LIKE '%$kata%'
         )
     ";
 }
 
 // ==========================================
-// HITUNG JUMLAH SISWA
+// HITUNG JUMLAH DATA
 // ==========================================
 
 $queryJumlah = mysqli_query($koneksi, "
     SELECT COUNT(*) AS total
     FROM ($sqlRekap) AS rekap
-    $where
 ");
 
 if (!$queryJumlah) {
@@ -218,8 +279,9 @@ $offset = ($halaman - 1) * $batas;
 $query = mysqli_query($koneksi, "
     SELECT *
     FROM ($sqlRekap) AS rekap
-    $where
-    ORDER BY rekap.total_poin DESC, rekap.nama_siswa ASC
+    ORDER BY
+        rekap.sisa_poin ASC,
+        rekap.nama_siswa ASC
     LIMIT $batas OFFSET $offset
 ");
 
@@ -236,13 +298,6 @@ $parameter = [
     'tahun' => $tahunFilter
 ];
 
-function e($nilai) {
-    return htmlspecialchars(
-        (string)($nilai ?? ''),
-        ENT_QUOTES,
-        'UTF-8'
-    );
-}
 ?>
 
 <!DOCTYPE html>
@@ -255,8 +310,10 @@ function e($nilai) {
 
     <title>Rekap Poin Siswa</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
 
     <style>
         body {
@@ -297,7 +354,8 @@ function e($nilai) {
         <h3 class="fw-bold">Rekap Poin Siswa</h3>
 
         <p class="text-muted mb-0">
-            Ringkasan jumlah pelanggaran dan total poin siswa.
+            Ringkasan jumlah pelanggaran, pengurangan poin,
+            dan sisa poin siswa.
         </p>
 
     </div>
@@ -306,7 +364,7 @@ function e($nilai) {
 
         <div class="card-body">
 
-            <!-- Pencarian dan Filter -->
+            <!-- PENCARIAN DAN FILTER -->
 
             <form method="GET" class="row g-2 mb-3">
 
@@ -356,25 +414,23 @@ function e($nilai) {
 
                         <select name="tahun" class="form-select">
 
-                            <option value="semua"
-                                <?= $tahunFilter === "semua" ? "selected" : ""; ?>>
+                            <option
+                                value="semua"
+                                <?= $tahunFilter === "semua" ? "selected" : ""; ?>
+                            >
                                 Semua Tahun Ajaran
                             </option>
 
-                            <?php if ($queryTahun): ?>
+                            <?php while ($ta = mysqli_fetch_assoc($queryTahun)): ?>
 
-                                <?php while ($ta = mysqli_fetch_assoc($queryTahun)): ?>
+                                <option
+                                    value="<?= (int)$ta['id']; ?>"
+                                    <?= $tahunFilter == $ta['id'] ? "selected" : ""; ?>
+                                >
+                                    <?= e($ta['nama']); ?>
+                                </option>
 
-                                    <option
-                                        value="<?= $ta['id']; ?>"
-                                        <?= $tahunFilter == $ta['id'] ? "selected" : ""; ?>
-                                    >
-                                        <?= e($ta['nama']); ?>
-                                    </option>
-
-                                <?php endwhile; ?>
-
-                            <?php endif; ?>
+                            <?php endwhile; ?>
 
                         </select>
 
@@ -400,7 +456,7 @@ function e($nilai) {
 
             </form>
 
-            <!-- Informasi Jumlah Data -->
+            <!-- INFORMASI DATA -->
 
             <div class="d-flex justify-content-between mb-3 flex-wrap gap-2">
 
@@ -422,7 +478,7 @@ function e($nilai) {
 
             </div>
 
-            <!-- Tabel Rekap -->
+            <!-- TABEL REKAP -->
 
             <div class="table-responsive">
 
@@ -437,7 +493,8 @@ function e($nilai) {
                             <th>Kelas</th>
                             <th>Tahun Ajaran</th>
                             <th>Jumlah Pelanggaran</th>
-                            <th>Total Poin</th>
+                            <th>Total Pengurangan</th>
+                            <th>Sisa Poin</th>
                         </tr>
 
                     </thead>
@@ -450,12 +507,26 @@ function e($nilai) {
 
                             <?php while ($data = mysqli_fetch_assoc($query)): ?>
 
+                                <?php
+                                $sisaPoin = (int)$data['sisa_poin'];
+
+                                if ($sisaPoin >= 80) {
+                                    $warnaPoin = 'bg-success';
+                                } elseif ($sisaPoin >= 60) {
+                                    $warnaPoin = 'bg-primary';
+                                } elseif ($sisaPoin >= 40) {
+                                    $warnaPoin = 'bg-warning text-dark';
+                                } else {
+                                    $warnaPoin = 'bg-danger';
+                                }
+                                ?>
+
                                 <tr>
 
                                     <td><?= $no++; ?></td>
 
                                     <td>
-                                        <?= e($data['nis'] ?? '-'); ?>
+                                        <?= e($data['nis']); ?>
                                     </td>
 
                                     <td>
@@ -467,7 +538,7 @@ function e($nilai) {
                                     </td>
 
                                     <td>
-                                        <?= e($data['tahun_ajaran'] ?? '-'); ?>
+                                        <?= e($data['tahun_ajaran']); ?>
                                     </td>
 
                                     <td>
@@ -475,8 +546,12 @@ function e($nilai) {
                                     </td>
 
                                     <td>
-                                        <span class="badge bg-primary">
-                                            <?= (int)$data['total_poin']; ?> Poin
+                                        -<?= (int)$data['total_pengurangan']; ?> poin
+                                    </td>
+
+                                    <td>
+                                        <span class="badge <?= $warnaPoin; ?>">
+                                            <?= $sisaPoin; ?> poin
                                         </span>
                                     </td>
 
@@ -488,8 +563,7 @@ function e($nilai) {
 
                             <tr>
 
-                                <td colspan="7"
-                                    class="text-center text-muted py-4">
+                                <td colspan="8" class="text-center text-muted py-4">
 
                                     Data rekap poin tidak ditemukan.
 
@@ -505,7 +579,7 @@ function e($nilai) {
 
             </div>
 
-            <!-- Pagination -->
+            <!-- PAGINATION -->
 
             <?php if ($totalHalaman > 1): ?>
 
@@ -515,14 +589,14 @@ function e($nilai) {
 
                         <li class="page-item <?= $halaman <= 1 ? 'disabled' : ''; ?>">
 
-                            <a class="page-link"
-                               href="?<?= e(http_build_query(array_merge(
-                                   $parameter,
-                                   ['halaman' => $halaman - 1]
-                               ))); ?>">
-
+                            <a
+                                class="page-link"
+                                href="?<?= e(http_build_query(array_merge(
+                                    $parameter,
+                                    ['halaman' => max(1, $halaman - 1)]
+                                ))); ?>"
+                            >
                                 Sebelumnya
-
                             </a>
 
                         </li>
@@ -531,14 +605,14 @@ function e($nilai) {
 
                             <li class="page-item <?= $halaman == $i ? 'active' : ''; ?>">
 
-                                <a class="page-link"
-                                   href="?<?= e(http_build_query(array_merge(
-                                       $parameter,
-                                       ['halaman' => $i]
-                                   ))); ?>">
-
+                                <a
+                                    class="page-link"
+                                    href="?<?= e(http_build_query(array_merge(
+                                        $parameter,
+                                        ['halaman' => $i]
+                                    ))); ?>"
+                                >
                                     <?= $i; ?>
-
                                 </a>
 
                             </li>
@@ -547,14 +621,14 @@ function e($nilai) {
 
                         <li class="page-item <?= $halaman >= $totalHalaman ? 'disabled' : ''; ?>">
 
-                            <a class="page-link"
-                               href="?<?= e(http_build_query(array_merge(
-                                   $parameter,
-                                   ['halaman' => $halaman + 1]
-                               ))); ?>">
-
+                            <a
+                                class="page-link"
+                                href="?<?= e(http_build_query(array_merge(
+                                    $parameter,
+                                    ['halaman' => min($totalHalaman, $halaman + 1)]
+                                ))); ?>"
+                            >
                                 Selanjutnya
-
                             </a>
 
                         </li>
