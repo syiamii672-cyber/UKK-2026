@@ -14,7 +14,7 @@ $idUser = (int) $_SESSION['id'];
 $pesan = "";
 $berhasil = isset($_GET['berhasil']);
 
-// Ambil identitas guru yang sedang login
+// Identitas guru yang login
 $queryGuru = mysqli_query($koneksi, "
     SELECT id, nama
     FROM t_guru
@@ -32,7 +32,7 @@ if (!$guru) {
 $guruId = (int) $guru['id'];
 $namaGuru = $guru['nama'];
 
-// Ambil tahun ajaran aktif
+// Tahun ajaran aktif
 $queryTahun = mysqli_query($koneksi, "
     SELECT id, nama
     FROM t_tahun_ajaran
@@ -48,13 +48,32 @@ if (!$tahun) {
 
 $tahunId = (int) $tahun['id'];
 
-// Ambil seluruh siswa dengan penempatan aktif
+// Ambil daftar kelas yang memiliki siswa aktif
+$queryKelas = mysqli_query($koneksi, "
+    SELECT DISTINCT
+        k.id,
+        k.nama
+    FROM t_kelas_siswa ks
+    JOIN t_kelas k ON ks.kelas_id = k.id
+    WHERE ks.tahun_ajaran_id = $tahunId
+    AND ks.status_aktif = 1
+    AND k.status_aktif = 1
+    ORDER BY k.nama ASC
+");
+
+$daftarKelas = [];
+
+while ($kelas = mysqli_fetch_assoc($queryKelas)) {
+    $daftarKelas[] = $kelas;
+}
+
+// Ambil siswa beserta kelas aktifnya
 $querySiswa = mysqli_query($koneksi, "
     SELECT
         s.id,
         s.nis,
         s.nama,
-        k.nama AS nama_kelas
+        ks.kelas_id
     FROM t_kelas_siswa ks
     JOIN t_siswa s ON ks.siswa_id = s.id
     JOIN t_kelas k ON ks.kelas_id = k.id
@@ -65,7 +84,13 @@ $querySiswa = mysqli_query($koneksi, "
     ORDER BY s.nama ASC
 ");
 
-// Ambil jenis pelanggaran aktif
+$daftarSiswa = [];
+
+while ($siswa = mysqli_fetch_assoc($querySiswa)) {
+    $daftarSiswa[] = $siswa;
+}
+
+// Jenis pelanggaran aktif
 $queryPelanggaran = mysqli_query($koneksi, "
     SELECT
         id,
@@ -77,19 +102,30 @@ $queryPelanggaran = mysqli_query($koneksi, "
     ORDER BY nama ASC
 ");
 
+// Nilai pilihan agar tetap terisi jika terjadi kesalahan
+$kelasPilihan = (int) ($_POST['kelas_id'] ?? 0);
+$siswaPilihan = (int) ($_POST['siswa_id'] ?? 0);
+
 // Proses penyimpanan
 if (isset($_POST['simpan'])) {
 
+    $kelasPilihan = (int) ($_POST['kelas_id'] ?? 0);
     $siswaId = (int) ($_POST['siswa_id'] ?? 0);
     $pelanggaranId = (int) ($_POST['pelanggaran_id'] ?? 0);
     $tanggal = $_POST['tanggal'] ?? '';
     $keterangan = trim($_POST['keterangan'] ?? '');
 
-    if ($siswaId <= 0 || $pelanggaranId <= 0 || $tanggal == "" || $keterangan == "") {
+    if (
+        $kelasPilihan <= 0 ||
+        $siswaId <= 0 ||
+        $pelanggaranId <= 0 ||
+        $tanggal == "" ||
+        $keterangan == ""
+    ) {
         $pesan = "Semua data wajib diisi.";
     } else {
 
-        // Pastikan siswa memiliki penempatan aktif
+        // Pastikan siswa benar-benar berada di kelas yang dipilih
         $cekSiswa = mysqli_query($koneksi, "
             SELECT
                 s.id,
@@ -100,6 +136,7 @@ if (isset($_POST['simpan'])) {
             JOIN t_siswa s ON ks.siswa_id = s.id
             JOIN t_kelas k ON ks.kelas_id = k.id
             WHERE s.id = $siswaId
+            AND ks.kelas_id = $kelasPilihan
             AND ks.tahun_ajaran_id = $tahunId
             AND ks.status_aktif = 1
             AND s.status_aktif = 1
@@ -121,10 +158,18 @@ if (isset($_POST['simpan'])) {
         $dataPelanggaran = mysqli_fetch_assoc($cekPelanggaran);
 
         if (!$dataSiswa) {
-            $pesan = "Siswa tidak ditemukan atau belum memiliki kelas aktif.";
+            $pesan = "Siswa tidak ditemukan dalam kelas yang dipilih atau sudah tidak aktif.";
         } elseif (!$dataPelanggaran) {
             $pesan = "Jenis pelanggaran tidak ditemukan atau sudah tidak aktif.";
-        } elseif (strtotime($tanggal) === false || $tanggal > date('Y-m-d')) {
+        } elseif (
+            !preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggal) ||
+            !checkdate(
+                (int) substr($tanggal, 5, 2),
+                (int) substr($tanggal, 8, 2),
+                (int) substr($tanggal, 0, 4)
+            ) ||
+            $tanggal > date('Y-m-d')
+        ) {
             $pesan = "Tanggal pelanggaran tidak valid.";
         } else {
 
@@ -183,7 +228,7 @@ if (isset($_POST['simpan'])) {
                 header("Location: catat_pelanggaran.php?berhasil=1");
                 exit;
             } else {
-                $pesan = "Gagal menyimpan pelanggaran.";
+                $pesan = "Gagal menyimpan pelanggaran: " . mysqli_stmt_error($stmt);
             }
 
             mysqli_stmt_close($stmt);
@@ -197,6 +242,7 @@ if (isset($_POST['simpan'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>Catat Pelanggaran</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -223,7 +269,7 @@ if (isset($_POST['simpan'])) {
 
     <?php if ($pesan != ""): ?>
         <div class="alert alert-danger">
-            <?= htmlspecialchars($pesan) ?>
+            <?= htmlspecialchars($pesan, ENT_QUOTES, 'UTF-8') ?>
         </div>
     <?php endif; ?>
 
@@ -236,6 +282,7 @@ if (isset($_POST['simpan'])) {
                     <label class="form-label fw-semibold">
                         Tahun Ajaran
                     </label>
+
                     <input type="text" class="form-control"
                         value="<?= htmlspecialchars($tahun['nama']) ?>"
                         readonly>
@@ -245,6 +292,7 @@ if (isset($_POST['simpan'])) {
                     <label class="form-label fw-semibold">
                         Guru Pencatat
                     </label>
+
                     <input type="text" class="form-control"
                         value="<?= htmlspecialchars($namaGuru) ?>"
                         readonly>
@@ -254,19 +302,67 @@ if (isset($_POST['simpan'])) {
 
                 <h5 class="mb-3">Data Siswa</h5>
 
+                <!-- Pilih kelas -->
                 <div class="mb-3">
-                    <label class="form-label">Pilih Siswa</label>
+                    <label for="kelas_id" class="form-label fw-semibold">
+                        Pilih Kelas
+                    </label>
 
-                    <select name="siswa_id" class="form-select" required>
-                        <option value="">-- Pilih Siswa --</option>
+                    <select name="kelas_id" id="kelas_id"
+                        class="form-select" required>
 
-                        <?php while ($s = mysqli_fetch_assoc($querySiswa)): ?>
-                            <option value="<?= $s['id'] ?>"
-                                <?= (($_POST['siswa_id'] ?? '') == $s['id']) ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($s['nis'] . " - " . $s['nama'] . " (" . $s['nama_kelas'] . ")") ?>
+                        <option value="">-- Pilih Kelas Terlebih Dahulu --</option>
+
+                        <?php foreach ($daftarKelas as $k): ?>
+                            <option value="<?= (int) $k['id'] ?>"
+                                <?= $kelasPilihan == $k['id'] ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($k['nama']) ?>
                             </option>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
+
                     </select>
+                </div>
+
+                <!-- Cari siswa -->
+                <div class="mb-2">
+                    <label for="cari_siswa" class="form-label fw-semibold">
+                        Cari Siswa
+                    </label>
+
+                    <input type="search" id="cari_siswa"
+                        class="form-control"
+                        placeholder="Ketik nama atau NIS siswa..."
+                        disabled>
+                </div>
+
+                <!-- Pilih siswa -->
+                <div class="mb-3">
+                    <label for="siswa_id" class="form-label fw-semibold">
+                        Pilih Siswa
+                    </label>
+
+                    <select name="siswa_id" id="siswa_id"
+                        class="form-select" required disabled>
+
+                        <option value="">-- Pilih Kelas Terlebih Dahulu --</option>
+
+                        <?php foreach ($daftarSiswa as $s): ?>
+                            <option
+                                value="<?= (int) $s['id'] ?>"
+                                data-kelas="<?= (int) $s['kelas_id'] ?>"
+                                data-cari="<?= htmlspecialchars(strtolower($s['nis'] . ' ' . $s['nama']), ENT_QUOTES, 'UTF-8') ?>"
+                                <?= $siswaPilihan == $s['id'] ? 'selected' : '' ?>>
+
+                                <?= htmlspecialchars($s['nis'] . ' - ' . $s['nama']) ?>
+
+                            </option>
+                        <?php endforeach; ?>
+
+                    </select>
+
+                    <small class="text-muted" id="info_siswa">
+                        Pilih kelas untuk menampilkan daftar siswanya.
+                    </small>
                 </div>
 
                 <hr>
@@ -274,7 +370,9 @@ if (isset($_POST['simpan'])) {
                 <h5 class="mb-3">Detail Pelanggaran</h5>
 
                 <div class="mb-3">
-                    <label class="form-label">Jenis Pelanggaran</label>
+                    <label class="form-label fw-semibold">
+                        Jenis Pelanggaran
+                    </label>
 
                     <select name="pelanggaran_id" class="form-select" required>
                         <option value="">-- Pilih Pelanggaran --</option>
@@ -282,15 +380,21 @@ if (isset($_POST['simpan'])) {
                         <?php while ($p = mysqli_fetch_assoc($queryPelanggaran)): ?>
                             <option value="<?= $p['id'] ?>"
                                 <?= (($_POST['pelanggaran_id'] ?? '') == $p['id']) ? 'selected' : '' ?>>
+
                                 <?= htmlspecialchars($p['nama']) ?>
-                                - <?= $p['poin'] ?> Poin
+                                - <?= (int) $p['poin'] ?> Poin
+
                             </option>
                         <?php endwhile; ?>
+
                     </select>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Tanggal Pelanggaran</label>
+                    <label class="form-label fw-semibold">
+                        Tanggal Pelanggaran
+                    </label>
+
                     <input type="date" name="tanggal"
                         class="form-control"
                         max="<?= date('Y-m-d') ?>"
@@ -299,7 +403,10 @@ if (isset($_POST['simpan'])) {
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label">Keterangan Kejadian</label>
+                    <label class="form-label fw-semibold">
+                        Keterangan Kejadian
+                    </label>
+
                     <textarea name="keterangan" class="form-control"
                         rows="4"
                         placeholder="Jelaskan kejadian pelanggaran siswa..."
@@ -307,7 +414,8 @@ if (isset($_POST['simpan'])) {
                 </div>
 
                 <div class="d-flex gap-2">
-                    <button type="submit" name="simpan" class="btn btn-primary">
+                    <button type="submit" name="simpan"
+                        class="btn btn-primary">
                         Simpan Pelanggaran
                     </button>
 
@@ -322,6 +430,83 @@ if (isset($_POST['simpan'])) {
     </div>
 
 </div>
+
+<script>
+const pilihKelas = document.getElementById('kelas_id');
+const cariSiswa = document.getElementById('cari_siswa');
+const pilihSiswa = document.getElementById('siswa_id');
+const infoSiswa = document.getElementById('info_siswa');
+
+function tampilkanSiswa() {
+    const kelasId = pilihKelas.value;
+    const keyword = cariSiswa.value.toLowerCase().trim();
+
+    let jumlahSiswa = 0;
+    let jumlahCocok = 0;
+
+    const pilihanSiswa = pilihSiswa.options;
+
+    for (let i = 0; i < pilihanSiswa.length; i++) {
+        const opsi = pilihanSiswa[i];
+
+        if (!opsi.value) {
+            continue;
+        }
+
+        const kelasSiswa = opsi.dataset.kelas;
+        const teksSiswa = opsi.dataset.cari || '';
+
+        const sesuaiKelas = kelasSiswa === kelasId;
+        const sesuaiCari = teksSiswa.includes(keyword);
+
+        opsi.hidden = !(sesuaiKelas && sesuaiCari);
+        opsi.disabled = !(sesuaiKelas && sesuaiCari);
+
+        if (sesuaiKelas) {
+            jumlahSiswa++;
+        }
+
+        if (sesuaiKelas && sesuaiCari) {
+            jumlahCocok++;
+        }
+    }
+
+    pilihSiswa.disabled = !kelasId;
+    cariSiswa.disabled = !kelasId;
+
+    if (!kelasId) {
+        pilihSiswa.value = '';
+        pilihSiswa.options[0].text = '-- Pilih Kelas Terlebih Dahulu --';
+        infoSiswa.textContent = 'Pilih kelas untuk menampilkan daftar siswanya.';
+        return;
+    }
+
+    pilihSiswa.options[0].text = '-- Pilih Siswa --';
+
+    if (jumlahSiswa === 0) {
+        infoSiswa.textContent = 'Belum ada siswa aktif di kelas ini.';
+    } else if (jumlahCocok === 0) {
+        infoSiswa.textContent = 'Siswa yang dicari tidak ditemukan.';
+    } else {
+        infoSiswa.textContent =
+            jumlahCocok + ' siswa ditemukan dari ' + jumlahSiswa + ' siswa di kelas ini.';
+    }
+}
+
+pilihKelas.addEventListener('change', function () {
+    pilihSiswa.value = '';
+    cariSiswa.value = '';
+    tampilkanSiswa();
+});
+
+cariSiswa.addEventListener('input', function () {
+    pilihSiswa.value = '';
+    tampilkanSiswa();
+});
+
+// Atur tampilan awal, termasuk ketika form dikirim ulang karena error
+tampilkanSiswa();
+</script>
 
 </body>
 </html>

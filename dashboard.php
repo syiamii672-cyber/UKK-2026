@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 
@@ -14,7 +15,7 @@ $role = $_SESSION['role'] ?? '';
 
 $menuAktif = "dashboard";
 
-// Mengambil jumlah data untuk Dashboard Admin
+// Total data untuk Dashboard Admin
 $totalSiswa = 0;
 $totalGuru = 0;
 $totalKelas = 0;
@@ -113,6 +114,7 @@ if ($role === "admin") {
         <?php if ($role === "admin"): ?>
 
             <!-- Dashboard Admin -->
+
             <div class="col-12 col-lg-4">
                 <div class="card kartu-dashboard shadow-sm h-100">
                     <div class="card-body">
@@ -152,6 +154,7 @@ if ($role === "admin") {
         <?php elseif ($role === "guru"): ?>
 
             <!-- Informasi Guru -->
+
             <div class="col-12 mb-2">
                 <div class="card kartu-dashboard shadow-sm">
                     <div class="card-body">
@@ -164,7 +167,9 @@ if ($role === "admin") {
 
                             <p class="text-secondary mb-2">
                                 Anda bertugas sebagai Wali Kelas.
-                                Silakan pantau poin, riwayat, dan laporan pelanggaran siswa.
+                                Silakan gunakan menu untuk mencatat pelanggaran,
+                                mengelola tindakan, memantau rekap poin,
+                                riwayat, dan laporan siswa.
                             </p>
 
                             <span class="badge bg-primary">
@@ -174,8 +179,9 @@ if ($role === "admin") {
                         <?php else: ?>
 
                             <p class="text-secondary mb-0">
-                                Silakan gunakan menu untuk mencatat pelanggaran
-                                dan mengelola tindak lanjut pelanggaran siswa.
+                                Silakan gunakan menu untuk mencatat pelanggaran,
+                                mengelola tindakan, melihat rekap poin,
+                                dan memantau riwayat pelanggaran siswa.
                             </p>
 
                         <?php endif; ?>
@@ -184,37 +190,67 @@ if ($role === "admin") {
                 </div>
             </div>
 
+            <!-- Menu yang dimiliki semua Guru -->
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <a href="catat_pelanggaran.php" class="kartu-menu">
+                    <div class="card kartu-dashboard shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="text-secondary">Catat Pelanggaran</h6>
+                            <h5 class="fw-bold mt-3">Catat Pelanggaran Siswa</h5>
+                            <p class="text-muted small mb-0">
+                                Masukkan catatan pelanggaran siswa.
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <a href="tindakan.php" class="kartu-menu">
+                    <div class="card kartu-dashboard shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="text-secondary">Tindakan</h6>
+                            <h5 class="fw-bold mt-3">Kelola Tindakan</h5>
+                            <p class="text-muted small mb-0">
+                                Lihat dan kelola tindak lanjut pelanggaran.
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <a href="rekap_poin.php" class="kartu-menu">
+                    <div class="card kartu-dashboard shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="text-secondary">Rekap Poin</h6>
+                            <h5 class="fw-bold mt-3">Lihat Rekap Poin</h5>
+                            <p class="text-muted small mb-0">
+                                Pantau jumlah pelanggaran dan total poin siswa.
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <a href="riwayat_pelanggaran.php" class="kartu-menu">
+                    <div class="card kartu-dashboard shadow-sm h-100">
+                        <div class="card-body">
+                            <h6 class="text-secondary">Riwayat</h6>
+                            <h5 class="fw-bold mt-3">Lihat Riwayat</h5>
+                            <p class="text-muted small mb-0">
+                                Lihat riwayat pelanggaran siswa.
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Menu tambahan khusus Wali Kelas -->
+
             <?php if ($isWaliKelas): ?>
-
-                <!-- Menu khusus Wali Kelas -->
-
-                <div class="col-12 col-md-6 col-lg-4">
-                    <a href="rekap_poin.php" class="kartu-menu">
-                        <div class="card kartu-dashboard shadow-sm h-100">
-                            <div class="card-body">
-                                <h6 class="text-secondary">Rekap Poin</h6>
-                                <h5 class="fw-bold mt-3">Lihat Rekap Poin</h5>
-                                <p class="text-muted small mb-0">
-                                    Pantau akumulasi poin pelanggaran siswa kelas Anda.
-                                </p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                <div class="col-12 col-md-6 col-lg-4">
-                    <a href="riwayat_pelanggaran.php" class="kartu-menu">
-                        <div class="card kartu-dashboard shadow-sm h-100">
-                            <div class="card-body">
-                                <h6 class="text-secondary">Riwayat</h6>
-                                <h5 class="fw-bold mt-3">Lihat Riwayat</h5>
-                                <p class="text-muted small mb-0">
-                                    Lihat riwayat pelanggaran siswa kelas Anda.
-                                </p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
 
                 <div class="col-12 col-md-6 col-lg-4">
                     <a href="laporan.php" class="kartu-menu">
@@ -224,38 +260,6 @@ if ($role === "admin") {
                                 <h5 class="fw-bold mt-3">Lihat Laporan</h5>
                                 <p class="text-muted small mb-0">
                                     Lihat laporan pelanggaran siswa kelas Anda.
-                                </p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-            <?php else: ?>
-
-                <!-- Menu khusus Guru Biasa -->
-
-                <div class="col-12 col-md-6 col-lg-4">
-                    <a href="catat_pelanggaran.php" class="kartu-menu">
-                        <div class="card kartu-dashboard shadow-sm h-100">
-                            <div class="card-body">
-                                <h6 class="text-secondary">Catat Pelanggaran</h6>
-                                <h5 class="fw-bold mt-3">Catat Pelanggaran Siswa</h5>
-                                <p class="text-muted small mb-0">
-                                    Masukkan catatan pelanggaran siswa.
-                                </p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-
-                <div class="col-12 col-md-6 col-lg-4">
-                    <a href="tindakan.php" class="kartu-menu">
-                        <div class="card kartu-dashboard shadow-sm h-100">
-                            <div class="card-body">
-                                <h6 class="text-secondary">Tindakan</h6>
-                                <h5 class="fw-bold mt-3">Kelola Tindakan</h5>
-                                <p class="text-muted small mb-0">
-                                    Lihat dan kelola tindak lanjut pelanggaran.
                                 </p>
                             </div>
                         </div>

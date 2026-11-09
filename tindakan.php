@@ -34,33 +34,50 @@ if (isset($_POST['simpan'])) {
         "Selesai"
     ];
 
-    if ($id <= 0 || $tindakan == "" || !in_array($status, $statusValid, true)) {
+    if ($id <= 0 || $tindakan === "" ||
+        !in_array($status, $statusValid, true)) {
+
         $pesan = "Data tindakan tidak valid.";
+
     } else {
 
+        // Pastikan data masih berstatus belum selesai
         $stmt = mysqli_prepare($koneksi, "
             UPDATE t_pelanggaran_siswa
             SET tindakan = ?, status = ?
             WHERE id = ?
+            AND status IN ('Belum ditangani', 'Sedang diproses')
         ");
 
-        mysqli_stmt_bind_param($stmt, "ssi", $tindakan, $status, $id);
+        mysqli_stmt_bind_param(
+            $stmt,
+            "ssi",
+            $tindakan,
+            $status,
+            $id
+        );
 
         if (mysqli_stmt_execute($stmt)) {
+            mysqli_stmt_close($stmt);
+
             header("Location: tindakan.php?berhasil=1");
             exit;
+
         } else {
             $pesan = "Gagal memperbarui tindakan.";
+            mysqli_stmt_close($stmt);
         }
-
-        mysqli_stmt_close($stmt);
     }
 }
 
-// Kondisi pencarian
-$where = "WHERE 1=1";
+// Halaman Tindakan hanya menampilkan data yang belum selesai
+$where = "
+    WHERE status IN ('Belum ditangani', 'Sedang diproses')
+";
 
-if ($cari != '') {
+// Pencarian
+if ($cari !== '') {
+
     $kata = mysqli_real_escape_string($koneksi, $cari);
 
     $where .= " AND (
@@ -69,17 +86,24 @@ if ($cari != '') {
         OR nama_pelanggaran LIKE '%$kata%'
         OR nama_guru LIKE '%$kata%'
         OR siswa_id IN (
-            SELECT id FROM t_siswa WHERE nis LIKE '%$kata%'
+            SELECT id
+            FROM t_siswa
+            WHERE nis LIKE '%$kata%'
         )
     )";
 }
 
+// Filter status yang masih aktif
 if (in_array($statusFilter, [
     "Belum ditangani",
-    "Sedang diproses",
-    "Selesai"
+    "Sedang diproses"
 ], true)) {
-    $statusAman = mysqli_real_escape_string($koneksi, $statusFilter);
+
+    $statusAman = mysqli_real_escape_string(
+        $koneksi,
+        $statusFilter
+    );
+
     $where .= " AND status = '$statusAman'";
 }
 
@@ -90,13 +114,18 @@ $queryJumlah = mysqli_query($koneksi, "
     $where
 ");
 
+if (!$queryJumlah) {
+    die("Gagal menghitung data: " . mysqli_error($koneksi));
+}
+
 $totalData = (int)mysqli_fetch_assoc($queryJumlah)['total'];
-$totalHalaman = max(1, ceil($totalData / $batas));
+$totalHalaman = max(1, (int)ceil($totalData / $batas));
 
 if ($halaman > $totalHalaman) {
     $halaman = $totalHalaman;
-    $offset = ($halaman - 1) * $batas;
 }
+
+$offset = ($halaman - 1) * $batas;
 
 // Ambil data sesuai halaman
 $query = mysqli_query($koneksi, "
@@ -119,7 +148,8 @@ if (!$query) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Tindakan Pelanggaran</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
 </head>
 
 <body class="bg-light">
@@ -131,7 +161,7 @@ if (!$query) {
     <div class="mb-4">
         <h3 class="fw-bold">Tindakan Pelanggaran</h3>
         <p class="text-muted">
-            Kelola tindak lanjut pelanggaran siswa.
+            Kelola tindak lanjut pelanggaran siswa yang belum selesai ditangani.
         </p>
     </div>
 
@@ -141,7 +171,7 @@ if (!$query) {
         </div>
     <?php endif; ?>
 
-    <?php if ($pesan != ""): ?>
+    <?php if ($pesan !== ''): ?>
         <div class="alert alert-danger">
             <?= htmlspecialchars($pesan) ?>
         </div>
@@ -160,36 +190,33 @@ if (!$query) {
                             class="form-control"
                             placeholder="Cari nama siswa, NIS, kelas, pelanggaran, atau guru..."
                             value="<?= htmlspecialchars($cari) ?>"
-                            oninput="this.form.submit()"
                         >
+
                         <input type="hidden" name="status"
-                            value="<?= htmlspecialchars($statusFilter) ?>">
+                               value="<?= htmlspecialchars($statusFilter) ?>">
                     </form>
                 </div>
 
                 <div class="col-md-5">
                     <form method="GET">
+
                         <input type="hidden" name="cari"
-                            value="<?= htmlspecialchars($cari) ?>">
+                               value="<?= htmlspecialchars($cari) ?>">
 
-                        <select name="status" class="form-select"
-                            onchange="this.form.submit()">
+                        <select name="status"
+                                class="form-select"
+                                onchange="this.form.submit()">
 
-                            <option value="">Semua Status</option>
+                            <option value="">Semua Status Aktif</option>
 
                             <option value="Belum ditangani"
-                                <?= $statusFilter == "Belum ditangani" ? "selected" : "" ?>>
+                                <?= $statusFilter === "Belum ditangani" ? "selected" : "" ?>>
                                 Belum ditangani
                             </option>
 
                             <option value="Sedang diproses"
-                                <?= $statusFilter == "Sedang diproses" ? "selected" : "" ?>>
+                                <?= $statusFilter === "Sedang diproses" ? "selected" : "" ?>>
                                 Sedang diproses
-                            </option>
-
-                            <option value="Selesai"
-                                <?= $statusFilter == "Selesai" ? "selected" : "" ?>>
-                                Selesai
                             </option>
 
                         </select>
@@ -211,6 +238,7 @@ if (!$query) {
             </div>
 
             <div class="table-responsive">
+
                 <table class="table table-bordered table-hover align-middle">
 
                     <thead class="table-light">
@@ -268,7 +296,7 @@ if (!$query) {
                                     <form method="POST">
 
                                         <input type="hidden" name="id"
-                                            value="<?= (int)$data['id'] ?>">
+                                               value="<?= (int)$data['id'] ?>">
 
                                         <textarea
                                             name="tindakan"
@@ -278,28 +306,28 @@ if (!$query) {
                                             required><?= htmlspecialchars($data['tindakan']) ?></textarea>
 
                                         <select name="status"
-                                            class="form-select form-select-sm mb-2"
-                                            required>
+                                                class="form-select form-select-sm mb-2"
+                                                required>
 
                                             <option value="Belum ditangani"
-                                                <?= $data['status'] == "Belum ditangani" ? "selected" : "" ?>>
+                                                <?= $data['status'] === "Belum ditangani" ? "selected" : "" ?>>
                                                 Belum ditangani
                                             </option>
 
                                             <option value="Sedang diproses"
-                                                <?= $data['status'] == "Sedang diproses" ? "selected" : "" ?>>
+                                                <?= $data['status'] === "Sedang diproses" ? "selected" : "" ?>>
                                                 Sedang diproses
                                             </option>
 
-                                            <option value="Selesai"
-                                                <?= $data['status'] == "Selesai" ? "selected" : "" ?>>
+                                            <option value="Selesai">
                                                 Selesai
                                             </option>
 
                                         </select>
 
-                                        <button type="submit" name="simpan"
-                                            class="btn btn-sm btn-primary w-100">
+                                        <button type="submit"
+                                                name="simpan"
+                                                class="btn btn-sm btn-primary w-100">
                                             Simpan Tindakan
                                         </button>
 
@@ -313,8 +341,9 @@ if (!$query) {
                     <?php else: ?>
 
                         <tr>
-                            <td colspan="8" class="text-center text-muted py-4">
-                                Data pelanggaran tidak ditemukan.
+                            <td colspan="8"
+                                class="text-center text-muted py-4">
+                                Tidak ada pelanggaran yang perlu ditangani.
                             </td>
                         </tr>
 
@@ -331,16 +360,16 @@ if (!$query) {
 
                         <li class="page-item <?= $halaman <= 1 ? 'disabled' : '' ?>">
                             <a class="page-link"
-                                href="?cari=<?= urlencode($cari) ?>&status=<?= urlencode($statusFilter) ?>&halaman=<?= $halaman - 1 ?>">
+                               href="?cari=<?= urlencode($cari) ?>&status=<?= urlencode($statusFilter) ?>&halaman=<?= max(1, $halaman - 1) ?>">
                                 Sebelumnya
                             </a>
                         </li>
 
                         <?php for ($i = 1; $i <= $totalHalaman; $i++): ?>
 
-                            <li class="page-item <?= $halaman == $i ? 'active' : '' ?>">
+                            <li class="page-item <?= $halaman === $i ? 'active' : '' ?>">
                                 <a class="page-link"
-                                    href="?cari=<?= urlencode($cari) ?>&status=<?= urlencode($statusFilter) ?>&halaman=<?= $i ?>">
+                                   href="?cari=<?= urlencode($cari) ?>&status=<?= urlencode($statusFilter) ?>&halaman=<?= $i ?>">
                                     <?= $i ?>
                                 </a>
                             </li>
@@ -349,7 +378,7 @@ if (!$query) {
 
                         <li class="page-item <?= $halaman >= $totalHalaman ? 'disabled' : '' ?>">
                             <a class="page-link"
-                                href="?cari=<?= urlencode($cari) ?>&status=<?= urlencode($statusFilter) ?>&halaman=<?= $halaman + 1 ?>">
+                               href="?cari=<?= urlencode($cari) ?>&status=<?= urlencode($statusFilter) ?>&halaman=<?= min($totalHalaman, $halaman + 1) ?>">
                                 Selanjutnya
                             </a>
                         </li>

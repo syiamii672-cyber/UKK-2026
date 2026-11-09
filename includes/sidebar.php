@@ -1,9 +1,18 @@
+
+
 <?php
 
-// Pastikan pemeriksaan Wali Kelas menggunakan aturan yang sama
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Ambil role langsung dari session login
+$role = $_SESSION['role'] ?? '';
+
 require_once __DIR__ . '/cek_wali_kelas.php';
 
 $menuAktif = $menuAktif ?? "";
+
 
 // Menu Admin
 $menuAdmin = [
@@ -24,18 +33,22 @@ $menuAdmin = [
 $menuGuru = [
     ["Dashboard", "dashboard.php", "dashboard"],
     ["Catat Pelanggaran", "catat_pelanggaran.php", "catat_pelanggaran"],
-    ["Tindakan", "tindakan.php", "tindakan"]
+    ["Tindakan", "tindakan.php", "tindakan"],
+    ["Rekap Poin", "rekap_poin.php", "rekap_poin"],
+    ["Riwayat", "riwayat_pelanggaran.php", "riwayat"]
 ];
 
 // Menu Wali Kelas
 $menuWaliKelas = [
     ["Dashboard", "dashboard.php", "dashboard"],
+    ["Catat Pelanggaran", "catat_pelanggaran.php", "catat_pelanggaran"],
+    ["Tindakan", "tindakan.php", "tindakan"],
     ["Rekap Poin", "rekap_poin.php", "rekap_poin"],
     ["Riwayat", "riwayat_pelanggaran.php", "riwayat"],
     ["Laporan", "laporan.php", "laporan"]
 ];
 
-// Menentukan menu berdasarkan role dan penugasan
+// Menentukan menu berdasarkan role
 if ($role === "admin") {
 
     $daftarMenu = $menuAdmin;
@@ -112,12 +125,16 @@ if ($role === "admin") {
     <ul class="nav nav-pills flex-column">
 
         <?php foreach ($daftarMenu as $menu): ?>
+
             <li class="nav-item mb-2">
                 <a href="<?= htmlspecialchars($menu[1]); ?>"
                    class="nav-link <?= $menuAktif === $menu[2] ? 'active' : ''; ?>">
+
                     <?= htmlspecialchars($menu[0]); ?>
+
                 </a>
             </li>
+
         <?php endforeach; ?>
 
         <hr class="text-secondary">
