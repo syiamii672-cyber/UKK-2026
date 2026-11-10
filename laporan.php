@@ -3,76 +3,74 @@
 include "includes/cek_session.php";
 include "config/koneksi.php";
 
-$role = $_SESSION['role'] ?? '';
+$role = strtolower(trim((string)($_SESSION['role'] ?? '')));
+$idUser = (int)($_SESSION['id'] ?? 0);
+$menuAktif = "laporan";
 
-if (!in_array($role, ["admin", "guru"], true)) {
+if (!in_array($role, ['admin', 'guru'], true)) {
     header("Location: dashboard.php");
     exit;
 }
 
-$menuAktif = "laporan";
-$idUser = (int)($_SESSION['id'] ?? 0);
-
-// Fungsi keamanan output
 function e($nilai) {
     return htmlspecialchars((string)($nilai ?? ''), ENT_QUOTES, 'UTF-8');
 }
 
-
- // ==========================================
- // CEK WALI KELAS
- // ==========================================
+// ==========================================
+// CEK WALI KELAS
+// ==========================================
 
 $isWaliKelas = false;
 $kelasWali = 0;
 $tahunWali = 0;
+$namaKelasWali = '';
 
-if ($role === "guru") {
+if ($role === 'guru') {
     $queryWali = mysqli_query($koneksi, "
-        SELECT w.kelas_id, w.tahun_ajaran_id
+        SELECT
+            w.kelas_id,
+            w.tahun_ajaran_id,
+            k.nama AS nama_kelas
         FROM t_guru g
         JOIN t_wali_kelas w ON g.id = w.guru_id
         JOIN t_kelas k ON w.kelas_id = k.id
         JOIN t_tahun_ajaran ta ON w.tahun_ajaran_id = ta.id
         WHERE g.user_id = $idUser
-        AND g.status_aktif = 1
-        AND w.status_aktif = 1
-        AND k.status_aktif = 1
-        AND ta.status_aktif = 1
+            AND g.status_aktif = 1
+            AND w.status_aktif = 1
+            AND k.status_aktif = 1
+            AND ta.status_aktif = 1
         LIMIT 1
     ");
 
-    if ($queryWali && mysqli_num_rows($queryWali) > 0) {
+    if (!$queryWali) {
+        die("Gagal memeriksa wali kelas: " . mysqli_error($koneksi));
+    }
+
+    if (mysqli_num_rows($queryWali) > 0) {
         $dataWali = mysqli_fetch_assoc($queryWali);
 
         $isWaliKelas = true;
-        $kelasWali = (int) $dataWali['kelas_id'];
-        $tahunWali = (int) $dataWali['tahun_ajaran_id'];
-    } else {
-        // Guru biasa tidak memiliki akses laporan
-        header("Location: dashboard.php");
-        exit;
+        $kelasWali = (int)$dataWali['kelas_id'];
+        $tahunWali = (int)$dataWali['tahun_ajaran_id'];
+        $namaKelasWali = $dataWali['nama_kelas'];
     }
 }
 
 // ==========================================
-// FILTER LAPORAN
+// FILTER PENCARIAN
 // ==========================================
 
-$cari = trim($_GET['cari'] ?? '');
-$tanggalAwal = $_GET['tanggal_awal'] ?? '';
-$tanggalAkhir = $_GET['tanggal_akhir'] ?? '';
-$kelasFilter = $_GET['kelas'] ?? '';
+$cari = isset($_GET['cari']) && is_scalar($_GET['cari'])
+    ? trim((string)$_GET['cari'])
+    : '';
 
-$statusValid = [
-    "Belum ditangani",
-    "Sedang diproses",
-    "Selesai"
-];
+$cariSQL = mysqli_real_escape_string($koneksi, $cari);
 
-$statusFilter = $_GET['status'] ?? '';
+// ==========================================
+// TAHUN AJARAN AKTIF
+// ==========================================
 
-// Tahun ajaran aktif sebagai pilihan default admin
 $queryAktif = mysqli_query($koneksi, "
     SELECT id
     FROM t_tahun_ajaran
@@ -80,327 +78,296 @@ $queryAktif = mysqli_query($koneksi, "
     LIMIT 1
 ");
 
-$tahunAktif = $queryAktif
-    ? mysqli_fetch_assoc($queryAktif)
-    : null;
-
-$tahunDefault = $tahunAktif
-    ? (string)$tahunAktif['id']
-    : "semua";
-
-$tahunFilter = $_GET['tahun'] ?? $tahunDefault;
-
-// Wali kelas dikunci pada kelas dan tahun ajarannya sendiri
-if ($isWaliKelas) {
-    $kelasFilter = (string)$kelasWali;
-    $tahunFilter = (string)$tahunWali;
-} else {
-    if (
-        $tahunFilter !== "semua" &&
-        !ctype_digit((string)$tahunFilter)
-    ) {
-        $tahunFilter = $tahunDefault;
-    }
-
-    if (
-        $kelasFilter !== "" &&
-        !ctype_digit((string)$kelasFilter)
-    ) {
-        $kelasFilter = "";
-    }
+if (!$queryAktif) {
+    die("Gagal mengambil tahun ajaran aktif: " . mysqli_error($koneksi));
 }
 
-// Validasi tanggal
-$pesanFilter = '';
-
-foreach (['tanggalAwal', 'tanggalAkhir'] as $namaTanggal) {
-    if ($$namaTanggal !== '') {
-        $tanggal = $$namaTanggal;
-
-        $valid = preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggal)
-            && checkdate(
-                (int)substr($tanggal, 5, 2),
-                (int)substr($tanggal, 8, 2),
-                (int)substr($tanggal, 0, 4)
-            );
-
-        if (!$valid) {
-            $$namaTanggal = '';
-            $pesanFilter = "Format tanggal tidak valid.";
-        }
-    }
-}
-
-if (
-    $tanggalAwal !== '' &&
-    $tanggalAkhir !== '' &&
-    $tanggalAwal > $tanggalAkhir
-) {
-    $pesanFilter = "Tanggal awal tidak boleh melebihi tanggal akhir.";
-}
-
-// Validasi status
-if (!in_array($statusFilter, $statusValid, true)) {
-    $statusFilter = '';
-}
+$dataAktif = mysqli_fetch_assoc($queryAktif);
+$tahunAktif = (int)($dataAktif['id'] ?? 0);
 
 // ==========================================
-// DATA PILIHAN FILTER
+// FILTER TAHUN AJARAN
 // ==========================================
 
 if ($isWaliKelas) {
-    $queryTahun = mysqli_query($koneksi, "
-        SELECT id, nama
-        FROM t_tahun_ajaran
-        WHERE id = $tahunWali
-    ");
-
-    $queryKelas = mysqli_query($koneksi, "
-        SELECT id, nama
-        FROM t_kelas
-        WHERE id = $kelasWali
-    ");
+    $tahun = $tahunWali;
 } else {
-    $queryTahun = mysqli_query($koneksi, "
-        SELECT id, nama
-        FROM t_tahun_ajaran
-        ORDER BY tanggal_mulai DESC
-    ");
+    $tahunInput = isset($_GET['tahun']) && is_scalar($_GET['tahun'])
+        ? trim((string)$_GET['tahun'])
+        : (string)$tahunAktif;
 
-    $queryKelas = mysqli_query($koneksi, "
-        SELECT id, nama
-        FROM t_kelas
-        ORDER BY nama ASC
-    ");
+    if ($tahunInput === 'all') {
+        $tahun = 'all';
+    } elseif (ctype_digit($tahunInput)) {
+        $tahun = (int)$tahunInput;
+    } else {
+        $tahun = $tahunAktif;
+    }
 }
 
 // ==========================================
-// SUSUN FILTER SQL
+// KONDISI DATA LAPORAN
 // ==========================================
 
-$where = "WHERE 1=1";
+$where = " WHERE ps.status = 'Selesai' ";
 
 if ($isWaliKelas) {
-    // Pembatasan wajib untuk Wali Kelas
-    $where .= " AND ps.kelas_id = $kelasWali";
-    $where .= " AND ps.tahun_ajaran_id = $tahunWali";
-} else {
-    if ($tahunFilter !== "semua") {
-        $tahunId = (int)$tahunFilter;
-        $where .= " AND ps.tahun_ajaran_id = $tahunId";
-    }
-
-    if ($kelasFilter !== '') {
-        $kelasId = (int)$kelasFilter;
-        $where .= " AND ps.kelas_id = $kelasId";
-    }
-}
-
-if ($tanggalAwal !== '') {
-    $awal = mysqli_real_escape_string($koneksi, $tanggalAwal);
-    $where .= " AND ps.tanggal >= '$awal'";
-}
-
-if ($tanggalAkhir !== '') {
-    $akhir = mysqli_real_escape_string($koneksi, $tanggalAkhir);
-    $where .= " AND ps.tanggal <= '$akhir'";
-}
-
-if ($statusFilter !== '') {
-    $statusAman = mysqli_real_escape_string($koneksi, $statusFilter);
-    $where .= " AND ps.status = '$statusAman'";
+    $where .= "
+        AND ps.kelas_id = $kelasWali
+        AND ps.tahun_ajaran_id = $tahunWali
+    ";
+} elseif ($tahun !== 'all') {
+    $where .= " AND ps.tahun_ajaran_id = $tahun ";
 }
 
 if ($cari !== '') {
-    $kata = mysqli_real_escape_string($koneksi, $cari);
-
-    $where .= " AND (
-        ps.nama_siswa LIKE '%$kata%'
-        OR ps.nama_kelas LIKE '%$kata%'
-        OR ps.nama_pelanggaran LIKE '%$kata%'
-        OR ps.nama_guru LIKE '%$kata%'
-        OR ps.siswa_id IN (
-            SELECT id
-            FROM t_siswa
-            WHERE nis LIKE '%$kata%'
+    $where .= "
+        AND (
+            ps.nama_siswa LIKE '%$cariSQL%'
+            OR s.nis LIKE '%$cariSQL%'
+            OR ps.nama_kelas LIKE '%$cariSQL%'
+            OR ps.nama_pelanggaran LIKE '%$cariSQL%'
+            OR ps.nama_guru LIKE '%$cariSQL%'
+            OR ps.keterangan LIKE '%$cariSQL%'
         )
-    )";
-}
-
-// Jika tanggal tidak valid, jangan tampilkan data
-if ($pesanFilter !== '') {
-    $where .= " AND 1=0";
+    ";
 }
 
 // ==========================================
-// RINGKASAN LAPORAN
+// QUERY DATA LAPORAN
 // ==========================================
 
-$queryRingkasan = mysqli_query($koneksi, "
-    SELECT
-        COUNT(*) AS jumlah,
-        COALESCE(SUM(ps.poin), 0) AS total_poin
-    FROM t_pelanggaran_siswa ps
-    $where
-");
-
-if (!$queryRingkasan) {
-    die("Gagal mengambil ringkasan: " . mysqli_error($koneksi));
-}
-
-$ringkasan = mysqli_fetch_assoc($queryRingkasan);
-
-$jumlahPelanggaran = (int)$ringkasan['jumlah'];
-$totalPoin = (int)$ringkasan['total_poin'];
-
-// ==========================================
-// PAGINATION DAN DATA LAPORAN
-// ==========================================
-
-$batas = 10;
-$halaman = max(1, (int)($_GET['halaman'] ?? 1));
-
-$totalHalaman = max(
-    1,
-    (int)ceil($jumlahPelanggaran / $batas)
-);
-
-$halaman = min($halaman, $totalHalaman);
-$offset = ($halaman - 1) * $batas;
-
-$isExcel = isset($_GET['export']) && $_GET['export'] === 'excel';
-$isCetak = isset($_GET['cetak']) && $_GET['cetak'] === '1';
-
-// Cetak dan Excel mengambil semua data hasil filter.
-// Tampilan biasa hanya mengambil 10 data per halaman.
 $sqlData = "
-    SELECT ps.*, s.nis
+    SELECT
+        ps.*,
+        s.nis
     FROM t_pelanggaran_siswa ps
     LEFT JOIN t_siswa s ON ps.siswa_id = s.id
     $where
     ORDER BY ps.tanggal DESC, ps.id DESC
 ";
 
-if (!$isExcel && !$isCetak) {
-    $sqlData .= " LIMIT $batas OFFSET $offset";
-}
-
-$query = mysqli_query($koneksi, $sqlData);
-
-if (!$query) {
-    die("Gagal mengambil laporan: " . mysqli_error($koneksi));
-}
-
-$jumlahDitampilkan = mysqli_num_rows($query);
-
 // ==========================================
-// EXPORT EXCEL
+// EKSPOR EXCEL (CSV)
 // ==========================================
 
-if ($isExcel) {
-    header("Content-Type: application/vnd.ms-excel; charset=UTF-8");
-    header("Content-Disposition: attachment; filename=laporan_pelanggaran.xls");
-    header("Cache-Control: no-store, no-cache, must-revalidate");
+if (isset($_GET['export']) && $_GET['export'] === 'excel') {
 
+    $queryExport = mysqli_query($koneksi, $sqlData);
+
+    if (!$queryExport) {
+        die("Gagal mengekspor laporan: " . mysqli_error($koneksi));
+    }
+
+    $namaFile = "laporan_pelanggaran_" . date('Ymd_His') . ".csv";
+
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+
+    header('Content-Type: text/csv; charset=UTF-8');
+    header('Content-Disposition: attachment; filename="' . $namaFile . '"');
+    header('Cache-Control: no-store, no-cache, must-revalidate');
+    header('Pragma: no-cache');
+    header('Expires: 0');
+
+    // BOM UTF-8
     echo "\xEF\xBB\xBF";
-    ?>
-    <table border="1">
-        <tr>
-            <th colspan="11">LAPORAN PELANGGARAN SISWA</th>
-        </tr>
-        <tr>
-            <th>No</th>
-            <th>Tanggal</th>
-            <th>NIS</th>
-            <th>Nama Siswa</th>
-            <th>Kelas</th>
-            <th>Pelanggaran</th>
-            <th>Poin</th>
-            <th>Guru</th>
-            <th>Keterangan</th>
-            <th>Tindakan</th>
-            <th>Status</th>
-        </tr>
 
-        <?php $no = 1; ?>
-        <?php while ($data = mysqli_fetch_assoc($query)): ?>
-            <tr>
-                <td><?= $no++ ?></td>
-                <td><?= e($data['tanggal']) ?></td>
-                <td><?= e($data['nis']) ?></td>
-                <td><?= e($data['nama_siswa']) ?></td>
-                <td><?= e($data['nama_kelas']) ?></td>
-                <td><?= e($data['nama_pelanggaran']) ?></td>
-                <td><?= (int)$data['poin'] ?></td>
-                <td><?= e($data['nama_guru']) ?></td>
-                <td><?= e($data['keterangan']) ?></td>
-                <td><?= e($data['tindakan']) ?></td>
-                <td><?= e($data['status']) ?></td>
-            </tr>
-        <?php endwhile; ?>
+    $output = fopen('php://output', 'w');
 
-        <tr>
-            <th colspan="6">Total</th>
-            <th><?= $totalPoin ?></th>
-            <th colspan="4">
-                Jumlah pelanggaran: <?= $jumlahPelanggaran ?>
-            </th>
-        </tr>
-    </table>
-    <?php
+    fputcsv($output, [
+        'No',
+        'Tanggal',
+        'NIS',
+        'Nama Siswa',
+        'Kelas',
+        'Pelanggaran',
+        'Pengurangan Poin',
+        'Guru Pencatat',
+        'Tindakan',
+        'Keterangan',
+        'Status'
+    ], ';', '"', '');
+
+    $no = 1;
+
+    while ($data = mysqli_fetch_assoc($queryExport)) {
+
+        $tanggal = '-';
+
+        if (
+            !empty($data['tanggal']) &&
+            strtotime($data['tanggal']) !== false
+        ) {
+            $tanggal = date('d-m-Y', strtotime($data['tanggal']));
+        }
+
+        $baris = [
+            $no++,
+            $tanggal,
+            $data['nis'] ?? '-',
+            $data['nama_siswa'] ?? '-',
+            $data['nama_kelas'] ?? '-',
+            $data['nama_pelanggaran'] ?? '-',
+            (int)($data['poin'] ?? 0),
+            $data['nama_guru'] ?? '-',
+            $data['tindakan'] ?: '-',
+            $data['keterangan'] ?: '-',
+            'Selesai'
+        ];
+
+        fputcsv($output, $baris, ';', '"', '');
+    }
+
+    fclose($output);
     exit;
 }
 
 // ==========================================
-// LINK FILTER, EXPORT, DAN CETAK
+// HITUNG JUMLAH DATA
 // ==========================================
 
-$parameter = [
-    "cari" => $cari,
-    "tahun" => $tahunFilter,
-    "kelas" => $kelasFilter,
-    "tanggal_awal" => $tanggalAwal,
-    "tanggal_akhir" => $tanggalAkhir,
-    "status" => $statusFilter
-];
+$queryJumlah = mysqli_query($koneksi, "
+    SELECT COUNT(*) AS total
+    FROM t_pelanggaran_siswa ps
+    LEFT JOIN t_siswa s ON ps.siswa_id = s.id
+    $where
+");
 
-$linkExport = "?" . http_build_query(
-    array_merge($parameter, ["export" => "excel"])
+if (!$queryJumlah) {
+    die("Gagal menghitung laporan: " . mysqli_error($koneksi));
+}
+
+$dataJumlah = mysqli_fetch_assoc($queryJumlah);
+$totalData = (int)$dataJumlah['total'];
+
+// ==========================================
+// MODE CETAK
+// ==========================================
+
+$modeCetak = isset($_GET['cetak']) && $_GET['cetak'] === '1';
+
+// ==========================================
+// PAGINATION
+// ==========================================
+
+$batas = 10;
+
+$halaman = isset($_GET['halaman']) && is_scalar($_GET['halaman'])
+    ? max(1, (int)$_GET['halaman'])
+    : 1;
+
+$totalHalaman = max(1, (int)ceil($totalData / $batas));
+$halaman = min($halaman, $totalHalaman);
+$offset = ($halaman - 1) * $batas;
+
+if (!$modeCetak) {
+    $sqlData .= " LIMIT $offset, $batas";
+}
+
+$queryLaporan = mysqli_query($koneksi, $sqlData);
+
+if (!$queryLaporan) {
+    die("Gagal mengambil laporan: " . mysqli_error($koneksi));
+}
+
+// ==========================================
+// DAFTAR TAHUN AJARAN
+// ==========================================
+
+$queryTahun = mysqli_query($koneksi, "
+    SELECT id, nama
+    FROM t_tahun_ajaran
+    ORDER BY tanggal_mulai DESC
+");
+
+if (!$queryTahun) {
+    die("Gagal mengambil daftar tahun ajaran: " . mysqli_error($koneksi));
+}
+
+// ==========================================
+// LINK FILTER
+// ==========================================
+
+$parameter = ['cari' => $cari];
+
+if (!$isWaliKelas) {
+    $parameter['tahun'] = (string)$tahun;
+}
+
+$linkExcel = 'laporan.php?' . http_build_query(
+    array_merge($parameter, ['export' => 'excel'])
 );
 
-$linkCetak = "?" . http_build_query(
-    array_merge($parameter, ["cetak" => "1"])
+$linkCetak = 'laporan.php?' . http_build_query(
+    array_merge($parameter, ['cetak' => '1'])
 );
 
 ?>
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Pelanggaran</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title><?= $modeCetak ? 'Cetak Laporan Pelanggaran' : 'Laporan Pelanggaran'; ?></title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
 
     <style>
-        @media print {
-            .sidebar-ukk,
-            .filter-area,
-            .tombol-aksi,
-            .pagination,
-            .footer-info {
-                display: none !important;
-            }
+        body {
+            margin: 0;
+            background: #f5f7fb;
+        }
 
+        .konten-utama {
+            margin-left: 220px;
+            width: calc(100% - 220px);
+            min-height: 100vh;
+            padding: 25px;
+            box-sizing: border-box;
+        }
+
+        .kartu {
+            border: none;
+            border-radius: 12px;
+        }
+
+        .table th {
+            white-space: nowrap;
+        }
+
+        @media (max-width: 575.98px) {
+            .konten-utama {
+                margin-left: 180px;
+                width: calc(100% - 180px);
+                padding: 15px;
+            }
+        }
+
+        @media print {
             body {
                 background: white !important;
             }
 
-            .container-fluid {
+            .konten-utama {
                 margin: 0 !important;
-                width: 100% !important;
                 padding: 0 !important;
+                width: 100% !important;
+            }
+
+            .sidebar,
+            .bagian-filter,
+            .bagian-tombol,
+            .bagian-pagination,
+            .alert {
+                display: none !important;
             }
 
             .card {
@@ -408,187 +375,159 @@ $linkCetak = "?" . http_build_query(
                 border: none !important;
             }
 
-            table {
+            .table {
                 font-size: 10px;
+            }
+
+            .table th,
+            .table td {
+                padding: 5px !important;
             }
 
             @page {
                 size: landscape;
-                margin: 1cm;
+                margin: 12mm;
             }
         }
     </style>
 </head>
 
-<body class="bg-light">
+<body>
 
-<?php include "includes/sidebar.php"; ?>
+<?php if (!$modeCetak): ?>
+    <?php include "includes/sidebar.php"; ?>
+<?php endif; ?>
 
-<div class="container-fluid"
-     style="margin-left:220px; width:calc(100% - 220px); padding:30px;">
+<main class="konten-utama">
 
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-        <div>
-            <h3 class="fw-bold mb-1">Laporan Pelanggaran</h3>
-            <p class="text-muted mb-0">
-                Rekap data pelanggaran siswa.
-                <?php if ($isWaliKelas): ?>
-                    <br><small>Data kelas yang menjadi tanggung jawab Anda.</small>
-                <?php endif; ?>
-            </p>
-        </div>
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">
+            <?= $modeCetak ? 'Laporan Pelanggaran Siswa' : 'Laporan Pelanggaran'; ?>
+        </h2>
 
-        <div class="d-flex gap-2 tombol-aksi">
-            <a href="<?= e($linkCetak) ?>" target="_blank" class="btn btn-primary">
-                Cetak Laporan
-            </a>
-
-            <a href="<?= e($linkExport) ?>" class="btn btn-success">
-                Export Excel
-            </a>
-        </div>
+        <p class="text-secondary mb-0">
+            Rekap data pelanggaran siswa yang telah selesai ditangani.
+        </p>
     </div>
 
-    <!-- Ringkasan -->
-    <div class="row g-3 mb-4">
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <p class="text-muted mb-1">Jumlah Pelanggaran</p>
-                    <h3 class="fw-bold mb-0">
-                        <?= number_format($jumlahPelanggaran) ?>
-                    </h3>
-                </div>
-            </div>
+    <?php if ($isWaliKelas): ?>
+        <div class="alert alert-primary">
+            <strong>Wali Kelas</strong> |
+            Kelas: <?= e($namaKelasWali); ?>
         </div>
+    <?php endif; ?>
 
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <p class="text-muted mb-1">Total Poin Pelanggaran</p>
-                    <h3 class="fw-bold mb-0">
-                        <?= number_format($totalPoin) ?>
-                    </h3>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Filter -->
-    <div class="card border-0 shadow-sm mb-4 filter-area">
+    <div class="card kartu shadow-sm">
         <div class="card-body">
 
-            <?php if ($pesanFilter !== ''): ?>
-                <div class="alert alert-warning">
-                    <?= e($pesanFilter) ?>
-                </div>
-            <?php endif; ?>
-
-            <form method="GET" class="row g-3">
+            <!-- FILTER -->
+            <form method="GET" action="laporan.php"
+                  class="row g-2 mb-3 bagian-filter">
 
                 <div class="col-md-4">
-                    <label class="form-label">Pencarian</label>
-                    <input type="text" name="cari" class="form-control"
-                           placeholder="NIS, nama siswa, pelanggaran, guru..."
-                           value="<?= e($cari) ?>">
+                    <input
+                        type="text"
+                        name="cari"
+                        class="form-control"
+                        placeholder="Cari NIS, siswa, kelas, pelanggaran..."
+                        value="<?= e($cari); ?>"
+                    >
                 </div>
 
-                <div class="col-md-2">
-                    <label class="form-label">Tahun Ajaran</label>
-
-                    <?php if ($isWaliKelas): ?>
-                        <?php $taWali = mysqli_fetch_assoc($queryTahun); ?>
-                        <input type="text" class="form-control"
-                               value="<?= e($taWali['nama'] ?? '-') ?>" disabled>
-                        <input type="hidden" name="tahun" value="<?= $tahunWali ?>">
-                    <?php else: ?>
+                <?php if (!$isWaliKelas): ?>
+                    <div class="col-md-3">
                         <select name="tahun" class="form-select">
-                            <option value="semua"
-                                <?= $tahunFilter === "semua" ? "selected" : "" ?>>
-                                Semua
+                            <option value="all"
+                                <?= $tahun === 'all' ? 'selected' : ''; ?>>
+                                Semua Tahun Ajaran
                             </option>
 
                             <?php while ($ta = mysqli_fetch_assoc($queryTahun)): ?>
-                                <option value="<?= $ta['id'] ?>"
-                                    <?= $tahunFilter == $ta['id'] ? "selected" : "" ?>>
-                                    <?= e($ta['nama']) ?>
+                                <option
+                                    value="<?= (int)$ta['id']; ?>"
+                                    <?= (string)$tahun === (string)$ta['id'] ? 'selected' : ''; ?>
+                                >
+                                    <?= e($ta['nama']); ?>
                                 </option>
                             <?php endwhile; ?>
                         </select>
-                    <?php endif; ?>
-                </div>
+                    </div>
+                <?php else: ?>
+                    <div class="col-md-3">
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="Kelas <?= e($namaKelasWali); ?>"
+                            disabled
+                        >
+                    </div>
+                <?php endif; ?>
 
                 <div class="col-md-2">
-                    <label class="form-label">Kelas</label>
-
-                    <?php if ($isWaliKelas): ?>
-                        <?php $kelasWaliData = mysqli_fetch_assoc($queryKelas); ?>
-                        <input type="text" class="form-control"
-                               value="<?= e($kelasWaliData['nama'] ?? '-') ?>" disabled>
-                        <input type="hidden" name="kelas" value="<?= $kelasWali ?>">
-                    <?php else: ?>
-                        <select name="kelas" class="form-select">
-                            <option value="">Semua Kelas</option>
-
-                            <?php while ($k = mysqli_fetch_assoc($queryKelas)): ?>
-                                <option value="<?= $k['id'] ?>"
-                                    <?= $kelasFilter == $k['id'] ? "selected" : "" ?>>
-                                    <?= e($k['nama']) ?>
-                                </option>
-                            <?php endwhile; ?>
-                        </select>
-                    <?php endif; ?>
+                    <input
+                        type="text"
+                        class="form-control"
+                        value="Selesai"
+                        disabled
+                    >
                 </div>
 
-                <div class="col-md-2">
-                    <label class="form-label">Tanggal Awal</label>
-                    <input type="date" name="tanggal_awal"
-                           class="form-control" value="<?= e($tanggalAwal) ?>">
-                </div>
-
-                <div class="col-md-2">
-                    <label class="form-label">Tanggal Akhir</label>
-                    <input type="date" name="tanggal_akhir"
-                           class="form-control" value="<?= e($tanggalAkhir) ?>">
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Status Penanganan</label>
-                    <select name="status" class="form-select">
-                        <option value="">Semua Status</option>
-
-                        <?php foreach ($statusValid as $st): ?>
-                            <option value="<?= e($st) ?>"
-                                <?= $statusFilter === $st ? "selected" : "" ?>>
-                                <?= e($st) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-
-                <div class="col-md-9 d-flex align-items-end gap-2">
-                    <button type="submit" class="btn btn-primary">
-                        Terapkan Filter
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary w-100">
+                        Cari
                     </button>
+                </div>
 
-                    <a href="laporan.php" class="btn btn-secondary">
+                <div class="col-md-2">
+                    <a href="laporan.php" class="btn btn-secondary w-100">
                         Reset
                     </a>
                 </div>
-
             </form>
-        </div>
-    </div>
 
-    <!-- Tabel laporan -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-body">
+            <!-- TOMBOL CETAK DAN EKSPOR -->
+            <div class="d-flex flex-wrap gap-2 mb-3 bagian-tombol">
 
-            <h5 class="fw-bold mb-3">Data Laporan</h5>
+                <button type="button"
+                onclick="window.print()"
+                class="btn btn-primary">
+            Cetak Laporan
+                </button>
 
+                <a href="<?= e($linkExcel); ?>"
+                   class="btn btn-success">
+                    Ekspor Excel
+                </a>
+
+            </div>
+
+            <!-- INFORMASI JUMLAH -->
+            <?php if (!$modeCetak): ?>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <small class="text-secondary">
+                        Menampilkan
+                        <?= $totalData > 0 ? $offset + 1 : 0; ?> -
+                        <?= min($offset + $batas, $totalData); ?>
+                        dari <?= $totalData; ?> laporan
+                    </small>
+
+                    <small class="text-secondary">
+                        Halaman <?= $halaman; ?> dari <?= $totalHalaman; ?>
+                    </small>
+                </div>
+            <?php else: ?>
+                <p class="mb-3">
+                    Tanggal cetak: <?= date('d-m-Y H:i'); ?>
+                    <br>
+                    Total data: <?= $totalData; ?>
+                </p>
+            <?php endif; ?>
+
+            <!-- TABEL -->
             <div class="table-responsive">
                 <table class="table table-bordered table-hover align-middle">
-                    <thead class="table-primary">
+
+                    <thead class="table-light">
                         <tr>
                             <th>No</th>
                             <th>Tanggal</th>
@@ -596,86 +535,133 @@ $linkCetak = "?" . http_build_query(
                             <th>Nama Siswa</th>
                             <th>Kelas</th>
                             <th>Pelanggaran</th>
-                            <th>Poin</th>
-                            <th>Guru</th>
+                            <th>Pengurangan Poin</th>
+                            <th>Guru Pencatat</th>
                             <th>Tindakan</th>
+                            <th>Keterangan</th>
                             <th>Status</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                    <?php if ($jumlahDitampilkan > 0): ?>
-                        <?php $no = $isCetak ? 1 : $offset + 1; ?>
+                        <?php if (mysqli_num_rows($queryLaporan) > 0): ?>
 
-                        <?php while ($data = mysqli_fetch_assoc($query)): ?>
+                            <?php $no = $modeCetak ? 1 : $offset + 1; ?>
+
+                            <?php while ($data = mysqli_fetch_assoc($queryLaporan)): ?>
+
+                                <?php
+                                $tanggal = '-';
+
+                                if (
+                                    !empty($data['tanggal']) &&
+                                    strtotime($data['tanggal']) !== false
+                                ) {
+                                    $tanggal = date(
+                                        'd-m-Y',
+                                        strtotime($data['tanggal'])
+                                    );
+                                }
+                                ?>
+
+                                <tr>
+                                    <td><?= $no++; ?></td>
+                                    <td><?= e($tanggal); ?></td>
+                                    <td><?= e($data['nis'] ?? '-'); ?></td>
+                                    <td><?= e($data['nama_siswa']); ?></td>
+                                    <td><?= e($data['nama_kelas']); ?></td>
+                                    <td><?= e($data['nama_pelanggaran']); ?></td>
+                                    <td><?= (int)$data['poin']; ?> poin</td>
+                                    <td><?= e($data['nama_guru']); ?></td>
+                                    <td><?= e($data['tindakan'] ?: '-'); ?></td>
+                                    <td><?= e($data['keterangan'] ?: '-'); ?></td>
+                                    <td>
+                                        <span class="badge bg-success">
+                                            Selesai
+                                        </span>
+                                    </td>
+                                </tr>
+
+                            <?php endwhile; ?>
+
+                        <?php else: ?>
                             <tr>
-                                <td><?= $no++ ?></td>
-                                <td>
-                                    <?= e(date('d-m-Y', strtotime($data['tanggal']))) ?>
+                                <td colspan="11"
+                                    class="text-center text-secondary py-4">
+                                    Belum ada laporan pelanggaran yang selesai ditangani.
                                 </td>
-                                <td><?= e($data['nis']) ?></td>
-                                <td><?= e($data['nama_siswa']) ?></td>
-                                <td><?= e($data['nama_kelas']) ?></td>
-                                <td><?= e($data['nama_pelanggaran']) ?></td>
-                                <td class="text-center">
-                                    <?= (int)$data['poin'] ?>
-                                </td>
-                                <td><?= e($data['nama_guru']) ?></td>
-                                <td><?= e($data['tindakan']) ?></td>
-                                <td><?= e($data['status']) ?></td>
                             </tr>
-                        <?php endwhile; ?>
-
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="10" class="text-center text-muted py-4">
-                                Tidak ada data laporan.
-                            </td>
-                        </tr>
-                    <?php endif; ?>
+                        <?php endif; ?>
                     </tbody>
+
                 </table>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3 footer-info">
-                <small class="text-muted">
-                    Menampilkan <?= $jumlahDitampilkan ?>
-                    dari <?= number_format($jumlahPelanggaran) ?> data
-                </small>
+            <!-- PAGINATION -->
+            <?php if (!$modeCetak): ?>
 
-                <?php if (!$isCetak && $totalHalaman > 1): ?>
-                    <nav>
-                        <ul class="pagination pagination-sm mb-0">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 bagian-pagination">
 
-                            <?php for ($i = 1; $i <= $totalHalaman; $i++): ?>
-                                <li class="page-item <?= $halaman == $i ? 'active' : '' ?>">
+                    <small class="text-secondary">
+                        Total <?= $totalData; ?> laporan pelanggaran
+                    </small>
+
+                    <?php if ($totalHalaman > 1): ?>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0">
+
+                                <li class="page-item <?= $halaman <= 1 ? 'disabled' : ''; ?>">
                                     <a class="page-link"
                                        href="?<?= e(http_build_query(array_merge(
                                            $parameter,
-                                           ["halaman" => $i]
-                                       ))) ?>">
-                                        <?= $i ?>
+                                           ['halaman' => max(1, $halaman - 1)]
+                                       ))); ?>">
+                                        Sebelumnya
                                     </a>
                                 </li>
-                            <?php endfor; ?>
 
-                        </ul>
-                    </nav>
-                <?php endif; ?>
-            </div>
+                                <?php for ($i = 1; $i <= $totalHalaman; $i++): ?>
+                                    <li class="page-item <?= $halaman == $i ? 'active' : ''; ?>">
+                                        <a class="page-link"
+                                           href="?<?= e(http_build_query(array_merge(
+                                               $parameter,
+                                               ['halaman' => $i]
+                                           ))); ?>">
+                                            <?= $i; ?>
+                                        </a>
+                                    </li>
+                                <?php endfor; ?>
+
+                                <li class="page-item <?= $halaman >= $totalHalaman ? 'disabled' : ''; ?>">
+                                    <a class="page-link"
+                                       href="?<?= e(http_build_query(array_merge(
+                                           $parameter,
+                                           ['halaman' => min($totalHalaman, $halaman + 1)]
+                                       ))); ?>">
+                                        Selanjutnya
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </nav>
+                    <?php endif; ?>
+
+                </div>
+
+            <?php else: ?>
+
+                <script>
+                    window.onload = function () {
+                        window.print();
+                    };
+                </script>
+
+            <?php endif; ?>
 
         </div>
     </div>
 
-</div>
-
-<?php if ($isCetak): ?>
-<script>
-    window.onload = function () {
-        window.print();
-    };
-</script>
-<?php endif; ?>
+</main>
 
 </body>
 </html>

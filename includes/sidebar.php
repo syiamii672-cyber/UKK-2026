@@ -35,7 +35,7 @@ $menuGuru = [
     ["Catat Pelanggaran", "catat_pelanggaran.php", "catat_pelanggaran"],
     ["Tindakan", "tindakan.php", "tindakan"],
     ["Rekap Poin", "rekap_poin.php", "rekap_poin"],
-    ["Riwayat", "riwayat_pelanggaran.php", "riwayat"]
+    ["Riwayat", "riwayat.php", "riwayat"]
 ];
 
 // Menu Wali Kelas
@@ -44,7 +44,7 @@ $menuWaliKelas = [
     ["Catat Pelanggaran", "catat_pelanggaran.php", "catat_pelanggaran"],
     ["Tindakan", "tindakan.php", "tindakan"],
     ["Rekap Poin", "rekap_poin.php", "rekap_poin"],
-    ["Riwayat", "riwayat_pelanggaran.php", "riwayat"],
+    ["Riwayat", "riwayat.php", "riwayat"],
     ["Laporan", "laporan.php", "laporan"]
 ];
 

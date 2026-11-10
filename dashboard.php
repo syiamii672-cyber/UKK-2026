@@ -235,7 +235,7 @@ if ($role === "admin") {
             </div>
 
             <div class="col-12 col-md-6 col-lg-4">
-                <a href="riwayat_pelanggaran.php" class="kartu-menu">
+                <a href="riwayat.php" class="kartu-menu">
                     <div class="card kartu-dashboard shadow-sm h-100">
                         <div class="card-body">
                             <h6 class="text-secondary">Riwayat</h6>

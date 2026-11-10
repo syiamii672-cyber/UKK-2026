@@ -154,7 +154,7 @@ if ($isWaliKelas) {
 // KONDISI QUERY
 // ==========================================
 
-$where = " WHERE 1=1 ";
+$where = " WHERE ps.status = 'Selesai' ";
 
 // Pembatasan Wali Kelas
 if ($isWaliKelas) {
