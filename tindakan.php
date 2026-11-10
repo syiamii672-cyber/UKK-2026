@@ -35,19 +35,14 @@ function e($nilai) {
 }
 
 // ==========================================
-// CEK WALI KELAS
+// CEK WALI KELAS (UNTUK INFORMASI SAJA)
 // ==========================================
 
 $isWaliKelas = false;
-$kelasWali = 0;
-$tahunWali = 0;
 $namaKelasWali = '';
 
 $stmtWali = mysqli_prepare($koneksi, "
-    SELECT
-        w.kelas_id,
-        w.tahun_ajaran_id,
-        k.nama AS nama_kelas
+    SELECT k.nama
     FROM t_guru g
     JOIN t_wali_kelas w
         ON g.id = w.guru_id
@@ -64,23 +59,15 @@ $stmtWali = mysqli_prepare($koneksi, "
 ");
 
 if (!$stmtWali) {
-    die("Gagal menyiapkan pemeriksaan wali kelas.");
+    die("Gagal memeriksa data wali kelas.");
 }
 
 mysqli_stmt_bind_param($stmtWali, "i", $idUser);
 mysqli_stmt_execute($stmtWali);
-
-mysqli_stmt_bind_result(
-    $stmtWali,
-    $kelasWaliData,
-    $tahunWaliData,
-    $namaKelasWaliData
-);
+mysqli_stmt_bind_result($stmtWali, $namaKelasWaliData);
 
 if (mysqli_stmt_fetch($stmtWali)) {
     $isWaliKelas = true;
-    $kelasWali = (int)$kelasWaliData;
-    $tahunWali = (int)$tahunWaliData;
     $namaKelasWali = $namaKelasWaliData;
 }
 
@@ -173,12 +160,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     } else {
 
-        // Periksa data pelanggaran terlebih dahulu.
+        // Periksa apakah data pelanggaran tersedia
+        // dan statusnya masih boleh ditangani.
+
         $stmtCek = mysqli_prepare($koneksi, "
-            SELECT
-                status,
-                kelas_id,
-                tahun_ajaran_id
+            SELECT status
             FROM t_pelanggaran_siswa
             WHERE id = ?
             LIMIT 1
@@ -192,13 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             mysqli_stmt_bind_param($stmtCek, "i", $id);
             mysqli_stmt_execute($stmtCek);
-
-            mysqli_stmt_bind_result(
-                $stmtCek,
-                $statusLama,
-                $kelasData,
-                $tahunData
-            );
+            mysqli_stmt_bind_result($stmtCek, $statusLama);
 
             $dataDitemukan = mysqli_stmt_fetch($stmtCek);
 
@@ -207,16 +187,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$dataDitemukan) {
 
                 $pesan = "Data pelanggaran tidak ditemukan.";
-
-            } elseif (
-                $isWaliKelas &&
-                (
-                    (int)$kelasData !== $kelasWali ||
-                    (int)$tahunData !== $tahunWali
-                )
-            ) {
-
-                $pesan = "Anda hanya boleh menangani pelanggaran siswa di kelas tanggung jawab Anda.";
 
             } elseif (!in_array($statusLama, [
                 "Belum ditangani",
@@ -227,63 +197,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             } else {
 
-                // Guru biasa boleh menangani seluruh data.
-                // Wali kelas hanya boleh menangani kelas dan tahun tugasnya.
+                // Semua akun Guru boleh menangani seluruh data pelanggaran.
 
-                if ($isWaliKelas) {
-
-                    $stmt = mysqli_prepare($koneksi, "
-                        UPDATE t_pelanggaran_siswa
-                        SET tindakan = ?, status = ?
-                        WHERE id = ?
-                            AND kelas_id = ?
-                            AND tahun_ajaran_id = ?
-                            AND status IN (
-                                'Belum ditangani',
-                                'Sedang diproses'
-                            )
-                    ");
-
-                    if ($stmt) {
-                        mysqli_stmt_bind_param(
-                            $stmt,
-                            "ssiii",
-                            $tindakan,
-                            $status,
-                            $id,
-                            $kelasWali,
-                            $tahunWali
-                        );
-                    }
-
-                } else {
-
-                    $stmt = mysqli_prepare($koneksi, "
-                        UPDATE t_pelanggaran_siswa
-                        SET tindakan = ?, status = ?
-                        WHERE id = ?
-                            AND status IN (
-                                'Belum ditangani',
-                                'Sedang diproses'
-                            )
-                    ");
-
-                    if ($stmt) {
-                        mysqli_stmt_bind_param(
-                            $stmt,
-                            "ssi",
-                            $tindakan,
-                            $status,
-                            $id
-                        );
-                    }
-                }
+                $stmt = mysqli_prepare($koneksi, "
+                    UPDATE t_pelanggaran_siswa
+                    SET tindakan = ?, status = ?
+                    WHERE id = ?
+                        AND status IN (
+                            'Belum ditangani',
+                            'Sedang diproses'
+                        )
+                ");
 
                 if (!$stmt) {
 
                     $pesan = "Gagal menyiapkan pembaruan tindakan.";
 
                 } else {
+
+                    mysqli_stmt_bind_param(
+                        $stmt,
+                        "ssi",
+                        $tindakan,
+                        $status,
+                        $id
+                    );
 
                     if (mysqli_stmt_execute($stmt)) {
 
@@ -318,21 +256,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // KONDISI QUERY
 // ==========================================
 
+// Tampilkan semua pelanggaran yang belum selesai.
+// Tidak dibatasi berdasarkan kelas maupun guru pencatat.
+
 $where = "
     WHERE ps.status IN (
         'Belum ditangani',
         'Sedang diproses'
     )
 ";
-
-// Pembatasan Wali Kelas
-if ($isWaliKelas) {
-
-    $where .= "
-        AND ps.kelas_id = $kelasWali
-        AND ps.tahun_ajaran_id = $tahunWali
-    ";
-}
 
 // ==========================================
 // PENCARIAN
@@ -485,7 +417,7 @@ if (!$query) {
         </h2>
 
         <p class="text-secondary mb-0">
-            Kelola tindak lanjut pelanggaran siswa yang belum selesai ditangani.
+            Kelola tindak lanjut seluruh pelanggaran siswa yang belum selesai ditangani.
         </p>
 
     </div>
@@ -498,6 +430,9 @@ if (!$query) {
             <strong>Wali Kelas</strong>
             <span class="mx-1">|</span>
             Kelas: <?= e($namaKelasWali); ?>
+            <div class="small mt-1">
+                Anda tetap dapat melihat dan menangani seluruh data pelanggaran siswa.
+            </div>
         </div>
 
     <?php endif; ?>
