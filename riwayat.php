@@ -29,7 +29,7 @@ function e($nilai) {
 }
 
 // ==========================================
-// IDENTITAS GURU YANG LOGIN
+// IDENTITAS GURU
 // ==========================================
 
 $idGuru = 0;
@@ -89,15 +89,10 @@ $tahunInput = isset($_GET['tahun']) && is_scalar($_GET['tahun'])
     : (string)$tahunAktif;
 
 if ($tahunInput === 'all') {
-
     $tahun = 'all';
-
 } elseif (ctype_digit($tahunInput)) {
-
     $tahun = (int)$tahunInput;
-
 } else {
-
     $tahun = $tahunAktif;
 }
 
@@ -105,21 +100,16 @@ if ($tahunInput === 'all') {
 // KONDISI QUERY
 // ==========================================
 
-// Tampilkan seluruh status pelanggaran
 $where = " WHERE 1=1 ";
 
 // Guru hanya melihat laporan yang dibuat sendiri
 if ($role === 'guru') {
-
     $where .= " AND ps.guru_id = $idGuru ";
-
 }
 
 // Filter tahun ajaran
 if ($tahun !== 'all') {
-
     $where .= " AND ps.tahun_ajaran_id = $tahun ";
-
 }
 
 // ==========================================
@@ -138,7 +128,6 @@ if ($cari !== '') {
             OR ps.keterangan LIKE '%$cariSQL%'
         )
     ";
-
 }
 
 // ==========================================
@@ -168,7 +157,7 @@ if (!$queryJumlah) {
 }
 
 $dataJumlah = mysqli_fetch_assoc($queryJumlah);
-$totalData = (int)$dataJumlah['total'];
+$totalData = (int)($dataJumlah['total'] ?? 0);
 
 $totalHalaman = max(
     1,
@@ -176,7 +165,6 @@ $totalHalaman = max(
 );
 
 $halaman = min($halaman, $totalHalaman);
-
 $offset = ($halaman - 1) * $batas;
 
 // ==========================================
@@ -374,9 +362,7 @@ $parameter = [
                 </small>
 
                 <small class="text-secondary">
-
                     Halaman <?= $halaman; ?> dari <?= $totalHalaman; ?>
-
                 </small>
 
             </div>
@@ -414,6 +400,7 @@ $parameter = [
 
                                 <?php
 
+                                // Format tanggal
                                 $tanggal = '-';
 
                                 if (
@@ -424,6 +411,20 @@ $parameter = [
                                         'd-m-Y',
                                         strtotime($data['tanggal'])
                                     );
+                                }
+
+                                // Status tindakan
+                                $status = trim($data['status'] ?? '');
+
+                                if ($status === 'Belum Ditindak' || $status === '') {
+                                    $status = 'Belum Ditindak';
+                                    $warnaStatus = 'secondary';
+                                } elseif ($status === 'Diproses') {
+                                    $warnaStatus = 'warning';
+                                } elseif ($status === 'Selesai') {
+                                    $warnaStatus = 'success';
+                                } else {
+                                    $warnaStatus = 'secondary';
                                 }
 
                                 ?>
@@ -443,23 +444,21 @@ $parameter = [
                                     <td><?= e($data['nama_pelanggaran']); ?></td>
 
                                     <td>
-
                                         <span class="badge bg-primary">
                                             -<?= (int)$data['poin']; ?> poin
                                         </span>
-
                                     </td>
 
                                     <td><?= e($data['nama_guru']); ?></td>
 
-                                    <td><?= e($data['tindakan'] ?: '-'); ?></td>
+                                    <td>
+                                        <?= e($data['tindakan'] ?: '-'); ?>
+                                    </td>
 
                                     <td>
-
                                         <span class="badge text-bg-<?= $warnaStatus ?>">
-                                            <?= e($status ?: '-'); ?>
+                                            <?= e($status); ?>
                                         </span>
-
                                     </td>
 
                                 </tr>
@@ -469,14 +468,9 @@ $parameter = [
                         <?php else: ?>
 
                             <tr>
-
-                                <td
-                                    colspan="10"
-                                    class="text-center text-secondary py-4"
-                                >
+                                <td colspan="10" class="text-center text-secondary py-4">
                                     Tidak ada riwayat pelanggaran ditemukan.
                                 </td>
-
                             </tr>
 
                         <?php endif; ?>
