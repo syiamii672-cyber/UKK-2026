@@ -11,9 +11,10 @@ include "config/koneksi.php";
 require_once "includes/cek_wali_kelas.php";
 
 $nama = $_SESSION['name'] ?? '';
-$role = $_SESSION['role'] ?? '';
+$role = strtolower(trim($_SESSION['role'] ?? ''));
 
 $menuAktif = "dashboard";
+$judulHalaman = "Dashboard";
 
 // Total data untuk Dashboard Admin
 $totalSiswa = 0;
@@ -27,15 +28,109 @@ if ($role === "admin") {
     $queryKelas = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM t_kelas");
 
     if ($querySiswa) {
-        $totalSiswa = mysqli_fetch_assoc($querySiswa)['total'];
+        $totalSiswa = (int) mysqli_fetch_assoc($querySiswa)['total'];
     }
 
     if ($queryGuru) {
-        $totalGuru = mysqli_fetch_assoc($queryGuru)['total'];
+        $totalGuru = (int) mysqli_fetch_assoc($queryGuru)['total'];
     }
 
     if ($queryKelas) {
-        $totalKelas = mysqli_fetch_assoc($queryKelas)['total'];
+        $totalKelas = (int) mysqli_fetch_assoc($queryKelas)['total'];
+    }
+}
+
+// Menentukan jenis pengguna
+if ($role === "admin") {
+    $labelRole = "Administrator";
+} elseif ($isWaliKelas) {
+    $labelRole = "Guru / Wali Kelas";
+} else {
+    $labelRole = "Guru";
+}
+
+// Daftar kartu dashboard
+$daftarKartu = [];
+
+if ($role === "admin") {
+
+    $daftarKartu = [
+        [
+            "judul" => "Data Siswa",
+            "jumlah" => $totalSiswa,
+            "deskripsi" => "Jumlah seluruh data siswa.",
+            "link" => "siswa.php",
+            "tombol" => "Kelola Siswa",
+            "ikon" => "bi-people"
+        ],
+        [
+            "judul" => "Data Guru",
+            "jumlah" => $totalGuru,
+            "deskripsi" => "Jumlah seluruh data guru.",
+            "link" => "data_guru.php",
+            "tombol" => "Kelola Guru",
+            "ikon" => "bi-person-badge"
+        ],
+        [
+            "judul" => "Data Kelas",
+            "jumlah" => $totalKelas,
+            "deskripsi" => "Jumlah seluruh kelas.",
+            "link" => "kelas.php",
+            "tombol" => "Kelola Kelas",
+            "ikon" => "bi-building"
+        ]
+    ];
+
+} elseif ($role === "guru") {
+
+    $daftarKartu = [
+        [
+            "judul" => "Input Pelanggaran",
+            "deskripsi" => "Masukkan data pelanggaran siswa.",
+            "link" => "input_pelanggaran.php",
+            "tombol" => "Input Sekarang",
+            "ikon" => "bi-pencil-square"
+        ],
+        [
+            "judul" => "Catatan Pelanggaran",
+            "deskripsi" => "Lihat catatan pelanggaran dan kelola tindakannya.",
+            "link" => "catatan_pelanggaran.php",
+            "tombol" => "Lihat Catatan",
+            "ikon" => "bi-journal-text"
+        ],
+        [
+            "judul" => "Rekap Poin",
+            "deskripsi" => "Pantau jumlah pelanggaran dan poin siswa.",
+            "link" => "rekap_poin.php",
+            "tombol" => "Lihat Rekap",
+            "ikon" => "bi-bar-chart"
+        ],
+        [
+            "judul" => "Riwayat",
+            "deskripsi" => "Lihat riwayat pelanggaran yang Anda laporkan.",
+            "link" => "riwayat.php",
+            "tombol" => "Lihat Riwayat",
+            "ikon" => "bi-clock-history"
+        ]
+    ];
+
+    if ($isWaliKelas) {
+
+        $daftarKartu[] = [
+            "judul" => "Rekap Kelas",
+            "deskripsi" => "Pantau rekap pelanggaran siswa di kelas Anda.",
+            "link" => "rekap_kelas.php",
+            "tombol" => "Lihat Rekap Kelas",
+            "ikon" => "bi-people"
+        ];
+
+        $daftarKartu[] = [
+            "judul" => "Laporan",
+            "deskripsi" => "Lihat laporan pelanggaran siswa kelas Anda.",
+            "link" => "laporan.php",
+            "tombol" => "Lihat Laporan",
+            "ikon" => "bi-file-earmark-text"
+        ];
     }
 }
 ?>
@@ -52,42 +147,65 @@ if ($role === "admin") {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
           rel="stylesheet">
 
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
     <style>
         body {
-            margin: 0;
-            background-color: #f8f9fa;
+            background: #F5F6F7;
+            color: #374151;
         }
 
         .konten-utama {
             margin-left: 220px;
-            width: calc(100% - 220px);
             min-height: 100vh;
-            padding: 24px;
-            box-sizing: border-box;
+        }
+
+        .isi-dashboard {
+            padding: 100px 28px 28px;
         }
 
         .kartu-dashboard {
-            border: none;
-            border-radius: 10px;
+            border: 1px solid #E5E9ED;
+            border-radius: 12px;
             transition: 0.2s;
         }
 
-        .kartu-menu {
-            text-decoration: none;
-            color: inherit;
-            display: block;
+        .kartu-dashboard:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(52,73,94,0.08) !important;
         }
 
-        .kartu-menu:hover .kartu-dashboard {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.10) !important;
+        .ikon-dashboard {
+            width: 43px;
+            height: 43px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: #E9EEF2;
+            color: #526D83;
+            font-size: 20px;
         }
 
-        @media (max-width: 575.98px) {
+        .btn-ukk {
+            background: #607D94;
+            color: white;
+            border: none;
+        }
+
+        .btn-ukk:hover {
+            background: #4E687E;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
             .konten-utama {
                 margin-left: 220px;
-                width: calc(100% - 220px);
-                padding: 15px;
+            }
+
+            .isi-dashboard {
+                padding: 95px 18px 18px;
             }
         }
     </style>
@@ -95,184 +213,116 @@ if ($role === "admin") {
 
 <body>
 
-<?php include "includes/sidebar.php"; ?>
+    <?php include "includes/sidebar.php"; ?>
 
-<main class="konten-utama">
+    <?php include "includes/navbar.php"; ?>
 
-    <h2 class="mb-1">Dashboard</h2>
+    <main class="konten-utama">
 
-    <p class="text-secondary mb-4">
-        Selamat datang, <?= htmlspecialchars($nama); ?>!
-        Kamu login sebagai
-        <?= $role === "admin"
-            ? "Administrator"
-            : ($isWaliKelas ? "Guru / Wali Kelas" : "Guru"); ?>.
-    </p>
+        <div class="isi-dashboard">
 
-    <div class="row g-3">
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-body p-4">
 
-        <?php if ($role === "admin"): ?>
+                    <h5 class="fw-semibold mb-2">
+                        Selamat datang, <?= htmlspecialchars($nama); ?>!
+                    </h5>
 
-            <!-- Dashboard Admin -->
+                    <p class="text-secondary mb-0">
+                        Anda login sebagai <?= htmlspecialchars($labelRole); ?>.
+                        Silakan gunakan menu yang tersedia untuk menjalankan tugas Anda.
+                    </p>
 
-            <div class="col-12 col-lg-4">
-                <div class="card kartu-dashboard shadow-sm h-100">
-                    <div class="card-body">
-                        <h6 class="text-secondary">Data Siswa</h6>
-                        <h2><?= $totalSiswa; ?></h2>
-                        <a href="siswa.php" class="btn btn-primary btn-sm">
-                            Kelola Siswa
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-12 col-lg-4">
-                <div class="card kartu-dashboard shadow-sm h-100">
-                    <div class="card-body">
-                        <h6 class="text-secondary">Data Guru</h6>
-                        <h2><?= $totalGuru; ?></h2>
-                        <a href="data_guru.php" class="btn btn-primary btn-sm">
-                            Kelola Guru
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-12 col-lg-4">
-                <div class="card kartu-dashboard shadow-sm h-100">
-                    <div class="card-body">
-                        <h6 class="text-secondary">Data Kelas</h6>
-                        <h2><?= $totalKelas; ?></h2>
-                        <a href="kelas.php" class="btn btn-primary btn-sm">
-                            Kelola Kelas
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-        <?php elseif ($role === "guru"): ?>
-
-            <!-- Informasi Guru -->
-
-            <div class="col-12 mb-2">
-                <div class="card kartu-dashboard shadow-sm">
-                    <div class="card-body">
-
-                        <h5 class="fw-bold">
-                            <?= $isWaliKelas ? "Dashboard Wali Kelas" : "Dashboard Guru"; ?>
-                        </h5>
-
-                        <?php if ($isWaliKelas): ?>
-
-                            <p class="text-secondary mb-2">
-                                Anda bertugas sebagai Wali Kelas.
-                                Silakan gunakan menu untuk mencatat pelanggaran,
-                                mengelola tindakan, memantau rekap poin,
-                                riwayat, dan laporan siswa.
-                            </p>
-
-                            <span class="badge bg-primary">
+                    <?php if ($role === "guru" && $isWaliKelas): ?>
+                        <div class="mt-3">
+                            <span class="badge rounded-pill px-3 py-2"
+                                  style="background:#E9EEF2;color:#526D83;">
+                                <i class="bi bi-building me-1"></i>
                                 Wali Kelas <?= htmlspecialchars($namaKelasWali); ?>
                             </span>
+                        </div>
+                    <?php endif; ?>
 
-                        <?php else: ?>
-
-                            <p class="text-secondary mb-0">
-                                Silakan gunakan menu untuk mencatat pelanggaran,
-                                mengelola tindakan, melihat rekap poin,
-                                dan memantau riwayat pelanggaran siswa.
-                            </p>
-
-                        <?php endif; ?>
-
-                    </div>
                 </div>
             </div>
 
-            <!-- Menu yang dimiliki semua Guru -->
+            <div class="mb-3">
 
-            <div class="col-12 col-md-6 col-lg-4">
-                <a href="catat_pelanggaran.php" class="kartu-menu">
-                    <div class="card kartu-dashboard shadow-sm h-100">
-                        <div class="card-body">
-                            <h6 class="text-secondary">Catat Pelanggaran</h6>
-                            <h5 class="fw-bold mt-3">Catat Pelanggaran Siswa</h5>
-                            <p class="text-muted small mb-0">
-                                Masukkan catatan pelanggaran siswa.
-                            </p>
-                        </div>
-                    </div>
-                </a>
+                <h5 class="fw-semibold mb-1">
+                    <?= $role === "admin" ? "Ringkasan Data" : "Menu Utama"; ?>
+                </h5>
+
+                <p class="text-secondary small mb-0">
+                    <?= $role === "admin"
+                        ? "Informasi jumlah data yang tersimpan dalam sistem."
+                        : "Pilih fitur yang ingin Anda gunakan."; ?>
+                </p>
+
             </div>
 
-            <div class="col-12 col-md-6 col-lg-4">
-                <a href="tindakan.php" class="kartu-menu">
-                    <div class="card kartu-dashboard shadow-sm h-100">
-                        <div class="card-body">
-                            <h6 class="text-secondary">Tindakan</h6>
-                            <h5 class="fw-bold mt-3">Kelola Tindakan</h5>
-                            <p class="text-muted small mb-0">
-                                Lihat dan kelola tindak lanjut pelanggaran.
-                            </p>
-                        </div>
-                    </div>
-                </a>
-            </div>
+            <div class="row g-3">
 
-            <div class="col-12 col-md-6 col-lg-4">
-                <a href="rekap_poin.php" class="kartu-menu">
-                    <div class="card kartu-dashboard shadow-sm h-100">
-                        <div class="card-body">
-                            <h6 class="text-secondary">Rekap Poin</h6>
-                            <h5 class="fw-bold mt-3">Lihat Rekap Poin</h5>
-                            <p class="text-muted small mb-0">
-                                Pantau jumlah pelanggaran dan total poin siswa.
-                            </p>
-                        </div>
-                    </div>
-                </a>
-            </div>
+                <?php foreach ($daftarKartu as $kartu): ?>
 
-            <div class="col-12 col-md-6 col-lg-4">
-                <a href="riwayat.php" class="kartu-menu">
-                    <div class="card kartu-dashboard shadow-sm h-100">
-                        <div class="card-body">
-                            <h6 class="text-secondary">Riwayat</h6>
-                            <h5 class="fw-bold mt-3">Lihat Riwayat</h5>
-                            <p class="text-muted small mb-0">
-                                Lihat riwayat pelanggaran siswa.
-                            </p>
-                        </div>
-                    </div>
-                </a>
-            </div>
+                    <div class="col-12 col-md-6 col-xl-4">
 
-            <!-- Menu tambahan khusus Wali Kelas -->
-
-            <?php if ($isWaliKelas): ?>
-
-                <div class="col-12 col-md-6 col-lg-4">
-                    <a href="laporan.php" class="kartu-menu">
                         <div class="card kartu-dashboard shadow-sm h-100">
-                            <div class="card-body">
-                                <h6 class="text-secondary">Laporan</h6>
-                                <h5 class="fw-bold mt-3">Lihat Laporan</h5>
-                                <p class="text-muted small mb-0">
-                                    Lihat laporan pelanggaran siswa kelas Anda.
+
+                            <div class="card-body p-4">
+
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+
+                                    <h6 class="text-secondary mb-0">
+                                        <?= htmlspecialchars($kartu['judul']); ?>
+                                    </h6>
+
+                                    <div class="ikon-dashboard">
+                                        <i class="bi <?= htmlspecialchars($kartu['ikon']); ?>"></i>
+                                    </div>
+
+                                </div>
+
+                                <?php if (isset($kartu['jumlah'])): ?>
+
+                                    <h2 class="fw-bold mb-2">
+                                        <?= $kartu['jumlah']; ?>
+                                    </h2>
+
+                                <?php else: ?>
+
+                                    <h5 class="fw-semibold mb-2">
+                                        <?= htmlspecialchars($kartu['judul']); ?>
+                                    </h5>
+
+                                <?php endif; ?>
+
+                                <p class="text-secondary small mb-4">
+                                    <?= htmlspecialchars($kartu['deskripsi']); ?>
                                 </p>
+
+                                <a href="<?= htmlspecialchars($kartu['link']); ?>"
+                                   class="btn btn-ukk btn-sm px-3">
+
+                                    <?= htmlspecialchars($kartu['tombol']); ?>
+                                    <i class="bi bi-arrow-right ms-1"></i>
+
+                                </a>
+
                             </div>
+
                         </div>
-                    </a>
-                </div>
 
-            <?php endif; ?>
+                    </div>
 
-        <?php endif; ?>
+                <?php endforeach; ?>
 
-    </div>
+            </div>
 
-</main>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

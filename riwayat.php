@@ -29,49 +29,27 @@ function e($nilai) {
 }
 
 // ==========================================
-// CEK WALI KELAS
+// IDENTITAS GURU YANG LOGIN
 // ==========================================
 
-$isWaliKelas = false;
-$kelasWali = 0;
-$tahunWali = 0;
-$namaKelasWali = '';
+$idGuru = 0;
 
 if ($role === 'guru') {
 
-    $queryWali = mysqli_query($koneksi, "
-        SELECT
-            w.kelas_id,
-            w.tahun_ajaran_id,
-            k.nama AS nama_kelas
-        FROM t_guru g
-        JOIN t_wali_kelas w
-            ON g.id = w.guru_id
-        JOIN t_kelas k
-            ON w.kelas_id = k.id
-        JOIN t_tahun_ajaran ta
-            ON w.tahun_ajaran_id = ta.id
-        WHERE g.user_id = $idUser
-            AND g.status_aktif = 1
-            AND w.status_aktif = 1
-            AND k.status_aktif = 1
-            AND ta.status_aktif = 1
+    $queryGuru = mysqli_query($koneksi, "
+        SELECT id
+        FROM t_guru
+        WHERE user_id = $idUser
+          AND status_aktif = 1
         LIMIT 1
     ");
 
-    if (!$queryWali) {
-        die("Gagal memeriksa wali kelas: " . mysqli_error($koneksi));
+    if (!$queryGuru) {
+        die("Gagal mengambil identitas guru: " . mysqli_error($koneksi));
     }
 
-    if (mysqli_num_rows($queryWali) > 0) {
-
-        $dataWali = mysqli_fetch_assoc($queryWali);
-
-        $isWaliKelas = true;
-        $kelasWali = (int)$dataWali['kelas_id'];
-        $tahunWali = (int)$dataWali['tahun_ajaran_id'];
-        $namaKelasWali = $dataWali['nama_kelas'];
-    }
+    $dataGuru = mysqli_fetch_assoc($queryGuru);
+    $idGuru = (int)($dataGuru['id'] ?? 0);
 }
 
 // ==========================================
@@ -83,24 +61,6 @@ $cari = isset($_GET['cari']) && is_scalar($_GET['cari'])
     : '';
 
 $cariSQL = mysqli_real_escape_string($koneksi, $cari);
-
-// ==========================================
-// FILTER STATUS
-// ==========================================
-
-$statusValid = [
-    "Belum ditangani",
-    "Sedang diproses",
-    "Selesai"
-];
-
-$status = isset($_GET['status']) && is_scalar($_GET['status'])
-    ? (string)$_GET['status']
-    : '';
-
-if (!in_array($status, $statusValid, true)) {
-    $status = '';
-}
 
 // ==========================================
 // TAHUN AJARAN AKTIF
@@ -118,60 +78,54 @@ if (!$queryAktif) {
 }
 
 $dataAktif = mysqli_fetch_assoc($queryAktif);
-
 $tahunAktif = (int)($dataAktif['id'] ?? 0);
 
 // ==========================================
 // FILTER TAHUN AJARAN
 // ==========================================
 
-if ($isWaliKelas) {
+$tahunInput = isset($_GET['tahun']) && is_scalar($_GET['tahun'])
+    ? trim((string)$_GET['tahun'])
+    : (string)$tahunAktif;
 
-    // Wali kelas hanya melihat tahun penugasannya.
-    $tahun = $tahunWali;
+if ($tahunInput === 'all') {
+
+    $tahun = 'all';
+
+} elseif (ctype_digit($tahunInput)) {
+
+    $tahun = (int)$tahunInput;
 
 } else {
 
-    $tahunInput = isset($_GET['tahun']) && is_scalar($_GET['tahun'])
-        ? trim((string)$_GET['tahun'])
-        : (string)$tahunAktif;
-
-    if ($tahunInput === 'all') {
-
-        $tahun = 'all';
-
-    } elseif (ctype_digit($tahunInput)) {
-
-        $tahun = (int)$tahunInput;
-
-    } else {
-
-        $tahun = $tahunAktif;
-    }
+    $tahun = $tahunAktif;
 }
 
 // ==========================================
 // KONDISI QUERY
 // ==========================================
 
-$where = " WHERE ps.status = 'Selesai' ";
+// Tampilkan seluruh status pelanggaran
+$where = " WHERE 1=1 ";
 
-// Pembatasan Wali Kelas
-if ($isWaliKelas) {
+// Guru hanya melihat laporan yang dibuat sendiri
+if ($role === 'guru') {
 
-    $where .= "
-        AND ps.kelas_id = $kelasWali
-        AND ps.tahun_ajaran_id = $tahunWali
-    ";
+    $where .= " AND ps.guru_id = $idGuru ";
 
-} elseif ($tahun !== 'all') {
-
-    $where .= "
-        AND ps.tahun_ajaran_id = $tahun
-    ";
 }
 
-// Pencarian
+// Filter tahun ajaran
+if ($tahun !== 'all') {
+
+    $where .= " AND ps.tahun_ajaran_id = $tahun ";
+
+}
+
+// ==========================================
+// PENCARIAN
+// ==========================================
+
 if ($cari !== '') {
 
     $where .= "
@@ -184,16 +138,7 @@ if ($cari !== '') {
             OR ps.keterangan LIKE '%$cariSQL%'
         )
     ";
-}
 
-// Filter status
-if ($status !== '') {
-
-    $statusSQL = mysqli_real_escape_string($koneksi, $status);
-
-    $where .= "
-        AND ps.status = '$statusSQL'
-    ";
 }
 
 // ==========================================
@@ -276,12 +221,8 @@ if (!$queryTahun) {
 
 $parameter = [
     'cari' => $cari,
-    'status' => $status
+    'tahun' => (string)$tahun
 ];
-
-if (!$isWaliKelas) {
-    $parameter['tahun'] = (string)$tahun;
-}
 
 ?>
 
@@ -347,25 +288,10 @@ if (!$isWaliKelas) {
         </h2>
 
         <p class="text-secondary mb-0">
-            Daftar catatan pelanggaran siswa yang telah tercatat dalam sistem.
+            Daftar pelanggaran yang pernah dicatat oleh akun Anda, termasuk dari kelas mana pun.
         </p>
 
     </div>
-
-    <!-- INFORMASI WALI KELAS -->
-
-    <?php if ($isWaliKelas): ?>
-
-        <div class="alert alert-primary">
-
-            <strong>Wali Kelas</strong>
-            <span class="mx-1">|</span>
-
-            Kelas: <?= e($namaKelasWali); ?>
-
-        </div>
-
-    <?php endif; ?>
 
     <div class="card kartu shadow-sm">
 
@@ -375,7 +301,7 @@ if (!$isWaliKelas) {
 
             <form method="GET" action="riwayat.php" class="row g-2 mb-3">
 
-                <div class="col-md-4">
+                <div class="col-md-5">
 
                     <input
                         type="text"
@@ -387,71 +313,33 @@ if (!$isWaliKelas) {
 
                 </div>
 
-                <?php if (!$isWaliKelas): ?>
+                <div class="col-md-4">
 
-                    <div class="col-md-3">
+                    <select name="tahun" class="form-select">
 
-                        <select name="tahun" class="form-select">
-
-                            <option
-                                value="all"
-                                <?= $tahun === 'all' ? 'selected' : ''; ?>
-                            >
-                                Semua Tahun Ajaran
-                            </option>
-
-                            <?php while ($ta = mysqli_fetch_assoc($queryTahun)): ?>
-
-                                <option
-                                    value="<?= (int)$ta['id']; ?>"
-                                    <?= (string)$tahun === (string)$ta['id'] ? 'selected' : ''; ?>
-                                >
-                                    <?= e($ta['nama']); ?>
-                                </option>
-
-                            <?php endwhile; ?>
-
-                        </select>
-
-                    </div>
-
-                <?php else: ?>
-
-                    <div class="col-md-3">
-
-                        <input
-                            type="text"
-                            class="form-control"
-                            value="Kelas <?= e($namaKelasWali); ?>"
-                            disabled
+                        <option
+                            value="all"
+                            <?= $tahun === 'all' ? 'selected' : ''; ?>
                         >
+                            Semua Tahun Ajaran
+                        </option>
 
-                    </div>
-
-                <?php endif; ?>
-
-                <div class="col-md-3">
-
-                    <select name="status" class="form-select">
-
-                        <option value="">Semua Status</option>
-
-                        <?php foreach ($statusValid as $st): ?>
+                        <?php while ($ta = mysqli_fetch_assoc($queryTahun)): ?>
 
                             <option
-                                value="<?= e($st); ?>"
-                                <?= $status === $st ? 'selected' : ''; ?>
+                                value="<?= (int)$ta['id']; ?>"
+                                <?= (string)$tahun === (string)$ta['id'] ? 'selected' : ''; ?>
                             >
-                                <?= e($st); ?>
+                                <?= e($ta['nama']); ?>
                             </option>
 
-                        <?php endforeach; ?>
+                        <?php endwhile; ?>
 
                     </select>
 
                 </div>
 
-                <div class="col-md-1">
+                <div class="col-md-3 d-flex gap-2">
 
                     <button
                         type="submit"
@@ -459,10 +347,6 @@ if (!$isWaliKelas) {
                     >
                         Cari
                     </button>
-
-                </div>
-
-                <div class="col-md-1">
 
                     <a
                         href="riwayat.php"
@@ -530,16 +414,6 @@ if (!$isWaliKelas) {
 
                                 <?php
 
-                                $warna = 'secondary';
-
-                                if ($data['status'] === 'Selesai') {
-                                    $warna = 'success';
-                                } elseif ($data['status'] === 'Sedang diproses') {
-                                    $warna = 'warning';
-                                } elseif ($data['status'] === 'Belum ditangani') {
-                                    $warna = 'danger';
-                                }
-
                                 $tanggal = '-';
 
                                 if (
@@ -582,8 +456,8 @@ if (!$isWaliKelas) {
 
                                     <td>
 
-                                        <span class="badge bg-<?= $warna; ?>">
-                                            <?= e($data['status']); ?>
+                                        <span class="badge text-bg-<?= $warnaStatus ?>">
+                                            <?= e($status ?: '-'); ?>
                                         </span>
 
                                     </td>
