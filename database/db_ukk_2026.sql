@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 12 Nov 2026 pada 19.33
+-- Waktu pembuatan: 12 Nov 2026 pada 22.48
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.0.30
 
@@ -471,6 +471,14 @@ CREATE TABLE `t_pelanggaran_siswa` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data untuk tabel `t_pelanggaran_siswa`
+--
+
+INSERT INTO `t_pelanggaran_siswa` (`id`, `tahun_ajaran_id`, `siswa_id`, `nama_siswa`, `kelas_id`, `nama_kelas`, `pelanggaran_id`, `nama_pelanggaran`, `pelanggaran_kategori_id`, `guru_id`, `nama_guru`, `tanggal`, `keterangan`, `poin`, `tindakan`, `status`, `created_at`, `updated_at`) VALUES
+(1, 1, 188, 'FAHMA TANIA AL JAHRA', 48, 'XII BD 1', 6, 'Atribut seragam tidak lengkap', 2, 32, 'Aldi Maulana, S.Pd', '2026-11-12', 'belum mengganti logo osis dengan logo ipm', 2, 'teguran lisan', 'Diproses', '2026-11-12 20:55:33', '2026-11-12 20:55:33'),
+(2, 1, 168, 'PUSPITA DEWI', 6, 'XII RPL 2', 6, 'Atribut seragam tidak lengkap', 2, 32, 'Aldi Maulana, S.Pd', '2026-11-12', 'tidak memasang logo jurusan', 2, 'teguran lisan', 'Selesai', '2026-11-12 21:04:38', '2026-11-12 21:04:38');
+
 -- --------------------------------------------------------
 
 --
@@ -893,7 +901,7 @@ ALTER TABLE `t_pelanggaran_kategori`
 -- AUTO_INCREMENT untuk tabel `t_pelanggaran_siswa`
 --
 ALTER TABLE `t_pelanggaran_siswa`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT untuk tabel `t_siswa`
