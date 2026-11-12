@@ -118,6 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 
 <?php include "includes/sidebar.php"; ?>
+<?php include "includes/navbar.php"; ?>
 
 <main class="konten">
     <h3 class="fw-bold mb-1">Edit Kategori Pelanggaran</h3>

@@ -116,7 +116,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
+    
 <?php include "includes/sidebar.php"; ?>
+<?php include "includes/navbar.php"; ?>
 
 <main style="margin-left:220px; padding:30px; min-height:100vh;">
     <h3 class="fw-bold">Edit Jenis Pelanggaran</h3>

@@ -116,6 +116,7 @@ if (isset($_POST['simpan'])) {
 <body class="bg-light">
 
 <?php include "includes/sidebar.php"; ?>
+<?php include "includes/navbar.php"; ?>
 
 <div style="margin-left:220px; padding:30px;">
 

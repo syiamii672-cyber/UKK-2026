@@ -124,6 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="bg-light">
 
 <?php include "includes/sidebar.php"; ?>
+<?php include "includes/navbar.php"; ?>
 
 <div class="konten-utama">
     <div class="container-fluid">

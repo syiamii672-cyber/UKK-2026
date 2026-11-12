@@ -1,4 +1,4 @@
-```php
+
 <?php
 include "includes/cek_session.php";
 include "config/koneksi.php";
@@ -11,7 +11,6 @@ if ($_SESSION['role'] !== "admin") {
 $menuAktif = "kelas";
 $cari = trim($_GET['cari'] ?? '');
 
-// Pengaturan pagination
 $batas = 10;
 $halaman = max(1, (int)($_GET['halaman'] ?? 1));
 $keyword = "%" . $cari . "%";
@@ -24,6 +23,7 @@ $sqlJumlah = "SELECT COUNT(*) AS total
                  OR jurusan LIKE ?";
 
 $stmtJumlah = mysqli_prepare($koneksi, $sqlJumlah);
+
 mysqli_stmt_bind_param(
     $stmtJumlah,
     "sss",
@@ -31,22 +31,23 @@ mysqli_stmt_bind_param(
     $keyword,
     $keyword
 );
+
 mysqli_stmt_execute($stmtJumlah);
 
-$hasilJumlah = mysqli_stmt_get_result($stmtJumlah);
-$dataJumlah = mysqli_fetch_assoc($hasilJumlah);
+$dataJumlah = mysqli_fetch_assoc(
+    mysqli_stmt_get_result($stmtJumlah)
+);
 
 $totalData = (int)$dataJumlah['total'];
 $totalHalaman = max(1, (int)ceil($totalData / $batas));
 
-// Jika halaman melebihi jumlah halaman, arahkan ke halaman terakhir
 if ($halaman > $totalHalaman) {
     $halaman = $totalHalaman;
 }
 
 $offset = ($halaman - 1) * $batas;
 
-// Mengambil data kelas sesuai halaman
+// Mengambil data kelas
 $sql = "SELECT id, nama, tingkat, jurusan, status_aktif
         FROM t_kelas
         WHERE nama LIKE ?
@@ -70,7 +71,7 @@ mysqli_stmt_bind_param(
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 
-// Membuat link halaman sambil mempertahankan pencarian
+// Link pagination
 function urlHalamanKelas($nomorHalaman, $cari)
 {
     return "kelas.php?" . http_build_query([
@@ -94,22 +95,198 @@ function urlHalamanKelas($nomorHalaman, $cari)
     <style>
         body {
             margin: 0;
-            background: #f8f9fa;
+            background: #F1F5FB;
         }
 
         .konten-utama {
-            margin-left: 220px;
-            width: calc(100% - 220px);
+            margin-left: 220px !important;
+            width: calc(100% - 220px) !important;
             min-height: 100vh;
-            padding: 24px;
+            padding: 100px 24px 30px;
             box-sizing: border-box;
         }
 
-        @media (max-width: 575.98px) {
+        .konten-utama,
+        .konten-utama * {
+            box-sizing: border-box;
+        }
+
+        .konten-utama .judul-halaman {
+            color: #173B67;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .konten-utama .deskripsi-halaman {
+            color: #718096;
+            font-size: 14px;
+            margin-bottom: 0;
+        }
+
+        .konten-utama .btn-tambah {
+            background: #245B96;
+            border: 1px solid #245B96;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-weight: 600;
+        }
+
+        .konten-utama .btn-tambah:hover {
+            background: #173B67;
+            border-color: #173B67;
+            color: #fff;
+        }
+
+        .konten-utama .card-data {
+            background: #fff;
+            border: 1px solid #E5EAF2;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(23, 59, 103, 0.06);
+        }
+
+        .konten-utama .form-control {
+            min-height: 42px;
+            border: 1px solid #D8E1ED;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .konten-utama .form-control:focus {
+            border-color: #3779C5;
+            box-shadow: 0 0 0 3px rgba(55, 121, 197, 0.12);
+        }
+
+        .konten-utama .btn-cari {
+            background: #245B96;
+            border-color: #245B96;
+            color: #fff;
+            border-radius: 8px;
+            padding: 9px 17px;
+        }
+
+        .konten-utama .btn-cari:hover {
+            background: #173B67;
+            color: #fff;
+        }
+
+        .konten-utama .btn-reset {
+            background: #E9EEF5;
+            border-color: #E9EEF5;
+            color: #40546B;
+            border-radius: 8px;
+            padding: 9px 17px;
+        }
+
+        .konten-utama .btn-reset:hover {
+            background: #DCE5F0;
+            color: #173B67;
+        }
+
+        .konten-utama .table {
+            margin-bottom: 0;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .konten-utama .table thead th {
+            background: #173B67;
+            color: #fff;
+            font-weight: 600;
+            padding: 13px 12px;
+            border-color: #31577F;
+        }
+
+        .konten-utama .table tbody td {
+            padding: 12px;
+            color: #40546B;
+            border-color: #E8EDF4;
+        }
+
+        .konten-utama .table tbody tr:hover {
+            background: #F5F8FC;
+        }
+
+        .konten-utama .badge {
+            padding: 7px 11px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .konten-utama .badge-aktif {
+            background: #E3F5EA;
+            color: #21834B;
+        }
+
+        .konten-utama .badge-nonaktif {
+            background: #EDF0F4;
+            color: #64748B;
+        }
+
+        .konten-utama .btn-edit {
+            background: #FFF3D6;
+            border: 1px solid #F5D58A;
+            color: #946200;
+            border-radius: 6px;
+        }
+
+        .konten-utama .btn-edit:hover {
+            background: #F5D58A;
+            color: #694600;
+        }
+
+        .konten-utama .btn-hapus {
+            background: #FCE8E8;
+            border: 1px solid #F3C4C4;
+            color: #C03939;
+            border-radius: 6px;
+        }
+
+        .konten-utama .btn-hapus:hover {
+            background: #F3C4C4;
+            color: #922B2B;
+        }
+
+        .konten-utama .alert {
+            border: 0;
+            border-radius: 9px;
+            font-size: 14px;
+        }
+
+        .konten-utama .info-data {
+            color: #718096;
+            font-size: 13px;
+        }
+
+        .konten-utama .pagination {
+            gap: 4px;
+        }
+
+        .konten-utama .page-link {
+            border: 1px solid #DCE5F0;
+            color: #245B96;
+            border-radius: 6px !important;
+            font-size: 13px;
+        }
+
+        .konten-utama .page-item.active .page-link {
+            background: #245B96;
+            border-color: #245B96;
+            color: #fff;
+        }
+
+        .konten-utama .page-item.disabled .page-link {
+            color: #A0AEC0;
+        }
+
+        @media (max-width: 767.98px) {
             .konten-utama {
-                margin-left: 180px;
-                width: calc(100% - 180px);
-                padding: 15px;
+                padding: 100px 15px 25px;
+            }
+
+            .konten-utama .judul-halaman {
+                font-size: 22px;
             }
         }
     </style>
@@ -118,20 +295,19 @@ function urlHalamanKelas($nomorHalaman, $cari)
 <body>
 
 <?php include "includes/sidebar.php"; ?>
+<?php include "includes/navbar.php"; ?>
 
 <main class="konten-utama">
 
-    <div class="d-flex flex-wrap justify-content-between
-                align-items-center gap-3 mb-4">
-
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <div>
-            <h2>Kelola Kelas</h2>
-            <p class="text-muted mb-0">
-                Kelola data kelas siswa
+            <h2 class="judul-halaman">Kelola Kelas</h2>
+            <p class="deskripsi-halaman">
+                Kelola data kelas siswa yang terdaftar di sekolah.
             </p>
         </div>
 
-        <a href="tambah_kelas.php" class="btn btn-primary">
+        <a href="tambah_kelas.php" class="btn btn-tambah">
             + Tambah Kelas
         </a>
     </div>
@@ -167,13 +343,12 @@ function urlHalamanKelas($nomorHalaman, $cari)
 
     <?php } ?>
 
-    <div class="card border-0 shadow-sm">
-        <div class="card-body">
+    <div class="card card-data">
+        <div class="card-body p-3 p-md-4">
 
-            <form method="GET" action="kelas.php"
-                  class="row g-2 mb-3">
+            <form method="GET" action="kelas.php" class="row g-2 mb-4">
 
-                <div class="col-md-6">
+                <div class="col-md-6 col-lg-5">
                     <input
                         type="search"
                         name="cari"
@@ -183,20 +358,40 @@ function urlHalamanKelas($nomorHalaman, $cari)
                 </div>
 
                 <div class="col-auto">
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-cari">
                         Cari
                     </button>
-
-                    <a href="kelas.php" class="btn btn-secondary">
-                        Reset
-                    </a>
                 </div>
+
+                <?php if ($cari !== '') { ?>
+                    <div class="col-auto">
+                        <a href="kelas.php" class="btn btn-reset">
+                            Reset
+                        </a>
+                    </div>
+                <?php } ?>
+
             </form>
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <div class="info-data">
+                    <?php if ($totalData > 0) { ?>
+                        Menampilkan <?= $offset + 1; ?>–<?= min($offset + $batas, $totalData); ?>
+                        dari <?= $totalData; ?> data kelas
+                    <?php } else { ?>
+                        Tidak ada data kelas
+                    <?php } ?>
+                </div>
+
+                <div class="info-data">
+                    Maksimal <?= $batas; ?> data per halaman
+                </div>
+            </div>
 
             <div class="table-responsive">
                 <table class="table table-bordered table-hover align-middle">
 
-                    <thead class="table-dark">
+                    <thead>
                         <tr>
                             <th>No</th>
                             <th>Nama Kelas</th>
@@ -209,7 +404,6 @@ function urlHalamanKelas($nomorHalaman, $cari)
 
                     <tbody>
                     <?php
-                    // Nomor data mengikuti halaman yang sedang dibuka
                     $no = $offset + 1;
 
                     if (mysqli_num_rows($result) > 0) {
@@ -233,20 +427,16 @@ function urlHalamanKelas($nomorHalaman, $cari)
 
                             <td>
                                 <?php if ($kelas['status_aktif'] == 1) { ?>
-                                    <span class="badge bg-success">
-                                        Aktif
-                                    </span>
+                                    <span class="badge badge-aktif">Aktif</span>
                                 <?php } else { ?>
-                                    <span class="badge bg-secondary">
-                                        Tidak Aktif
-                                    </span>
+                                    <span class="badge badge-nonaktif">Tidak Aktif</span>
                                 <?php } ?>
                             </td>
 
                             <td>
                                 <a
                                     href="edit_kelas.php?id=<?= (int)$kelas['id']; ?>"
-                                    class="btn btn-sm btn-warning mb-1">
+                                    class="btn btn-sm btn-edit mb-1">
                                     Edit
                                 </a>
 
@@ -261,9 +451,7 @@ function urlHalamanKelas($nomorHalaman, $cari)
                                         name="id"
                                         value="<?= (int)$kelas['id']; ?>">
 
-                                    <button
-                                        type="submit"
-                                        class="btn btn-sm btn-danger mb-1">
+                                    <button type="submit" class="btn btn-sm btn-hapus mb-1">
                                         Hapus
                                     </button>
                                 </form>
@@ -276,7 +464,7 @@ function urlHalamanKelas($nomorHalaman, $cari)
                     ?>
 
                         <tr>
-                            <td colspan="6" class="text-center py-4">
+                            <td colspan="6" class="text-center py-4 text-muted">
                                 Data kelas tidak ditemukan.
                             </td>
                         </tr>
@@ -287,21 +475,13 @@ function urlHalamanKelas($nomorHalaman, $cari)
                 </table>
             </div>
 
-            <!-- Informasi jumlah data -->
-            <div class="d-flex flex-wrap justify-content-between
-                        align-items-center gap-2 mt-3">
+            <?php if ($totalHalaman > 1) { ?>
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-4">
 
-                <small class="text-muted">
-                    <?php if ($totalData > 0) { ?>
-                        Menampilkan <?= $offset + 1; ?>–<?= min($offset + $batas, $totalData); ?>
-                        dari <?= $totalData; ?> data kelas
-                    <?php } else { ?>
-                        Tidak ada data kelas
-                    <?php } ?>
-                </small>
+                    <small class="info-data">
+                        Halaman <?= $halaman; ?> dari <?= $totalHalaman; ?>
+                    </small>
 
-                <!-- Navigasi halaman -->
-                <?php if ($totalHalaman > 1) { ?>
                     <nav aria-label="Navigasi halaman kelas">
                         <ul class="pagination pagination-sm mb-0">
 
@@ -333,15 +513,15 @@ function urlHalamanKelas($nomorHalaman, $cari)
 
                         </ul>
                     </nav>
-                <?php } ?>
-
-            </div>
+                </div>
+            <?php } ?>
 
         </div>
     </div>
 
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
-```

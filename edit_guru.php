@@ -147,6 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body>
 
 <?php include "includes/sidebar.php"; ?>
+<?php include "includes/navbar.php"; ?>
 
 <main class="konten-utama">
     <h2>Edit Data Guru</h2>

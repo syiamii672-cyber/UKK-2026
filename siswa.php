@@ -1,4 +1,3 @@
-
 <?php
 include "includes/cek_session.php";
 include "config/koneksi.php";
@@ -10,14 +9,12 @@ if ($_SESSION['role'] != "admin") {
 
 $menuAktif = "siswa";
 
-// Pengaturan pencarian dan pagination
 $cari = trim($_GET['cari'] ?? '');
 $batas = 10;
-$halaman = max(1, (int) ($_GET['halaman'] ?? 1));
-
+$halaman = max(1, (int)($_GET['halaman'] ?? 1));
 $keyword = "%" . $cari . "%";
 
-// Hitung jumlah data siswa sesuai pencarian
+// Hitung jumlah data siswa
 $stmtJumlah = mysqli_prepare(
     $koneksi,
     "SELECT COUNT(*) AS total
@@ -27,31 +24,21 @@ $stmtJumlah = mysqli_prepare(
         OR nama LIKE ?"
 );
 
-mysqli_stmt_bind_param(
-    $stmtJumlah,
-    "sss",
-    $keyword,
-    $keyword,
-    $keyword
-);
-
+mysqli_stmt_bind_param($stmtJumlah, "sss", $keyword, $keyword, $keyword);
 mysqli_stmt_execute($stmtJumlah);
+
 $hasilJumlah = mysqli_stmt_get_result($stmtJumlah);
 $dataJumlah = mysqli_fetch_assoc($hasilJumlah);
-
-$totalData = (int) $dataJumlah['total'];
-$totalHalaman = max(1, (int) ceil($totalData / $batas));
+$totalData = (int)$dataJumlah['total'];
 
 mysqli_stmt_close($stmtJumlah);
 
-// Pastikan halaman sesuai jumlah data
-if ($halaman > $totalHalaman) {
-    $halaman = $totalHalaman;
-}
-
+// Pagination
+$totalHalaman = max(1, (int)ceil($totalData / $batas));
+$halaman = min($halaman, $totalHalaman);
 $offset = ($halaman - 1) * $batas;
 
-// Ambil data siswa untuk halaman saat ini
+// Ambil data siswa
 $stmtData = mysqli_prepare(
     $koneksi,
     "SELECT id, nis, nisn, nama, jenis_kelamin,
@@ -80,7 +67,6 @@ $result = mysqli_stmt_get_result($stmtData);
 $nomorAwal = $offset + 1;
 $nomorAkhir = min($offset + $batas, $totalData);
 
-// URL pagination tetap membawa kata pencarian
 function urlHalamanSiswa($nomorHalaman, $cari)
 {
     return '?' . http_build_query([
@@ -96,7 +82,7 @@ function urlHalamanSiswa($nomorHalaman, $cari)
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Data Siswa - Sistem Informasi Pelanggaran Siswa</title>
+    <title>Kelola Siswa - Sistem Informasi Pelanggaran Siswa</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
           rel="stylesheet">
@@ -104,22 +90,170 @@ function urlHalamanSiswa($nomorHalaman, $cari)
     <style>
         body {
             margin: 0;
-            background-color: #f8f9fa;
+            background-color: #F1F5FB;
+        }
+
+        /* CSS dibatasi pada konten halaman, tidak menyentuh sidebar/navbar */
+        .konten-utama,
+        .konten-utama * {
+            box-sizing: border-box;
         }
 
         .konten-utama {
-            margin-left: 220px;
-            width: calc(100% - 220px);
+            position: relative;
+            display: block;
+            margin-left: 220px !important;
+            width: calc(100% - 220px) !important;
+            min-width: 0;
             min-height: 100vh;
-            padding: 24px;
-            box-sizing: border-box;
+            padding: 100px 24px 30px;
+        }
+
+        .judul-halaman h2 {
+            color: #173B67;
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .judul-halaman p {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .btn-tambah {
+            background-color: #245B96;
+            border-color: #245B96;
+            border-radius: 8px;
+            padding: 9px 16px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .btn-tambah:hover {
+            background-color: #173B67;
+            border-color: #173B67;
+        }
+
+        .card-data {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(23, 59, 103, 0.07);
+        }
+
+        .card-data .card-body {
+            padding: 22px;
+        }
+
+        .konten-utama .form-control {
+            border-radius: 8px;
+            border-color: #D8E1EE;
+            font-size: 14px;
+            min-height: 39px;
+        }
+
+        .konten-utama .form-control:focus {
+            border-color: #3779C5;
+            box-shadow: 0 0 0 0.2rem rgba(55, 121, 197, 0.12);
+        }
+
+        .btn-cari {
+            background-color: #245B96;
+            border-color: #245B96;
+            border-radius: 8px;
+            font-size: 14px;
+            padding: 8px 17px;
+        }
+
+        .btn-cari:hover {
+            background-color: #173B67;
+            border-color: #173B67;
+        }
+
+        .btn-reset {
+            border-radius: 8px;
+            font-size: 14px;
+            padding: 8px 17px;
+        }
+
+        .konten-utama .table {
+            margin-bottom: 0;
+            font-size: 13px;
+        }
+
+        .konten-utama .table thead th {
+            background-color: #173B67;
+            color: #FFFFFF;
+            font-weight: 600;
+            padding: 13px 12px;
+            white-space: nowrap;
+            border-color: #31577F;
+        }
+
+        .konten-utama .table tbody td {
+            padding: 12px;
+            color: #35465C;
+            border-color: #E5EAF1;
+        }
+
+        .konten-utama .table tbody tr:hover {
+            background-color: #F4F8FD;
+        }
+
+        .konten-utama .badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
+
+        .btn-aksi {
+            border-radius: 6px;
+            font-size: 12px;
+            padding: 5px 11px;
+            font-weight: 600;
+        }
+
+        .konten-utama .pagination {
+            gap: 4px;
+        }
+
+        .konten-utama .pagination .page-link {
+            border: 1px solid #D8E1EE;
+            border-radius: 6px;
+            color: #245B96;
+            font-size: 13px;
+            padding: 7px 12px;
+        }
+
+        .konten-utama .pagination .page-item.active .page-link {
+            background-color: #245B96;
+            border-color: #245B96;
+            color: #FFFFFF;
+        }
+
+        .konten-utama .pagination .page-item.disabled .page-link {
+            color: #A0AEC0;
+        }
+
+        .konten-utama .alert {
+            border: none;
+            border-radius: 9px;
+            font-size: 14px;
         }
 
         @media (max-width: 767.98px) {
             .konten-utama {
-                margin-left: 180px;
-                width: calc(100% - 180px);
-                padding: 15px;
+                margin-left: 220px !important;
+                width: calc(100% - 220px) !important;
+                padding: 100px 12px 20px;
+            }
+
+            .card-data .card-body {
+                padding: 14px;
+            }
+
+            .judul-halaman h2 {
+                font-size: 21px;
             }
         }
     </style>
@@ -128,53 +262,58 @@ function urlHalamanSiswa($nomorHalaman, $cari)
 <body>
 
 <?php include "includes/sidebar.php"; ?>
+<?php include "includes/navbar.php"; ?>
 
 <main class="konten-utama">
 
-    <!-- Judul dan tombol tambah -->
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
-        <div>
-            <h2 class="mb-1">Data Siswa</h2>
-            <p class="text-muted mb-0">Kelola data siswa</p>
+    <!-- JUDUL HALAMAN -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div class="judul-halaman">
+            <h2 class="mb-1">Kelola Siswa</h2>
+            <p class="mb-0">Kelola data siswa yang terdaftar di sekolah.</p>
         </div>
 
-        <a href="tambah_siswa.php" class="btn btn-primary">
+        <a href="tambah_siswa.php" class="btn btn-primary btn-tambah">
             + Tambah Siswa
         </a>
     </div>
 
-    <!-- Notifikasi -->
-    <?php if (isset($_GET['pesan'])) { ?>
+    <!-- NOTIFIKASI -->
+    <?php if (isset($_GET['pesan'])): ?>
 
-        <?php if ($_GET['pesan'] == 'tambah') { ?>
-            <div class="alert alert-success">
+        <?php if ($_GET['pesan'] == 'tambah'): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
                 Data siswa berhasil ditambahkan.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
 
-        <?php } elseif ($_GET['pesan'] == 'edit') { ?>
-            <div class="alert alert-success">
+        <?php elseif ($_GET['pesan'] == 'edit'): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
                 Data siswa berhasil diperbarui.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
 
-        <?php } elseif ($_GET['pesan'] == 'hapus') { ?>
-            <div class="alert alert-success">
+        <?php elseif ($_GET['pesan'] == 'hapus'): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
                 Data siswa berhasil dihapus.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
 
-        <?php } elseif ($_GET['pesan'] == 'gagal_hapus') { ?>
-            <div class="alert alert-danger">
+        <?php elseif ($_GET['pesan'] == 'gagal_hapus'): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 Data siswa tidak dapat dihapus karena masih memiliki
                 data kelas atau catatan pelanggaran.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-        <?php } ?>
+        <?php endif; ?>
 
-    <?php } ?>
+    <?php endif; ?>
 
-    <!-- Tabel dan pencarian -->
-    <div class="card shadow-sm border-0">
+    <!-- DATA SISWA -->
+    <div class="card card-data">
         <div class="card-body">
 
-            <!-- Form pencarian -->
+            <!-- PENCARIAN -->
             <form action="siswa.php" method="GET" class="row g-2 mb-3">
 
                 <div class="col-md-6 col-lg-5">
@@ -183,36 +322,36 @@ function urlHalamanSiswa($nomorHalaman, $cari)
                         name="cari"
                         class="form-control"
                         placeholder="Cari NIS, NISN, atau nama siswa..."
-                        value="<?= htmlspecialchars($cari, ENT_QUOTES, 'UTF-8'); ?>"
-                    >
+                        value="<?= htmlspecialchars($cari, ENT_QUOTES, 'UTF-8'); ?>">
                 </div>
 
                 <div class="col-auto">
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary btn-cari">
                         Cari
                     </button>
                 </div>
 
-                <?php if ($cari !== '') { ?>
+                <?php if ($cari !== ''): ?>
                     <div class="col-auto">
-                        <a href="siswa.php" class="btn btn-secondary">
+                        <a href="siswa.php" class="btn btn-secondary btn-reset">
                             Reset
                         </a>
                     </div>
-                <?php } ?>
+                <?php endif; ?>
 
             </form>
 
-            <!-- Informasi jumlah data -->
+            <!-- JUMLAH DATA -->
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
 
                 <small class="text-muted">
-                    <?php if ($totalData > 0) { ?>
-                        Menampilkan <?= $nomorAwal; ?>–<?= $nomorAkhir; ?>
-                        dari <?= $totalData; ?> data siswa
-                    <?php } else { ?>
+                    <?php if ($totalData > 0): ?>
+                        Menampilkan
+                        <strong><?= $nomorAwal; ?>–<?= $nomorAkhir; ?></strong>
+                        dari <strong><?= $totalData; ?></strong> data siswa
+                    <?php else: ?>
                         Tidak ada data siswa yang ditemukan.
-                    <?php } ?>
+                    <?php endif; ?>
                 </small>
 
                 <small class="text-muted">
@@ -221,30 +360,28 @@ function urlHalamanSiswa($nomorHalaman, $cari)
 
             </div>
 
-            <!-- Tabel data siswa -->
+            <!-- TABEL SISWA -->
             <div class="table-responsive">
-                <table class="table table-bordered table-hover align-middle mb-0">
+                <table class="table table-bordered table-hover align-middle">
 
-                  
-            <thead class="table-dark">
-                <tr>
-                    <th>No</th>
-                    <th>NIS</th>
-                    <th>NISN</th>
-                    <th>Nama</th>
-                    <th>Jenis Kelamin</th>
-                    <th>Alamat</th>
-                    <th>Status</th>
-                    <th style="min-width: 140px;">Aksi</th>
-                </tr>
-            </thead>
-
+                    <thead>
+                        <tr>
+                            <th width="55">No</th>
+                            <th>NIS</th>
+                            <th>NISN</th>
+                            <th>Nama Siswa</th>
+                            <th>Jenis Kelamin</th>
+                            <th>Alamat</th>
+                            <th width="120">Status</th>
+                            <th width="145">Aksi</th>
+                        </tr>
+                    </thead>
 
                     <tbody>
 
-                    <?php if ($totalData > 0) { ?>
+                    <?php if ($totalData > 0): ?>
 
-                        <?php while ($siswa = mysqli_fetch_assoc($result)) { ?>
+                        <?php while ($siswa = mysqli_fetch_assoc($result)): ?>
 
                             <tr>
                                 <td><?= $nomorAwal++; ?></td>
@@ -257,7 +394,7 @@ function urlHalamanSiswa($nomorHalaman, $cari)
                                     <?= htmlspecialchars($siswa['nisn'] ?? '', ENT_QUOTES, 'UTF-8'); ?>
                                 </td>
 
-                                <td>
+                                <td class="fw-semibold">
                                     <?= htmlspecialchars($siswa['nama'] ?? '', ENT_QUOTES, 'UTF-8'); ?>
                                 </td>
 
@@ -273,100 +410,112 @@ function urlHalamanSiswa($nomorHalaman, $cari)
                                     ?>
                                 </td>
 
-                                
-                                    <td style="min-width: 200px; white-space: normal;">
-                                        <?= htmlspecialchars($siswa['alamat'] ?? '-', ENT_QUOTES, 'UTF-8'); ?>
-                                    </td>
+                                <td style="min-width: 200px; white-space: normal;">
+                                    <?php
+                                    $alamat = trim($siswa['alamat'] ?? '');
 
-
-                                <td>
-                                    <?php if ($siswa['status_aktif'] == 1) { ?>
-                                        <span class="badge bg-success">Aktif</span>
-                                    <?php } else { ?>
-                                        <span class="badge bg-secondary">Tidak Aktif</span>
-                                    <?php } ?>
+                                    echo $alamat !== ''
+                                        ? htmlspecialchars($alamat, ENT_QUOTES, 'UTF-8')
+                                        : '-';
+                                    ?>
                                 </td>
 
                                 <td>
-                                    <a href="edit_siswa.php?id=<?= (int) $siswa['id']; ?>"
-                                       class="btn btn-sm btn-warning mb-1">
-                                        Edit
-                                    </a>
+                                    <?php if ($siswa['status_aktif'] == 1): ?>
+                                        <span class="badge bg-success">Aktif</span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary">Tidak Aktif</span>
+                                    <?php endif; ?>
+                                </td>
 
-                                    <form action="hapus_siswa.php"
-                                          method="POST"
-                                          class="d-inline"
-                                          onsubmit="return confirm('Yakin ingin menghapus data siswa ini?');">
+                                <td>
+                                    <div class="d-flex flex-wrap gap-1">
 
-                                        <input type="hidden"
-                                               name="id"
-                                               value="<?= (int) $siswa['id']; ?>">
+                                        <a
+                                            href="edit_siswa.php?id=<?= (int)$siswa['id']; ?>"
+                                            class="btn btn-warning btn-aksi">
+                                            Edit
+                                        </a>
 
-                                        <button type="submit"
-                                                class="btn btn-sm btn-danger mb-1">
-                                            Hapus
-                                        </button>
-                                    </form>
+                                        <form
+                                            action="hapus_siswa.php"
+                                            method="POST"
+                                            class="d-inline"
+                                            onsubmit="return confirm('Yakin ingin menghapus data siswa ini?');">
+
+                                            <input
+                                                type="hidden"
+                                                name="id"
+                                                value="<?= (int)$siswa['id']; ?>">
+
+                                            <button
+                                                type="submit"
+                                                class="btn btn-danger btn-aksi">
+                                                Hapus
+                                            </button>
+
+                                        </form>
+
+                                    </div>
                                 </td>
                             </tr>
 
-                        <?php } ?>
+                        <?php endwhile; ?>
 
-                    <?php } else { ?>
+                    <?php else: ?>
 
                         <tr>
-                            <td colspan="8" class="text-center text-muted py-4">
-                                <?php if ($cari !== '') { ?>
-                                    Siswa yang kamu cari tidak ditemukan.
-                                <?php } else { ?>
-                                    Belum ada data siswa.
-                                <?php } ?>
+                            <td colspan="8" class="text-center py-4 text-muted">
+                                <?= $cari !== ''
+                                    ? 'Siswa yang kamu cari tidak ditemukan.'
+                                    : 'Belum ada data siswa.'; ?>
                             </td>
                         </tr>
 
-                    <?php } ?>
+                    <?php endif; ?>
 
                     </tbody>
                 </table>
             </div>
 
-            <!-- Pagination -->
-            <?php if ($totalHalaman > 1) { ?>
+            <!-- PAGINATION -->
+            <?php if ($totalHalaman > 1): ?>
 
-                <nav aria-label="Navigasi halaman data siswa" class="mt-3">
-
+                <nav class="mt-4" aria-label="Navigasi halaman data siswa">
                     <ul class="pagination justify-content-center flex-wrap mb-0">
 
                         <li class="page-item <?= $halaman <= 1 ? 'disabled' : ''; ?>">
-                            <a class="page-link"
-                               href="<?= htmlspecialchars(urlHalamanSiswa(max(1, $halaman - 1), $cari), ENT_QUOTES, 'UTF-8'); ?>">
+                            <a
+                                class="page-link"
+                                href="<?= htmlspecialchars(urlHalamanSiswa(max(1, $halaman - 1), $cari), ENT_QUOTES, 'UTF-8'); ?>">
                                 Sebelumnya
                             </a>
                         </li>
 
-                        <?php for ($i = 1; $i <= $totalHalaman; $i++) { ?>
+                        <?php for ($i = 1; $i <= $totalHalaman; $i++): ?>
 
                             <li class="page-item <?= $i == $halaman ? 'active' : ''; ?>">
-                                <a class="page-link"
-                                   href="<?= htmlspecialchars(urlHalamanSiswa($i, $cari), ENT_QUOTES, 'UTF-8'); ?>">
+                                <a
+                                    class="page-link"
+                                    href="<?= htmlspecialchars(urlHalamanSiswa($i, $cari), ENT_QUOTES, 'UTF-8'); ?>">
                                     <?= $i; ?>
                                 </a>
                             </li>
 
-                        <?php } ?>
+                        <?php endfor; ?>
 
                         <li class="page-item <?= $halaman >= $totalHalaman ? 'disabled' : ''; ?>">
-                            <a class="page-link"
-                               href="<?= htmlspecialchars(urlHalamanSiswa(min($totalHalaman, $halaman + 1), $cari), ENT_QUOTES, 'UTF-8'); ?>">
+                            <a
+                                class="page-link"
+                                href="<?= htmlspecialchars(urlHalamanSiswa(min($totalHalaman, $halaman + 1), $cari), ENT_QUOTES, 'UTF-8'); ?>">
                                 Berikutnya
                             </a>
                         </li>
 
                     </ul>
-
                 </nav>
 
-            <?php } ?>
+            <?php endif; ?>
 
         </div>
     </div>

@@ -1,73 +1,70 @@
+
 <?php
 include "includes/cek_session.php";
 include "config/koneksi.php";
 
-if ($_SESSION['role'] !== "admin") {
+$role = strtolower(trim($_SESSION['role'] ?? ''));
+
+if ($role !== "admin") {
     header("Location: dashboard.php");
     exit;
 }
 
 $menuAktif = "wali_kelas";
 
-// Pengaturan pencarian dan pagination
-$kataKunci = trim($_GET['cari'] ?? '');
-$batas = 10;
-$halaman = max(1, (int)($_GET['halaman'] ?? 1));
-$keyword = "%" . $kataKunci . "%";
-
-// Hitung jumlah data
-$sqlJumlah = "SELECT COUNT(*) AS total
-              FROM t_wali_kelas w
-              JOIN t_guru g ON w.guru_id = g.id
-              JOIN t_kelas k ON w.kelas_id = k.id
-              JOIN t_tahun_ajaran ta ON w.tahun_ajaran_id = ta.id
-              WHERE g.nama LIKE ?
-                 OR g.nip LIKE ?
-                 OR k.nama LIKE ?
-                 OR ta.nama LIKE ?";
-
-$stmtJumlah = mysqli_prepare($koneksi, $sqlJumlah);
-mysqli_stmt_bind_param(
-    $stmtJumlah,
-    "ssss",
-    $keyword,
-    $keyword,
-    $keyword,
-    $keyword
-);
-mysqli_stmt_execute($stmtJumlah);
-
-$hasilJumlah = mysqli_stmt_get_result($stmtJumlah);
-$totalData = (int) mysqli_fetch_assoc($hasilJumlah)['total'];
-
-$totalHalaman = max(1, (int) ceil($totalData / $batas));
-
-if ($halaman > $totalHalaman) {
-    $halaman = $totalHalaman;
+function e($nilai)
+{
+    return htmlspecialchars((string)($nilai ?? ''), ENT_QUOTES, 'UTF-8');
 }
 
+$cari = trim($_GET['cari'] ?? '');
+$batas = 10;
+$halaman = max(1, (int)($_GET['halaman'] ?? 1));
+$keyword = "%" . $cari . "%";
+
+$sqlJumlah = "
+    SELECT COUNT(*) AS total
+    FROM t_wali_kelas w
+    JOIN t_guru g ON w.guru_id = g.id
+    JOIN t_kelas k ON w.kelas_id = k.id
+    JOIN t_tahun_ajaran ta ON w.tahun_ajaran_id = ta.id
+    WHERE g.nama LIKE ?
+       OR g.nip LIKE ?
+       OR k.nama LIKE ?
+       OR ta.nama LIKE ?
+";
+
+$stmtJumlah = mysqli_prepare($koneksi, $sqlJumlah);
+mysqli_stmt_bind_param($stmtJumlah, "ssss", $keyword, $keyword, $keyword, $keyword);
+mysqli_stmt_execute($stmtJumlah);
+$hasilJumlah = mysqli_stmt_get_result($stmtJumlah);
+$totalData = (int)(mysqli_fetch_assoc($hasilJumlah)['total'] ?? 0);
+
+$totalHalaman = max(1, (int)ceil($totalData / $batas));
+$halaman = min($halaman, $totalHalaman);
 $offset = ($halaman - 1) * $batas;
 
-// Ambil data penugasan wali kelas
-$sqlData = "SELECT
-                w.id,
-                g.nip,
-                g.nama AS nama_guru,
-                k.nama AS nama_kelas,
-                ta.nama AS nama_tahun_ajaran,
-                w.tanggal_mulai,
-                w.tanggal_selesai,
-                w.status_aktif
-            FROM t_wali_kelas w
-            JOIN t_guru g ON w.guru_id = g.id
-            JOIN t_kelas k ON w.kelas_id = k.id
-            JOIN t_tahun_ajaran ta ON w.tahun_ajaran_id = ta.id
-            WHERE g.nama LIKE ?
-               OR g.nip LIKE ?
-               OR k.nama LIKE ?
-               OR ta.nama LIKE ?
-            ORDER BY w.id DESC
-            LIMIT ? OFFSET ?";
+$sqlData = "
+    SELECT
+        w.id,
+        g.nip,
+        g.nama AS nama_guru,
+        k.nama AS nama_kelas,
+        ta.nama AS nama_tahun_ajaran,
+        w.tanggal_mulai,
+        w.tanggal_selesai,
+        w.status_aktif
+    FROM t_wali_kelas w
+    JOIN t_guru g ON w.guru_id = g.id
+    JOIN t_kelas k ON w.kelas_id = k.id
+    JOIN t_tahun_ajaran ta ON w.tahun_ajaran_id = ta.id
+    WHERE g.nama LIKE ?
+       OR g.nip LIKE ?
+       OR k.nama LIKE ?
+       OR ta.nama LIKE ?
+    ORDER BY w.id DESC
+    LIMIT ? OFFSET ?
+";
 
 $stmtData = mysqli_prepare($koneksi, $sqlData);
 mysqli_stmt_bind_param(
@@ -83,99 +80,187 @@ mysqli_stmt_bind_param(
 mysqli_stmt_execute($stmtData);
 $result = mysqli_stmt_get_result($stmtData);
 
-$nomorAwal = $totalData > 0 ? $offset + 1 : 0;
-$nomorAkhir = min($offset + $batas, $totalData);
+function urlHalamanWali($nomorHalaman, $cari)
+{
+    return "wali_kelas.php?" . http_build_query([
+        "cari" => $cari,
+        "halaman" => $nomorHalaman
+    ]);
+}
+
+$pesan = $_GET['pesan'] ?? '';
 ?>
 
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Kelola Wali Kelas</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-          rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
         body {
             margin: 0;
-            background: #f8fafc;
-            color: #172554;
+            background: #F1F5FB;
         }
 
         .konten-utama {
-            margin-left: 220px;
-            width: calc(100% - 220px);
+            margin-left: 220px !important;
+            width: calc(100% - 220px) !important;
             min-height: 100vh;
-            padding: 28px;
+            padding: 100px 24px 30px;
             box-sizing: border-box;
         }
 
-        .kartu-data {
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            box-shadow: 0 4px 18px rgba(23, 37, 84, 0.04);
+        .konten-utama,
+        .konten-utama * {
+            box-sizing: border-box;
         }
 
         .judul-halaman {
-            color: #172554;
+            color: #173B67;
             font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .deskripsi-halaman,
+        .info-data {
+            color: #718096;
+            font-size: 13px;
+        }
+
+        .card-data {
+            background: #fff;
+            border: 1px solid #E5EAF2;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(23, 59, 103, .06);
+        }
+
+        .btn-tambah,
+        .btn-cari {
+            background: #245B96;
+            border: 1px solid #245B96;
+            color: #fff;
+            border-radius: 8px;
+            font-weight: 600;
         }
 
         .btn-tambah {
-            background: #2563eb;
-            border-color: #2563eb;
-            color: #fff;
-            border-radius: 8px;
+            padding: 10px 16px;
         }
 
-        .btn-tambah:hover {
-            background: #1d4ed8;
+        .btn-tambah:hover,
+        .btn-cari:hover {
+            background: #173B67;
+            border-color: #173B67;
             color: #fff;
         }
 
         .form-control {
+            min-height: 42px;
+            border: 1px solid #D8E1ED;
             border-radius: 8px;
-            padding: 10px 12px;
-        }
-
-        .table thead th {
-            background: #eff6ff;
-            color: #172554;
-            white-space: nowrap;
-            font-size: 13px;
-        }
-
-        .table td {
-            vertical-align: middle;
             font-size: 14px;
         }
 
+        .form-control:focus {
+            border-color: #3779C5;
+            box-shadow: 0 0 0 3px rgba(55, 121, 197, .12);
+        }
+
+        .btn-reset {
+            background: #E9EEF5;
+            border: 1px solid #E9EEF5;
+            color: #40546B;
+            border-radius: 8px;
+        }
+
+        .btn-reset:hover {
+            background: #DCE5F0;
+            color: #173B67;
+        }
+
+        .table {
+            margin-bottom: 0;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .table thead th {
+            background: #173B67;
+            color: #fff;
+            font-weight: 600;
+            padding: 13px 12px;
+            border-color: #31577F;
+        }
+
+        .table tbody td {
+            padding: 12px;
+            color: #40546B;
+            border-color: #E8EDF4;
+        }
+
+        .table tbody tr:hover {
+            background: #F5F8FC;
+        }
+
+        .badge-status {
+            padding: 7px 11px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
         .badge-aktif {
-            background: #dcfce7;
-            color: #166534;
+            background: #E3F5EA;
+            color: #21834B;
         }
 
         .badge-nonaktif {
-            background: #fee2e2;
-            color: #991b1b;
+            background: #EDF0F4;
+            color: #64748B;
         }
 
-        .pagination .page-link {
-            color: #2563eb;
+        .btn-warning {
+            color: #805700;
         }
 
-        .pagination .active .page-link {
-            background: #2563eb;
-            border-color: #2563eb;
+        .pagination {
+            gap: 4px;
+        }
+
+        .page-link {
+            border: 1px solid #DCE5F0;
+            color: #245B96;
+            border-radius: 6px !important;
+            font-size: 13px;
+        }
+
+        .page-item.active .page-link {
+            background: #245B96;
+            border-color: #245B96;
             color: #fff;
         }
 
-        @media (max-width: 575.98px) {
+        .page-item.disabled .page-link {
+            color: #A0AEC0;
+        }
+
+        .alert {
+            border: 0;
+            border-radius: 9px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 767.98px) {
             .konten-utama {
-                padding: 16px;
+                padding: 100px 15px 25px;
+            }
+
+            .judul-halaman {
+                font-size: 22px;
             }
         }
     </style>
@@ -184,201 +269,184 @@ $nomorAkhir = min($offset + $batas, $totalData);
 <body>
 
 <?php include "includes/sidebar.php"; ?>
+<?php include "includes/navbar.php"; ?>
 
 <main class="konten-utama">
 
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <div>
-            <h3 class="judul-halaman mb-1">Kelola Wali Kelas</h3>
-            <p class="text-secondary mb-0">
+            <h2 class="judul-halaman">Kelola Wali Kelas</h2>
+            <p class="deskripsi-halaman mb-0">
                 Kelola penugasan guru sebagai wali kelas.
             </p>
         </div>
 
-        <a href="tambah_wali_kelas.php" class="btn btn-tambah px-3 py-2">
+        <a href="tambah_wali_kelas.php" class="btn btn-tambah">
             + Tambah Penugasan
         </a>
     </div>
 
-    <?php if (isset($_GET['pesan'])): ?>
-        <?php if ($_GET['pesan'] === 'tambah'): ?>
-            <div class="alert alert-success">Penugasan wali kelas berhasil ditambahkan.</div>
-        <?php elseif ($_GET['pesan'] === 'edit'): ?>
-            <div class="alert alert-success">Penugasan wali kelas berhasil diperbarui.</div>
-        <?php elseif ($_GET['pesan'] === 'hapus'): ?>
-            <div class="alert alert-success">Penugasan wali kelas berhasil dihapus.</div>
-        <?php elseif ($_GET['pesan'] === 'gagal_hapus'): ?>
-            <div class="alert alert-danger">Penugasan gagal dihapus. Periksa relasi data terlebih dahulu.</div>
-        <?php elseif ($_GET['pesan'] === 'gagal'): ?>
-            <div class="alert alert-danger">Terjadi kesalahan. Silakan periksa data kembali.</div>
-        <?php endif; ?>
+    <?php if ($pesan === 'tambah'): ?>
+        <div class="alert alert-success">Penugasan wali kelas berhasil ditambahkan.</div>
+    <?php elseif ($pesan === 'edit'): ?>
+        <div class="alert alert-success">Penugasan wali kelas berhasil diperbarui.</div>
+    <?php elseif ($pesan === 'hapus'): ?>
+        <div class="alert alert-success">Penugasan wali kelas berhasil dihapus.</div>
+    <?php elseif ($pesan === 'gagal_hapus'): ?>
+        <div class="alert alert-danger">Penugasan gagal dihapus. Periksa relasi data terlebih dahulu.</div>
+    <?php elseif ($pesan === 'gagal'): ?>
+        <div class="alert alert-danger">Terjadi kesalahan. Silakan periksa data kembali.</div>
     <?php endif; ?>
 
-    <div class="kartu-data p-3 p-md-4">
+    <div class="card card-data">
+        <div class="card-body p-3 p-md-4">
 
-        <form method="GET" class="row g-2 mb-3">
-            <div class="col-md-6 col-lg-5">
-                <input
-                    type="text"
-                    name="cari"
-                    class="form-control"
-                    placeholder="Cari nama guru, NIP, kelas, atau tahun ajaran..."
-                    value="<?= htmlspecialchars($kataKunci) ?>"
-                >
+            <form method="GET" action="wali_kelas.php" class="row g-2 mb-4">
+                <div class="col-md-6 col-lg-5">
+                    <input
+                        type="search"
+                        name="cari"
+                        class="form-control"
+                        placeholder="Cari nama guru, NIP, kelas, atau tahun ajaran..."
+                        value="<?= e($cari); ?>"
+                        autocomplete="off">
+                </div>
+
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-cari px-3">Cari</button>
+                </div>
+
+                <?php if ($cari !== ''): ?>
+                    <div class="col-auto">
+                        <a href="wali_kelas.php" class="btn btn-reset px-3">Reset</a>
+                    </div>
+                <?php endif; ?>
+            </form>
+
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                <div class="info-data">
+                    <?php if ($totalData > 0): ?>
+                        Menampilkan <?= $offset + 1; ?>–<?= min($offset + $batas, $totalData); ?>
+                        dari <?= $totalData; ?> data penugasan
+                    <?php else: ?>
+                        Tidak ada data penugasan
+                    <?php endif; ?>
+                </div>
+
+                <div class="info-data">Maksimal <?= $batas; ?> data per halaman</div>
             </div>
 
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary">Cari</button>
-                <a href="wali_kelas.php" class="btn btn-outline-secondary">Reset</a>
-            </div>
-        </form>
-
-        <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
-            <span class="text-secondary small">
-                Menampilkan <?= $nomorAwal ?>–<?= $nomorAkhir ?>
-                dari <?= $totalData ?> data penugasan
-            </span>
-            <span class="text-secondary small">Maksimal 10 data per halaman</span>
-        </div>
-
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead>
-                    <tr>
-                        <th>No.</th>
-                        <th>Guru</th>
-                        <th>Kelas</th>
-                        <th>Tahun Ajaran</th>
-                        <th>Masa Penugasan</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                <?php if (mysqli_num_rows($result) > 0): ?>
-                    <?php $no = $offset + 1; ?>
-                    <?php while ($row = mysqli_fetch_assoc($result)): ?>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle">
+                    <thead>
                         <tr>
-                            <td><?= $no++ ?></td>
+                            <th>No.</th>
+                            <th>Guru</th>
+                            <th>Kelas</th>
+                            <th>Tahun Ajaran</th>
+                            <th>Masa Penugasan</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
 
-                            <td>
-                                <div class="fw-semibold">
-                                    <?= htmlspecialchars($row['nama_guru']) ?>
-                                </div>
-                                <small class="text-secondary">
-                                    NIP: <?= htmlspecialchars($row['nip']) ?>
-                                </small>
-                            </td>
+                    <tbody>
+                    <?php if (mysqli_num_rows($result) > 0): ?>
+                        <?php $no = $offset + 1; ?>
 
-                            <td><?= htmlspecialchars($row['nama_kelas']) ?></td>
+                        <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                            <tr>
+                                <td><?= $no++; ?></td>
 
-                            <td><?= htmlspecialchars($row['nama_tahun_ajaran']) ?></td>
+                                <td>
+                                    <div class="fw-semibold"><?= e($row['nama_guru']); ?></div>
+                                    <small class="text-secondary">NIP: <?= e($row['nip']); ?></small>
+                                </td>
 
-                            <td>
-                                <?= date('d-m-Y', strtotime($row['tanggal_mulai'])) ?>
-                                <span class="text-secondary">s.d.</span>
-                                <?= date('d-m-Y', strtotime($row['tanggal_selesai'])) ?>
-                            </td>
+                                <td><?= e($row['nama_kelas']); ?></td>
+                                <td><?= e($row['nama_tahun_ajaran']); ?></td>
 
-                            <td>
-                                <?php if ((int)$row['status_aktif'] === 1): ?>
-                                    <span class="badge badge-aktif rounded-pill px-3 py-2">
-                                        Aktif
-                                    </span>
-                                <?php else: ?>
-                                    <span class="badge badge-nonaktif rounded-pill px-3 py-2">
-                                        Tidak Aktif
-                                    </span>
-                                <?php endif; ?>
-                            </td>
+                                <td>
+                                    <?= !empty($row['tanggal_mulai']) ? date('d-m-Y', strtotime($row['tanggal_mulai'])) : '-'; ?>
+                                    <span class="text-secondary">s.d.</span>
+                                    <?= !empty($row['tanggal_selesai']) ? date('d-m-Y', strtotime($row['tanggal_selesai'])) : '-'; ?>
+                                </td>
 
-                            <td>
-                                <div class="d-flex gap-1">
-                                    <a
-                                        href="edit_wali_kelas.php?id=<?= (int)$row['id'] ?>"
-                                        class="btn btn-sm btn-warning"
-                                    >Edit</a>
+                                <td>
+                                    <?php if ((int)$row['status_aktif'] === 1): ?>
+                                        <span class="badge badge-status badge-aktif">Aktif</span>
+                                    <?php else: ?>
+                                        <span class="badge badge-status badge-nonaktif">Tidak Aktif</span>
+                                    <?php endif; ?>
+                                </td>
 
-                                    <form
-                                        action="hapus_wali_kelas.php"
-                                        method="POST"
-                                        onsubmit="return confirm('Yakin ingin menghapus penugasan ini?')"
-                                    >
-                                        <input
-                                            type="hidden"
-                                            name="id"
-                                            value="<?= (int)$row['id'] ?>"
-                                        >
-                                        <button type="submit" class="btn btn-sm btn-danger">
-                                            Hapus
-                                        </button>
-                                    </form>
-                                </div>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="edit_wali_kelas.php?id=<?= (int)$row['id']; ?>"
+                                           class="btn btn-sm btn-warning">
+                                            Edit
+                                        </a>
+
+                                        <form action="hapus_wali_kelas.php"
+                                              method="POST"
+                                              class="d-inline"
+                                              onsubmit="return confirm('Yakin ingin menghapus penugasan ini?');">
+                                            <input type="hidden" name="id" value="<?= (int)$row['id']; ?>">
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                Hapus
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">
+                                Data penugasan wali kelas tidak ditemukan.
                             </td>
                         </tr>
-                    <?php endwhile; ?>
-                <?php else: ?>
-                    <tr>
-                        <td colspan="7" class="text-center py-4 text-secondary">
-                            Belum ada data penugasan wali kelas.
-                        </td>
-                    </tr>
-                <?php endif; ?>
-                </tbody>
-            </table>
+                    <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <?php if ($totalHalaman > 1): ?>
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-4">
+                    <small class="info-data">
+                        Halaman <?= $halaman; ?> dari <?= $totalHalaman; ?>
+                    </small>
+
+                    <nav aria-label="Navigasi halaman wali kelas">
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item <?= $halaman <= 1 ? 'disabled' : ''; ?>">
+                                <a class="page-link"
+                                   href="<?= e(urlHalamanWali(max(1, $halaman - 1), $cari)); ?>">
+                                    Sebelumnya
+                                </a>
+                            </li>
+
+                            <?php for ($i = 1; $i <= $totalHalaman; $i++): ?>
+                                <li class="page-item <?= $i === $halaman ? 'active' : ''; ?>">
+                                    <a class="page-link" href="<?= e(urlHalamanWali($i, $cari)); ?>">
+                                        <?= $i; ?>
+                                    </a>
+                                </li>
+                            <?php endfor; ?>
+
+                            <li class="page-item <?= $halaman >= $totalHalaman ? 'disabled' : ''; ?>">
+                                <a class="page-link"
+                                   href="<?= e(urlHalamanWali(min($totalHalaman, $halaman + 1), $cari)); ?>">
+                                    Berikutnya
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            <?php endif; ?>
+
         </div>
-
- 
-        <?php if ($totalHalaman > 1): ?>
-            <nav aria-label="Navigasi halaman">
-                <ul class="pagination justify-content-center flex-wrap mb-0">
-
-                    <!-- Tombol Sebelumnya -->
-                    <li class="page-item <?= $halaman <= 1 ? 'disabled' : '' ?>">
-                        <a
-                            class="page-link"
-                            href="?<?= http_build_query([
-                                'cari' => $kataKunci,
-                                'halaman' => max(1, $halaman - 1)
-                            ]) ?>"
-                        >
-                            Sebelumnya
-                        </a>
-                    </li>
-
-                    <!-- Nomor Halaman -->
-                    <?php for ($i = 1; $i <= $totalHalaman; $i++): ?>
-                        <li class="page-item <?= $halaman === $i ? 'active' : '' ?>">
-                            <a
-                                class="page-link"
-                                href="?<?= http_build_query([
-                                    'cari' => $kataKunci,
-                                    'halaman' => $i
-                                ]) ?>"
-                            >
-                                <?= $i ?>
-                            </a>
-                        </li>
-                    <?php endfor; ?>
-
-                    <!-- Tombol Berikutnya -->
-                    <li class="page-item <?= $halaman >= $totalHalaman ? 'disabled' : '' ?>">
-                        <a
-                            class="page-link"
-                            href="?<?= http_build_query([
-                                'cari' => $kataKunci,
-                                'halaman' => min($totalHalaman, $halaman + 1)
-                            ]) ?>"
-                        >
-                            Berikutnya
-                        </a>
-                    </li>
-
-                </ul>
-            </nav>
-        <?php endif; ?>
-
     </div>
 </main>
 

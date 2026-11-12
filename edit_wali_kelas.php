@@ -115,6 +115,7 @@ $tahunList = mysqli_query($koneksi, "SELECT id, nama FROM t_tahun_ajaran WHERE s
 <body>
 
 <?php include "includes/sidebar.php"; ?>
+<?php include "includes/navbar.php"; ?>
 
 <main class="konten">
     <h3 class="fw-bold mb-1">Edit Penugasan Wali Kelas</h3>
