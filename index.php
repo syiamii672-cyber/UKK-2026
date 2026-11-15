@@ -1,13 +1,19 @@
 
 <?php
-session_start();
+
+// Memulai session jika belum aktif
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Jika sudah login, langsung ke dashboard
 if (isset($_SESSION['id'])) {
     header("Location: dashboard.php");
     exit;
 }
+
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -387,5 +393,12 @@ if (isset($_SESSION['id'])) {
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
+<script>
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        window.location.reload();
+    }
+});
+</script>
 </body>
 </html>

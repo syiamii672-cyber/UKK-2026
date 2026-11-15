@@ -1,14 +1,17 @@
+
 <?php
 include "includes/cek_session.php";
 include "config/koneksi.php";
 
-if ($_SESSION['role'] != "admin") {
+if (($_SESSION['role'] ?? '') !== "admin") {
     header("Location: dashboard.php");
     exit;
 }
 
 $menuAktif = "kelas";
 $error = "";
+
+$daftarJurusan = ['RPL', 'TKJ', 'TSM', 'TKR', 'BD'];
 
 // Ambil ID kelas dari URL
 $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
@@ -41,25 +44,27 @@ if (!$kelas) {
 
 // Isi awal form
 $nama = $kelas['nama'];
-$tingkat = $kelas['tingkat'];
-$jurusan = $kelas['jurusan'];
+$tingkat = (string) $kelas['tingkat'];
+$jurusan = strtoupper(trim($kelas['jurusan']));
 $status_aktif = (string) $kelas['status_aktif'];
 
 // Proses saat tombol Simpan Perubahan ditekan
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = trim($_POST['nama'] ?? '');
     $tingkat = trim($_POST['tingkat'] ?? '');
-    $jurusan = trim($_POST['jurusan'] ?? '');
+    $jurusan = strtoupper(trim($_POST['jurusan'] ?? ''));
     $status_aktif = (string) ($_POST['status_aktif'] ?? '');
 
     if (
         $nama === '' ||
         $tingkat === '' ||
-        $jurusan === '' ||
+        !in_array($tingkat, ['10', '11', '12'], true) ||
+        !in_array($jurusan, $daftarJurusan, true) ||
         !in_array($status_aktif, ['0', '1'], true)
     ) {
         $error = "Semua data wajib diisi dengan benar.";
     } else {
+
         // Cek apakah nama kelas sudah digunakan kelas lain
         $cek = mysqli_prepare(
             $koneksi,
@@ -79,6 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($duplikat) {
             $error = "Nama kelas tersebut sudah digunakan.";
         } else {
+
             // Update data kelas
             $update = mysqli_prepare(
                 $koneksi,
@@ -87,13 +93,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                  WHERE id = ?"
             );
 
+            $status = (int) $status_aktif;
+
             mysqli_stmt_bind_param(
                 $update,
                 "sssii",
                 $nama,
                 $tingkat,
                 $jurusan,
-                $status_aktif,
+                $status,
                 $id
             );
 
@@ -116,11 +124,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Kelas - Sistem Informasi Pelanggaran Siswa</title>
+
+    <title>Edit Kelas - SIPENA MU</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
           rel="stylesheet">
 </head>
+
 <body class="bg-light">
 
 <?php include "includes/sidebar.php"; ?>
@@ -128,6 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <div class="konten-utama">
     <div class="container-fluid">
+
         <div class="mb-4">
             <h3 class="fw-bold mb-1">Edit Data Kelas</h3>
             <p class="text-secondary mb-0">
@@ -140,56 +151,86 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <?php if ($error !== ""): ?>
                     <div class="alert alert-danger">
-                        <?= htmlspecialchars($error) ?>
+                        <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?>
                     </div>
                 <?php endif; ?>
 
                 <form method="POST">
+
                     <div class="mb-3">
-                        <label for="nama" class="form-label">Nama Kelas</label>
+                        <label for="nama" class="form-label">
+                            Nama Kelas
+                        </label>
                         <input
                             type="text"
                             name="nama"
                             id="nama"
                             class="form-control"
-                            value="<?= htmlspecialchars($nama) ?>"
-                            required
-                        >
+                            maxlength="100"
+                            value="<?= htmlspecialchars($nama, ENT_QUOTES, 'UTF-8'); ?>"
+                            required>
                     </div>
 
                     <div class="mb-3">
-                        <label for="tingkat" class="form-label">Tingkat</label>
-                        <select name="tingkat" id="tingkat"
-                                class="form-select" required>
+                        <label for="tingkat" class="form-label">
+                            Tingkat
+                        </label>
+                        <select
+                            name="tingkat"
+                            id="tingkat"
+                            class="form-select"
+                            required>
+
                             <option value="">-- Pilih Tingkat --</option>
-                            <option value="10" <?= $tingkat == '10' ? 'selected' : '' ?>>10</option>
-                            <option value="11" <?= $tingkat == '11' ? 'selected' : '' ?>>11</option>
-                            <option value="12" <?= $tingkat == '12' ? 'selected' : '' ?>>12</option>
+
+                            <option value="10" <?= $tingkat === '10' ? 'selected' : ''; ?>>10</option>
+                            <option value="11" <?= $tingkat === '11' ? 'selected' : ''; ?>>11</option>
+                            <option value="12" <?= $tingkat === '12' ? 'selected' : ''; ?>>12</option>
+
                         </select>
                     </div>
 
                     <div class="mb-3">
-                        <label for="jurusan" class="form-label">Jurusan</label>
-                        <input
-                            type="text"
+                        <label for="jurusan" class="form-label">
+                            Jurusan
+                        </label>
+                        <select
                             name="jurusan"
                             id="jurusan"
-                            class="form-control"
-                            value="<?= htmlspecialchars($jurusan) ?>"
-                            required
-                        >
+                            class="form-select"
+                            required>
+
+                            <option value="">-- Pilih Jurusan --</option>
+
+                            <?php foreach ($daftarJurusan as $item): ?>
+                                <option
+                                    value="<?= htmlspecialchars($item); ?>"
+                                    <?= $jurusan === $item ? 'selected' : ''; ?>>
+                                    <?= htmlspecialchars($item); ?>
+                                </option>
+                            <?php endforeach; ?>
+
+                        </select>
                     </div>
 
                     <div class="mb-4">
-                        <label for="status_aktif" class="form-label">Status</label>
-                        <select name="status_aktif" id="status_aktif"
-                                class="form-select" required>
-                            <option value="1" <?= $status_aktif === '1' ? 'selected' : '' ?>>
+                        <label for="status_aktif" class="form-label">
+                            Status
+                        </label>
+                        <select
+                            name="status_aktif"
+                            id="status_aktif"
+                            class="form-select"
+                            required>
+
+                            <option value="1" <?= $status_aktif === '1' ? 'selected' : ''; ?>>
                                 Aktif
                             </option>
-                            <option value="0" <?= $status_aktif === '0' ? 'selected' : '' ?>>
+
+                            <option value="0" <?= $status_aktif === '0' ? 'selected' : ''; ?>>
                                 Nonaktif
                             </option>
+
                         </select>
                     </div>
 
@@ -202,10 +243,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             Kembali
                         </a>
                     </div>
+
                 </form>
 
             </div>
         </div>
+
     </div>
 </div>
 
@@ -226,6 +269,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 </style>
+
+<script>
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        window.location.reload();
+    }
+});
+</script>
 
 </body>
 </html>

@@ -208,44 +208,17 @@ function urlHalamanKelas($nomorHalaman, $cari)
         }
 
         .konten-utama .badge {
-            padding: 7px 11px;
-            border-radius: 20px;
+            padding: 6px 10px;
+            border-radius: 6px;
             font-size: 11px;
             font-weight: 600;
         }
 
-        .konten-utama .badge-aktif {
-            background: #E3F5EA;
-            color: #21834B;
-        }
-
-        .konten-utama .badge-nonaktif {
-            background: #EDF0F4;
-            color: #64748B;
-        }
-
-        .konten-utama .btn-edit {
-            background: #FFF3D6;
-            border: 1px solid #F5D58A;
-            color: #946200;
+        .konten-utama .btn-aksi {
             border-radius: 6px;
-        }
-
-        .konten-utama .btn-edit:hover {
-            background: #F5D58A;
-            color: #694600;
-        }
-
-        .konten-utama .btn-hapus {
-            background: #FCE8E8;
-            border: 1px solid #F3C4C4;
-            color: #C03939;
-            border-radius: 6px;
-        }
-
-        .konten-utama .btn-hapus:hover {
-            background: #F3C4C4;
-            color: #922B2B;
+            font-size: 12px;
+            padding: 5px 11px;
+            font-weight: 600;
         }
 
         .konten-utama .alert {
@@ -393,12 +366,12 @@ function urlHalamanKelas($nomorHalaman, $cari)
 
                     <thead>
                         <tr>
-                            <th>No</th>
+                            <th width="55">No</th>
                             <th>Nama Kelas</th>
                             <th>Tingkat</th>
                             <th>Jurusan</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
+                            <th width="120">Status</th>
+                            <th width="145">Aksi</th>
                         </tr>
                     </thead>
 
@@ -427,34 +400,36 @@ function urlHalamanKelas($nomorHalaman, $cari)
 
                             <td>
                                 <?php if ($kelas['status_aktif'] == 1) { ?>
-                                    <span class="badge badge-aktif">Aktif</span>
+                                    <span class="badge bg-success">Aktif</span>
                                 <?php } else { ?>
-                                    <span class="badge badge-nonaktif">Tidak Aktif</span>
+                                    <span class="badge bg-secondary">Tidak Aktif</span>
                                 <?php } ?>
                             </td>
 
                             <td>
-                                <a
-                                    href="edit_kelas.php?id=<?= (int)$kelas['id']; ?>"
-                                    class="btn btn-sm btn-edit mb-1">
-                                    Edit
-                                </a>
+                                <div class="d-flex flex-wrap gap-1">
+                                    <a
+                                        href="edit_kelas.php?id=<?= (int)$kelas['id']; ?>"
+                                        class="btn btn-warning btn-aksi">
+                                        Edit
+                                    </a>
 
-                                <form
-                                    action="hapus_kelas.php"
-                                    method="POST"
-                                    class="d-inline"
-                                    onsubmit="return confirm('Yakin ingin menghapus kelas ini?');">
+                                    <form
+                                        action="hapus_kelas.php"
+                                        method="POST"
+                                        class="d-inline"
+                                        onsubmit="return confirm('Yakin ingin menghapus kelas ini?');">
 
-                                    <input
-                                        type="hidden"
-                                        name="id"
-                                        value="<?= (int)$kelas['id']; ?>">
+                                        <input
+                                            type="hidden"
+                                            name="id"
+                                            value="<?= (int)$kelas['id']; ?>">
 
-                                    <button type="submit" class="btn btn-sm btn-hapus mb-1">
-                                        Hapus
-                                    </button>
-                                </form>
+                                        <button type="submit" class="btn btn-danger btn-aksi">
+                                            Hapus
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
 
@@ -523,5 +498,12 @@ function urlHalamanKelas($nomorHalaman, $cari)
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
+<script>
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        window.location.reload();
+    }
+});
+</script>
 </body>
 </html>

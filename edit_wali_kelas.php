@@ -197,5 +197,13 @@ $tahunList = mysqli_query($koneksi, "SELECT id, nama FROM t_tahun_ajaran WHERE s
     </div>
 </main>
 
+<script>
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        window.location.reload();
+    }
+});
+</script>
+
 </body>
 </html>

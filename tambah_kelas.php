@@ -3,7 +3,7 @@
 include "includes/cek_session.php";
 include "config/koneksi.php";
 
-if ($_SESSION['role'] !== "admin") {
+if (($_SESSION['role'] ?? '') !== "admin") {
     header("Location: dashboard.php");
     exit;
 }
@@ -16,18 +16,26 @@ $tingkat = "";
 $jurusan = "";
 $status_aktif = "1";
 
+// Daftar jurusan yang diperbolehkan
+$daftarJurusan = ['RPL', 'TKJ', 'TSM', 'TKR', 'BD'];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = trim($_POST['nama'] ?? '');
     $tingkat = trim($_POST['tingkat'] ?? '');
-    $jurusan = trim($_POST['jurusan'] ?? '');
+    $jurusan = strtoupper(trim($_POST['jurusan'] ?? ''));
     $status_aktif = $_POST['status_aktif'] ?? '1';
 
     // Validasi input
     if ($nama === '' || $tingkat === '' || $jurusan === '') {
         $pesanError = "Semua data kelas wajib diisi.";
+    } elseif (!in_array($tingkat, ['10', '11', '12'], true)) {
+        $pesanError = "Tingkat kelas tidak valid.";
+    } elseif (!in_array($jurusan, $daftarJurusan, true)) {
+        $pesanError = "Jurusan yang dipilih tidak valid.";
     } elseif (!in_array($status_aktif, ['0', '1'], true)) {
         $pesanError = "Status kelas tidak valid.";
     } else {
+
         // Cek apakah nama kelas sudah digunakan
         $stmtCek = mysqli_prepare(
             $koneksi,
@@ -36,13 +44,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         mysqli_stmt_bind_param($stmtCek, "s", $nama);
         mysqli_stmt_execute($stmtCek);
-        $hasilCek = mysqli_stmt_get_result($stmtCek);
 
-        if (mysqli_num_rows($hasilCek) > 0) {
-            $pesanError = "Nama kelas tersebut sudah terdaftar.";
-        }
+        $hasilCek = mysqli_stmt_get_result($stmtCek);
+        $duplikat = mysqli_num_rows($hasilCek) > 0;
 
         mysqli_stmt_close($stmtCek);
+
+        if ($duplikat) {
+            $pesanError = "Nama kelas tersebut sudah terdaftar.";
+        }
 
         // Simpan data jika lolos validasi
         if ($pesanError === '') {
@@ -76,9 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $pesanError = "Data kelas gagal disimpan. Periksa kembali data yang dimasukkan.";
             }
 
-            if ($stmtSimpan) {
-                mysqli_stmt_close($stmtSimpan);
-            }
+            mysqli_stmt_close($stmtSimpan);
         }
     }
 }
@@ -179,15 +187,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label for="jurusan" class="form-label">
                         Jurusan
                     </label>
-                    <input
-                        type="text"
+                    <select
                         id="jurusan"
                         name="jurusan"
-                        class="form-control"
-                        maxlength="100"
-                        placeholder="Contoh: RPL, TKJ, AKL"
-                        value="<?= htmlspecialchars($jurusan, ENT_QUOTES, 'UTF-8'); ?>"
+                        class="form-select"
                         required>
+
+                        <option value="">-- Pilih Jurusan --</option>
+
+                        <?php foreach ($daftarJurusan as $item) { ?>
+                            <option
+                                value="<?= htmlspecialchars($item); ?>"
+                                <?= $jurusan === $item ? 'selected' : ''; ?>>
+                                <?= htmlspecialchars($item); ?>
+                            </option>
+                        <?php } ?>
+
+                    </select>
                 </div>
 
                 <div class="mb-4">
@@ -223,5 +239,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 </main>
 
+<script>
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        window.location.reload();
+    }
+});
+</script>
 </body>
 </html>

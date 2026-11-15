@@ -1,4 +1,3 @@
-```php
 <?php
 include "includes/cek_session.php";
 include "config/koneksi.php";
@@ -245,6 +244,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 </style>
 
+<script>
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        window.location.reload();
+    }
+});
+</script>
+
 </body>
 </html>
-```

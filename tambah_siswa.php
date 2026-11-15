@@ -264,5 +264,12 @@ $menuAktif = "siswa";
     </div>
 </main>
 
+<script>
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        window.location.reload();
+    }
+});
+</script>
 </body>
 </html>

@@ -6,7 +6,7 @@ include "config/koneksi.php";
 
 // Pastikan proses login menggunakan POST.
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: login.php");
+    header("Location: index.php");
     exit;
 }
 
@@ -14,7 +14,7 @@ $email = trim($_POST['email'] ?? '');
 $password = $_POST['password'] ?? '';
 
 if ($email === '' || $password === '') {
-    header("Location: login.php?error=1");
+    header("Location: index.php?error=1");
     exit;
 }
 
@@ -27,7 +27,7 @@ $query = "SELECT id, name, email, password, role
 $stmt = mysqli_prepare($koneksi, $query);
 
 if (!$stmt) {
-    header("Location: login.php?error=1");
+    header("Location: index.php?error=1");
     exit;
 }
 
@@ -121,7 +121,7 @@ if ($loginBerhasil) {
 }
 
 // Jika login gagal.
-header("Location: login.php?error=1");
+header("Location: index.php?error=1");
 exit;
 
 ?>
