@@ -1,5 +1,5 @@
 <?php
-include "config/koneksi.php";
+include __DIR__ . "/koneksi.php";
 
 $akun = [
     "aldi@gmail.com" => "Guru12345!",

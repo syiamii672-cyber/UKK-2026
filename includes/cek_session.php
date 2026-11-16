@@ -13,7 +13,7 @@ header("Expires: 0");
 
 // Memeriksa session pengguna
 if (!isset($_SESSION['id'])) {
-    header("Location: /UKK-2026/index.php");
+    header("Location: index.php");
     exit;
 }
 

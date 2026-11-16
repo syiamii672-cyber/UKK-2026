@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 12 Nov 2026 pada 22.48
+-- Waktu pembuatan: 16 Nov 2026 pada 17.54
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.0.30
 
@@ -471,14 +471,6 @@ CREATE TABLE `t_pelanggaran_siswa` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data untuk tabel `t_pelanggaran_siswa`
---
-
-INSERT INTO `t_pelanggaran_siswa` (`id`, `tahun_ajaran_id`, `siswa_id`, `nama_siswa`, `kelas_id`, `nama_kelas`, `pelanggaran_id`, `nama_pelanggaran`, `pelanggaran_kategori_id`, `guru_id`, `nama_guru`, `tanggal`, `keterangan`, `poin`, `tindakan`, `status`, `created_at`, `updated_at`) VALUES
-(1, 1, 188, 'FAHMA TANIA AL JAHRA', 48, 'XII BD 1', 6, 'Atribut seragam tidak lengkap', 2, 32, 'Aldi Maulana, S.Pd', '2026-11-12', 'belum mengganti logo osis dengan logo ipm', 2, 'teguran lisan', 'Diproses', '2026-11-12 20:55:33', '2026-11-12 20:55:33'),
-(2, 1, 168, 'PUSPITA DEWI', 6, 'XII RPL 2', 6, 'Atribut seragam tidak lengkap', 2, 32, 'Aldi Maulana, S.Pd', '2026-11-12', 'tidak memasang logo jurusan', 2, 'teguran lisan', 'Selesai', '2026-11-12 21:04:38', '2026-11-12 21:04:38');
-
 -- --------------------------------------------------------
 
 --
@@ -671,7 +663,7 @@ CREATE TABLE `t_tahun_ajaran` (
 --
 
 INSERT INTO `t_tahun_ajaran` (`id`, `nama`, `tanggal_mulai`, `tanggal_selesai`, `status_aktif`, `created_at`, `updated_at`) VALUES
-(1, '2026/2027', '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-09-23 01:00:00');
+(1, '2026/2027', '2026-07-01', '2027-06-30', 1, '2026-01-01 01:00:00', '2026-11-16 13:11:03');
 
 -- --------------------------------------------------------
 
@@ -728,7 +720,7 @@ INSERT INTO `t_users` (`id`, `name`, `email`, `email_verified_at`, `password`, `
 (79, 'Yaneu Nurdian, S.Pd., M.Pd', 'yaneu@gmail.com', '2026-11-05 02:25:35', '$2y$10$ym31UErSRvWGSt3iG5mdzePVB6eepebhNDJmSYc/KK/g.iYx9t1De', '', 'guru', '2026-11-05 02:25:35', '2026-11-12 05:56:51'),
 (80, 'Ucu Muhammad Khoer N, S.Pd', 'ucu@gmail.com', '2026-11-05 02:25:35', '$2y$10$ym31UErSRvWGSt3iG5mdzePVB6eepebhNDJmSYc/KK/g.iYx9t1De', '', 'guru', '2026-11-05 02:25:35', '2026-11-12 05:56:51'),
 (81, 'Mira Dwi Rahmawati, S.Ag', 'mira@gmail.com', '2026-11-05 02:25:35', '$2y$10$ym31UErSRvWGSt3iG5mdzePVB6eepebhNDJmSYc/KK/g.iYx9t1De', '', 'guru', '2026-11-05 02:25:35', '2026-11-12 05:56:51'),
-(82, 'Aldi Maulana, S.Pd', 'aldi@gmail.com', '2026-11-05 02:25:35', '$2y$10$pcCt8F8dNv3R2wt3YkVWVOHg3qixR3JzgZwMpwbgPe14T1sUgrKS6', '', 'guru', '2026-11-05 02:25:35', '2026-11-12 13:45:01'),
+(82, 'Aldi Maulana, S.Pd', 'aldi@gmail.com', '2026-11-05 02:25:35', '$2y$10$DJOJG7l1dp1tVV8QlP1BrORay75bzrQ//ROWwVv60332y.VFyxPci', '', 'guru', '2026-11-05 02:25:35', '2026-11-16 09:29:53'),
 (83, 'Eli Rosliah, S.Pd', 'eli@gmail.com', '2026-11-05 02:25:35', '$2y$10$ym31UErSRvWGSt3iG5mdzePVB6eepebhNDJmSYc/KK/g.iYx9t1De', '', 'guru', '2026-11-05 02:25:35', '2026-11-12 05:56:51'),
 (84, 'Isni Nur Fitriani, S.Pd', 'isni@gmail.com', '2026-11-05 02:25:35', '$2y$10$ym31UErSRvWGSt3iG5mdzePVB6eepebhNDJmSYc/KK/g.iYx9t1De', '', 'guru', '2026-11-05 02:25:35', '2026-11-12 05:56:51'),
 (85, 'Aanisah Putri Nur Aini, S.Pd', 'aanisah@gmail.com', '2026-11-05 02:25:35', '$2y$10$ym31UErSRvWGSt3iG5mdzePVB6eepebhNDJmSYc/KK/g.iYx9t1De', '', 'guru', '2026-11-05 02:25:35', '2026-11-12 05:56:51'),
@@ -751,8 +743,7 @@ INSERT INTO `t_users` (`id`, `name`, `email`, `email_verified_at`, `password`, `
 (102, 'Sri Nurrizki Putri Krisnadi, S.Pd', 'sri@gmail.com', '2026-11-05 02:25:35', '$2y$10$ym31UErSRvWGSt3iG5mdzePVB6eepebhNDJmSYc/KK/g.iYx9t1De', '', 'guru', '2026-11-05 02:25:35', '2026-11-12 05:56:51'),
 (103, 'Riesy Putri Navia, S.Kom', 'riesy@gmail.com', '2026-11-05 02:25:35', '$2y$10$ym31UErSRvWGSt3iG5mdzePVB6eepebhNDJmSYc/KK/g.iYx9t1De', '', 'guru', '2026-11-05 02:25:35', '2026-11-12 05:56:51'),
 (104, 'Rurry Febriani Maryadi, S.Pd', 'rurry@gmail.com', '2026-11-05 02:25:35', '$2y$10$ym31UErSRvWGSt3iG5mdzePVB6eepebhNDJmSYc/KK/g.iYx9t1De', '', 'guru', '2026-11-05 02:25:35', '2026-11-12 05:56:51'),
-(105, 'Irvan Rizal, S.Pd', 'irvan@gmail.com', '2026-11-05 02:25:35', '$2y$10$ym31UErSRvWGSt3iG5mdzePVB6eepebhNDJmSYc/KK/g.iYx9t1De', '', 'guru', '2026-11-05 02:25:35', '2026-11-12 05:56:51'),
-(106, 'yudi', 'yd@gmail.com', '2026-11-12 14:18:38', '$2y$10$pJbPPhZ0eqckjxNHDuXNEenDSNvfMi6TViRpNCz6OhR4IyB/pbnWi', '', 'guru', '2026-11-12 14:18:38', '2026-11-12 14:18:38');
+(105, 'Irvan Rizal, S.Pd', 'irvan@gmail.com', '2026-11-05 02:25:35', '$2y$10$ym31UErSRvWGSt3iG5mdzePVB6eepebhNDJmSYc/KK/g.iYx9t1De', '', 'guru', '2026-11-05 02:25:35', '2026-11-12 05:56:51');
 
 -- --------------------------------------------------------
 
@@ -781,7 +772,8 @@ INSERT INTO `t_wali_kelas` (`id`, `tahun_ajaran_id`, `kelas_id`, `guru_id`, `tan
 (52, 1, 34, 28, '2026-07-01', '2027-06-30', 1, '2026-11-05 04:26:18', '2026-11-05 04:26:18'),
 (53, 1, 48, 29, '2026-07-01', '2027-06-30', 1, '2026-11-09 09:10:52', '2026-11-09 09:10:52'),
 (54, 1, 40, 51, '2026-07-01', '2027-06-30', 1, '2026-11-09 09:10:52', '2026-11-09 09:10:52'),
-(55, 1, 30, 30, '2026-07-01', '2027-06-30', 1, '2026-11-09 09:10:52', '2026-11-12 14:42:54');
+(55, 1, 30, 30, '2026-07-01', '2027-06-30', 1, '2026-11-09 09:10:52', '2026-11-12 14:42:54'),
+(58, 1, 17, 9, '2026-07-07', '2027-07-07', 1, '2026-11-16 12:02:45', '2026-11-16 12:02:45');
 
 --
 -- Indexes for dumped tables
@@ -871,61 +863,61 @@ ALTER TABLE `t_wali_kelas`
 -- AUTO_INCREMENT untuk tabel `t_guru`
 --
 ALTER TABLE `t_guru`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT untuk tabel `t_kelas`
 --
 ALTER TABLE `t_kelas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
 -- AUTO_INCREMENT untuk tabel `t_kelas_siswa`
 --
 ALTER TABLE `t_kelas_siswa`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=365;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=371;
 
 --
 -- AUTO_INCREMENT untuk tabel `t_pelanggaran`
 --
 ALTER TABLE `t_pelanggaran`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT untuk tabel `t_pelanggaran_kategori`
 --
 ALTER TABLE `t_pelanggaran_kategori`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT untuk tabel `t_pelanggaran_siswa`
 --
 ALTER TABLE `t_pelanggaran_siswa`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT untuk tabel `t_siswa`
 --
 ALTER TABLE `t_siswa`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=278;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=283;
 
 --
 -- AUTO_INCREMENT untuk tabel `t_tahun_ajaran`
 --
 ALTER TABLE `t_tahun_ajaran`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
 -- AUTO_INCREMENT untuk tabel `t_users`
 --
 ALTER TABLE `t_users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=107;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=108;
 
 --
 -- AUTO_INCREMENT untuk tabel `t_wali_kelas`
 --
 ALTER TABLE `t_wali_kelas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 
 --
 -- Ketidakleluasaan untuk tabel pelimpahan (Dumped Tables)

@@ -288,13 +288,16 @@ if (isset($_SESSION['id'])) {
             </div>
 
             <h1>
-                Sistem Informasi Pelanggaran dan Pembinaan
-                Siswa Muhammadiyah
+                SipenaMU
+                <!-- Sistem Informasi Pelanggaran dan Pembinaan
+                Siswa Muhammadiyah -->
                 <!-- Sistem Informasi<br>
                 Pelanggaran Siswa -->
             </h1>
 
             <p>
+                Sistem Informasi Pelanggaran dan Pembinaan
+                Siswa Muhammadiyah.
                 Platform pengelolaan data pelanggaran siswa untuk
                 membantu sekolah melakukan pencatatan, pemantauan,
                 dan pelaporan secara terstruktur.
