@@ -1,3 +1,4 @@
+
 <?php
 include "includes/cek_session.php";
 include "config/koneksi.php";
@@ -126,7 +127,7 @@ if ($tahunAktif > 0) {
     $where .= " AND 1 = 0 ";
 }
 
-// Wali kelas hanya melihat kelasnya sendiri
+// Wali kelas hanya melihat kelas dan tahun ajarannya sendiri
 if ($isWaliKelas) {
     $where .= "
         AND ps.kelas_id = $kelasWali
@@ -139,7 +140,9 @@ if ($isWaliKelas) {
 // =====================================================
 
 if ($pesanTanggal !== '') {
+
     $where .= " AND 1 = 0 ";
+
 } else {
 
     if ($tanggalMulai !== '') {
@@ -247,293 +250,47 @@ if (($_GET['export'] ?? '') === 'excel') {
     header("Cache-Control: max-age=0");
 
     echo "\xEF\xBB\xBF";
-
-        ?>
+    ?>
     <!DOCTYPE html>
     <html lang="id">
     <head>
         <meta charset="UTF-8">
+        <title>Laporan Pelanggaran Siswa</title>
+
         <style>
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                border: 1px solid #000;
+            }
 
-body {
-    margin: 0;
-    background: #F1F5FB;
-    color: #26374A;
-}
+            th, td {
+                border: 1px solid #000;
+                padding: 6px 8px;
+                vertical-align: top;
+            }
 
-/* GARIS TABEL UNTUK EKSPOR EXCEL */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    border-spacing: 0;
-    border: 1px solid #000000;
-}
-
-table th,
-table td {
-    border: 1px solid #000000 !important;
-    padding: 6px 8px;
-    vertical-align: top;
-}
-
-table th {
-    background-color: #D9EAF7;
-    color: #173B67;
-    font-weight: bold;
-    text-align: center;
-}
-
-.konten-utama {
-    margin-left: 220px !important;
-    width: calc(100% - 220px) !important;
-    min-height: 100vh;
-    padding: 100px 24px 30px;
-    box-sizing: border-box;
-}
-
-.konten-utama,
-.konten-utama * {
-    box-sizing: border-box;
-}
-
-.konten-utama .judul-halaman {
-    color: #173B67;
-    font-weight: 700;
-}
-
-.konten-utama .kartu {
-    background: #fff;
-    border: 1px solid #E5EAF2;
-    border-radius: 12px;
-    box-shadow: 0 3px 12px rgba(23,59,103,.06);
-}
-
-.konten-utama .card-body {
-    padding: 24px;
-}
-
-.konten-utama .form-control,
-.konten-utama .form-select {
-    min-height: 42px;
-    border: 1px solid #D8E1ED;
-    border-radius: 8px;
-    font-size: 14px;
-}
-
-.konten-utama .form-control:focus,
-.konten-utama .form-select:focus {
-    border-color: #3779C5;
-    box-shadow: 0 0 0 3px rgba(55,121,197,.12);
-}
-
-.konten-utama .btn {
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 9px 15px;
-}
-
-.konten-utama .btn-primary {
-    background: #245B96;
-    border-color: #245B96;
-    color: #fff;
-}
-
-.konten-utama .btn-primary:hover {
-    background: #173B67;
-    border-color: #173B67;
-    color: #fff;
-}
-
-.konten-utama .btn-outline-primary {
-    color: #245B96;
-    border-color: #245B96;
-}
-
-.konten-utama .btn-outline-primary:hover {
-    color: #fff;
-    background: #173B67;
-    border-color: #173B67;
-}
-
-.konten-utama .btn-outline-secondary {
-    background: #E9EEF5;
-    border-color: #E9EEF5;
-    color: #40546B;
-}
-
-.konten-utama .btn-outline-secondary:hover {
-    background: #DCE5F0;
-    border-color: #DCE5F0;
-    color: #173B67;
-}
-
-.konten-utama .table {
-    margin-bottom: 0;
-    font-size: 13px;
-    vertical-align: middle;
-}
-
-.konten-utama .table thead th {
-    background: #173B67;
-    color: #fff;
-    font-weight: 600;
-    white-space: nowrap;
-    padding: 13px 12px;
-    border-color: #31577F;
-}
-
-.konten-utama .table tbody td {
-    padding: 12px;
-    color: #40546B;
-    border-color: #E8EDF4;
-}
-
-.konten-utama .table tbody tr:hover {
-    background: #F7FAFE;
-}
-
-.konten-utama .badge {
-    font-size: 12px;
-    font-weight: 600;
-    padding: 6px 10px;
-    border-radius: 20px;
-}
-
-.konten-utama .pagination {
-    gap: 4px;
-}
-
-.konten-utama .page-link {
-    border: 1px solid #DCE5F0;
-    border-radius: 6px !important;
-    color: #245B96;
-    font-size: 13px;
-}
-
-.konten-utama .page-link:hover {
-    background: #EAF2FB;
-    color: #173B67;
-}
-
-.konten-utama .page-item.active .page-link {
-    background: #245B96;
-    border-color: #245B96;
-    color: #fff;
-}
-
-.konten-utama .page-item.disabled .page-link {
-    color: #AAB6C5;
-}
-
-.konten-utama input[type="date"] {
-    cursor: pointer;
-}
-
-.konten-utama .info-tahun {
-    color: #245B96;
-    background: #EAF2FB;
-    border: 1px solid #D7E6F7;
-    border-radius: 8px;
-    padding: 9px 13px;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-@media (max-width: 767.98px) {
-    .konten-utama {
-        padding: 100px 15px 25px;
-    }
-
-    .konten-utama .card-body {
-        padding: 16px;
-    }
-
-    .konten-utama .judul-halaman {
-        font-size: 22px;
-    }
-}
-
-@media print {
-    @page {
-        size: landscape;
-        margin: 12mm;
-    }
-
-    html,
-    body {
-        background: #fff !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-
-    body > :not(.konten-utama) {
-        display: none !important;
-    }
-
-    .konten-utama {
-        display: block !important;
-        position: static !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-        min-height: auto !important;
-    }
-
-    .bagian-filter,
-    .bagian-tombol,
-    .bagian-pagination,
-    .alert,
-    .no-print {
-        display: none !important;
-    }
-
-    .konten-utama .kartu,
-    .konten-utama .card {
-        box-shadow: none !important;
-        border: none !important;
-    }
-
-    .konten-utama .card-body {
-        padding: 0 !important;
-    }
-
-    .konten-utama .table-responsive {
-        overflow: visible !important;
-    }
-
-    .konten-utama .table {
-        width: 100% !important;
-        font-size: 9px !important;
-    }
-
-    .konten-utama .table th,
-    .konten-utama .table td {
-        padding: 5px !important;
-        color: #000 !important;
-        border: 1px solid #999 !important;
-    }
-
-    .konten-utama .table thead th {
-        background: #173B67 !important;
-        color: #fff !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-
-    .konten-utama .judul-halaman {
-        color: #173B67 !important;
-    }
-}
-
+            th {
+                background: #D9EAF7;
+                color: #173B67;
+                font-weight: bold;
+                text-align: center;
+            }
         </style>
     </head>
+
     <body>
+
         <h3>LAPORAN PELANGGARAN SISWA</h3>
+
         <p>Tahun Ajaran: <?= e($namaTahunAktif); ?></p>
         <p>Tanggal ekspor: <?= date('d-m-Y H:i:s'); ?> WIB</p>
 
-        <table border="1" cellspacing="0" cellpadding="6" style="border-collapse:collapse;border:1px solid #000000;width:100%;">
+        <?php if ($isWaliKelas): ?>
+            <p>Kelas: <?= e($namaKelasWali); ?></p>
+        <?php endif; ?>
+
+        <table>
             <thead>
                 <tr>
                     <th>No</th>
@@ -549,20 +306,26 @@ table th {
                     <th>Status</th>
                 </tr>
             </thead>
+
             <tbody>
+
                 <?php $no = 1; ?>
 
                 <?php while ($data = mysqli_fetch_assoc($queryExport)): ?>
+
                     <tr>
                         <td><?= $no++; ?></td>
+
                         <td>
                             <?= !empty($data['tanggal'])
                                 ? date('d-m-Y', strtotime($data['tanggal']))
                                 : '-'; ?>
                         </td>
+
                         <td style="mso-number-format:'\@';">
                             <?= e($data['nis'] ?? '-'); ?>
                         </td>
+
                         <td><?= e($data['nama_siswa']); ?></td>
                         <td><?= e($data['nama_kelas']); ?></td>
                         <td><?= e($data['nama_pelanggaran']); ?></td>
@@ -572,16 +335,12 @@ table th {
                         <td><?= e($data['keterangan'] ?: '-'); ?></td>
                         <td>Selesai</td>
                     </tr>
+
                 <?php endwhile; ?>
+
             </tbody>
         </table>
-    <script>
-    window.addEventListener('pageshow', function(event) {
-        if (event.persisted) {
-            window.location.reload();
-        }
-    });
-    </script>
+
     </body>
     </html>
     <?php
@@ -619,6 +378,7 @@ $totalHalaman = max(1, (int)ceil($totalData / $batas));
 $halaman = min($halaman, $totalHalaman);
 $offset = ($halaman - 1) * $batas;
 
+// Mode cetak menampilkan seluruh data hasil filter
 if (!$modeCetak) {
     $sqlData .= " LIMIT $offset, $batas";
 }
@@ -633,13 +393,25 @@ if (!$queryLaporan) {
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title><?= $modeCetak ? 'Cetak Laporan' : 'Laporan Pelanggaran'; ?></title>
+    <title>
+        <?= $modeCetak ? 'Cetak Laporan' : 'Laporan Pelanggaran'; ?>
+    </title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    >
+
     <style>
         body {
             margin: 0;
@@ -799,8 +571,6 @@ if (!$queryLaporan) {
                 padding: 0 !important;
             }
 
-            /* Sembunyikan semua elemen body selain isi laporan.
-               Sidebar dan navbar tidak perlu diubah file aslinya. */
             body > :not(.konten-utama) {
                 display: none !important;
             }
@@ -850,6 +620,7 @@ if (!$queryLaporan) {
 
             .konten-utama .table thead th {
                 background: #EAF1F9 !important;
+                color: #173B67 !important;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
@@ -869,6 +640,7 @@ if (!$queryLaporan) {
 <main class="konten-utama">
 
     <div class="mb-4">
+
         <h2 class="judul-halaman mb-1">
             <?= $modeCetak ? 'Laporan Pelanggaran Siswa' : 'Laporan Pelanggaran'; ?>
         </h2>
@@ -881,30 +653,41 @@ if (!$queryLaporan) {
             <strong>Tahun Ajaran Aktif:</strong>
             <?= e($namaTahunAktif); ?>
         </div>
+
     </div>
 
     <?php if ($isWaliKelas): ?>
+
         <div class="alert alert-primary">
             <strong>Wali Kelas</strong> |
             Kelas: <?= e($namaKelasWali); ?>
         </div>
+
     <?php endif; ?>
 
     <div class="card kartu shadow-sm">
+
         <div class="card-body">
 
             <?php if ($pesanTanggal): ?>
+
                 <div class="alert alert-warning">
                     <?= e($pesanTanggal); ?>
                 </div>
+
             <?php endif; ?>
 
-            <form method="GET"
-                  action="laporan.php"
-                  id="filterLaporan"
-                  class="row g-2 mb-3 bagian-filter">
+            <!-- FILTER LAPORAN -->
+
+            <form
+                method="GET"
+                action="laporan.php"
+                id="filterLaporan"
+                class="row g-2 mb-3 bagian-filter"
+            >
 
                 <div class="col-lg-4 col-md-12">
+
                     <input
                         type="text"
                         name="cari"
@@ -914,9 +697,11 @@ if (!$queryLaporan) {
                         value="<?= e($cari); ?>"
                         autocomplete="off"
                     >
+
                 </div>
 
                 <div class="col-lg-2 col-md-6">
+
                     <input
                         type="date"
                         name="tanggal_mulai"
@@ -926,9 +711,11 @@ if (!$queryLaporan) {
                         max="<?= e($tanggalSelesai); ?>"
                         title="Tanggal mulai"
                     >
+
                 </div>
 
                 <div class="col-lg-2 col-md-6">
+
                     <input
                         type="date"
                         name="tanggal_selesai"
@@ -938,21 +725,30 @@ if (!$queryLaporan) {
                         min="<?= e($tanggalMulai); ?>"
                         title="Tanggal selesai"
                     >
+
                 </div>
 
                 <div class="col-lg-2 col-md-6">
+
                     <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i>
                         Cari Data
                     </button>
+
                 </div>
 
                 <div class="col-lg-2 col-md-6">
+
                     <a href="laporan.php" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-arrow-counterclockwise"></i>
                         Reset Filter
                     </a>
+
                 </div>
 
             </form>
+
+            <!-- TOMBOL CETAK DAN EKSPOR -->
 
             <div class="d-flex flex-wrap gap-2 mb-3 bagian-tombol">
 
@@ -962,14 +758,18 @@ if (!$queryLaporan) {
                 </a>
 
                 <a href="<?= e($linkExcel); ?>" class="btn btn-outline-primary">
+                    <i class="bi bi-file-earmark-excel"></i>
                     Ekspor Excel
                 </a>
 
             </div>
 
+            <!-- INFORMASI JUMLAH DATA -->
+
             <?php if (!$modeCetak): ?>
 
                 <div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
+
                     <small class="text-secondary">
                         Menampilkan
                         <?= $totalData ? $offset + 1 : 0; ?> -
@@ -980,18 +780,31 @@ if (!$queryLaporan) {
                     <small class="text-secondary">
                         Halaman <?= $halaman; ?> dari <?= $totalHalaman; ?>
                     </small>
+
                 </div>
 
             <?php else: ?>
 
                 <div class="mb-3 small">
-                    <div>Tanggal cetak: <?= date('d-m-Y H:i:s'); ?> WIB</div>
-                    <div>Total data: <?= $totalData; ?> laporan</div>
+
+                    <div>
+                        Tanggal cetak:
+                        <?= date('d-m-Y H:i:s'); ?> WIB
+                    </div>
+
+                    <div>
+                        Total data:
+                        <?= $totalData; ?> laporan
+                    </div>
+
                 </div>
 
             <?php endif; ?>
 
+            <!-- TABEL LAPORAN -->
+
             <div class="table-responsive">
+
                 <table class="table table-hover align-middle">
 
                     <thead>
@@ -1019,6 +832,7 @@ if (!$queryLaporan) {
                             <?php while ($data = mysqli_fetch_assoc($queryLaporan)): ?>
 
                                 <tr>
+
                                     <td><?= $no++; ?></td>
 
                                     <td>
@@ -1028,19 +842,37 @@ if (!$queryLaporan) {
                                     </td>
 
                                     <td><?= e($data['nis'] ?? '-'); ?></td>
-                                    <td class="fw-semibold"><?= e($data['nama_siswa']); ?></td>
+
+                                    <td class="fw-semibold">
+                                        <?= e($data['nama_siswa']); ?>
+                                    </td>
+
                                     <td><?= e($data['nama_kelas']); ?></td>
+
                                     <td><?= e($data['nama_pelanggaran']); ?></td>
-                                    <td><?= (int)($data['poin'] ?? 0); ?> poin</td>
-                                    <td><?= e($data['nama_guru'] ?: '-'); ?></td>
-                                    <td><?= e($data['tindakan'] ?: '-'); ?></td>
-                                    <td><?= e($data['keterangan'] ?: '-'); ?></td>
+
+                                    <td>
+                                        <?= (int)($data['poin'] ?? 0); ?> poin
+                                    </td>
+
+                                    <td>
+                                        <?= e($data['nama_guru'] ?: '-'); ?>
+                                    </td>
+
+                                    <td>
+                                        <?= e($data['tindakan'] ?: '-'); ?>
+                                    </td>
+
+                                    <td>
+                                        <?= e($data['keterangan'] ?: '-'); ?>
+                                    </td>
 
                                     <td>
                                         <span class="badge bg-success">
                                             Selesai
                                         </span>
                                     </td>
+
                                 </tr>
 
                             <?php endwhile; ?>
@@ -1048,21 +880,30 @@ if (!$queryLaporan) {
                         <?php else: ?>
 
                             <tr>
+
                                 <td colspan="11" class="text-center text-secondary py-5">
+
                                     <div class="fw-semibold mb-1">
                                         Tidak ada data laporan
                                     </div>
+
                                     <small>
                                         Coba periksa kembali kata pencarian atau rentang tanggal.
                                     </small>
+
                                 </td>
+
                             </tr>
 
                         <?php endif; ?>
 
                     </tbody>
+
                 </table>
+
             </div>
+
+            <!-- PAGINATION -->
 
             <?php if (!$modeCetak): ?>
 
@@ -1083,34 +924,48 @@ if (!$queryLaporan) {
                         ?>
 
                         <nav>
+
                             <ul class="pagination pagination-sm mb-0">
 
                                 <li class="page-item <?= $halaman <= 1 ? 'disabled' : ''; ?>">
-                                    <a class="page-link"
-                                       href="<?= e($linkHalaman(max(1, $halaman - 1))); ?>">
+
+                                    <a
+                                        class="page-link"
+                                        href="<?= e($linkHalaman(max(1, $halaman - 1))); ?>"
+                                    >
                                         Sebelumnya
                                     </a>
+
                                 </li>
 
                                 <?php for ($i = 1; $i <= $totalHalaman; $i++): ?>
 
                                     <li class="page-item <?= $halaman == $i ? 'active' : ''; ?>">
-                                        <a class="page-link"
-                                           href="<?= e($linkHalaman($i)); ?>">
+
+                                        <a
+                                            class="page-link"
+                                            href="<?= e($linkHalaman($i)); ?>"
+                                        >
                                             <?= $i; ?>
                                         </a>
+
                                     </li>
 
                                 <?php endfor; ?>
 
                                 <li class="page-item <?= $halaman >= $totalHalaman ? 'disabled' : ''; ?>">
-                                    <a class="page-link"
-                                       href="<?= e($linkHalaman(min($totalHalaman, $halaman + 1))); ?>">
+
+                                    <a
+                                        class="page-link"
+                                        href="<?= e($linkHalaman(min($totalHalaman, $halaman + 1))); ?>"
+                                    >
                                         Selanjutnya
                                     </a>
+
                                 </li>
 
                             </ul>
+
                         </nav>
 
                     <?php endif; ?>
@@ -1128,9 +983,12 @@ if (!$queryLaporan) {
             <?php endif; ?>
 
         </div>
+
     </div>
 
 </main>
+
+<!-- JAVASCRIPT FILTER -->
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -1140,30 +998,51 @@ document.addEventListener('DOMContentLoaded', function () {
     const tanggalMulai = document.getElementById('tanggalMulai');
     const tanggalSelesai = document.getElementById('tanggalSelesai');
 
-    let timer = null;
+    let timerPencarian = null;
 
-    <script>
-document.addEventListener('DOMContentLoaded', function () {
+    // =========================================
+    // PENCARIAN OTOMATIS
+    // =========================================
 
-    const form = document.getElementById('filterLaporan');
-    const inputCari = document.getElementById('inputCari');
-    const tanggalMulai = document.getElementById('tanggalMulai');
-    const tanggalSelesai = document.getElementById('tanggalSelesai');
+    if (inputCari && form) {
 
-    // PENCARIAN DENGAN ENTER
-    if (inputCari) {
-        inputCari.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
+        inputCari.addEventListener('input', function () {
+
+            clearTimeout(timerPencarian);
+
+            timerPencarian = setTimeout(function () {
                 form.requestSubmit();
-            }
+            }, 400);
+
         });
+
+        // PENCARIAN DENGAN ENTER
+
+        inputCari.addEventListener('keydown', function (event) {
+
+            if (event.key === 'Enter') {
+
+                event.preventDefault();
+
+                clearTimeout(timerPencarian);
+
+                form.requestSubmit();
+
+            }
+
+        });
+
     }
 
-    // FILTER TANGGAL
+    // =========================================
+    // FILTER TANGGAL OTOMATIS
+    // =========================================
+
     [tanggalMulai, tanggalSelesai].forEach(function (input) {
 
-        if (!input) return;
+        if (!input || !form) {
+            return;
+        }
 
         input.addEventListener('change', function () {
 
@@ -1171,8 +1050,11 @@ document.addEventListener('DOMContentLoaded', function () {
             const selesai = tanggalSelesai.value;
 
             if (mulai && selesai && mulai > selesai) {
+
                 alert('Tanggal mulai tidak boleh melebihi tanggal selesai.');
+
                 return;
+
             }
 
             form.requestSubmit();
@@ -1184,15 +1066,17 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
 window.addEventListener('pageshow', function(event) {
+
     if (event.persisted) {
         window.location.reload();
     }
+
 });
 </script>
+
 </body>
 </html>
