@@ -20,7 +20,6 @@ $menuAdmin = [
     ["Kelola Wali Kelas", "wali_kelas.php", "wali_kelas", "bi-person-workspace"],
     ["Kategori Pelanggaran", "kategori_pelanggaran.php", "kategori", "bi-tags"],
     ["Jenis Pelanggaran", "jenis_pelanggaran.php", "jenis", "bi-list-check"],
-    ["Rekap Poin", "rekap_poin.php", "rekap_poin", "bi-bar-chart"],
     ["About Me", "about.php", "about", "bi-info-circle"],
     ["Laporan", "laporan.php", "laporan", "bi-file-earmark-text"]
 ];

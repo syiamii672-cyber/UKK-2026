@@ -1,4 +1,3 @@
-
 <?php
 include "includes/cek_session.php";
 include "config/koneksi.php";
@@ -248,17 +247,40 @@ if (($_GET['export'] ?? '') === 'excel') {
     header("Cache-Control: max-age=0");
 
     echo "\xEF\xBB\xBF";
-    ?>
+
+        ?>
     <!DOCTYPE html>
     <html lang="id">
     <head>
         <meta charset="UTF-8">
         <style>
-           
+
 body {
     margin: 0;
     background: #F1F5FB;
     color: #26374A;
+}
+
+/* GARIS TABEL UNTUK EKSPOR EXCEL */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    border: 1px solid #000000;
+}
+
+table th,
+table td {
+    border: 1px solid #000000 !important;
+    padding: 6px 8px;
+    vertical-align: top;
+}
+
+table th {
+    background-color: #D9EAF7;
+    color: #173B67;
+    font-weight: bold;
+    text-align: center;
 }
 
 .konten-utama {
@@ -511,7 +533,7 @@ body {
         <p>Tahun Ajaran: <?= e($namaTahunAktif); ?></p>
         <p>Tanggal ekspor: <?= date('d-m-Y H:i:s'); ?> WIB</p>
 
-        <table>
+        <table border="1" cellspacing="0" cellpadding="6" style="border-collapse:collapse;border:1px solid #000000;width:100%;">
             <thead>
                 <tr>
                     <th>No</th>
@@ -618,7 +640,6 @@ if (!$queryLaporan) {
     <title><?= $modeCetak ? 'Cetak Laporan' : 'Laporan Pelanggaran'; ?></title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <style>
         body {
             margin: 0;
@@ -1121,26 +1142,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let timer = null;
 
-    // PENCARIAN OTOMATIS
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const form = document.getElementById('filterLaporan');
+    const inputCari = document.getElementById('inputCari');
+    const tanggalMulai = document.getElementById('tanggalMulai');
+    const tanggalSelesai = document.getElementById('tanggalSelesai');
+
+    // PENCARIAN DENGAN ENTER
     if (inputCari) {
-
-        inputCari.addEventListener('input', function () {
-
-            clearTimeout(timer);
-
-            timer = setTimeout(function () {
-                form.requestSubmit();
-            }, 400);
-
-        });
-
         inputCari.addEventListener('keydown', function (event) {
-
             if (event.key === 'Enter') {
-                clearTimeout(timer);
+                event.preventDefault();
                 form.requestSubmit();
             }
-
         });
     }
 
@@ -1167,6 +1183,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 </script>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 

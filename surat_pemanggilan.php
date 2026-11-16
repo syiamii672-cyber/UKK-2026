@@ -365,47 +365,129 @@ $tanggalSurat = tanggalIndonesia(date('Y-m-d'));
             line-height: 1.5;
         }
 
-        @media print {
-            @page {
-                size: A4;
-                margin: 0;
-            }
+        
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 10mm;
+    }
 
-            body {
-                background: #fff;
-            }
+    html,
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+        color: #000 !important;
+        font-family: "Times New Roman", serif;
+    }
 
-            .toolbar {
-                display: none !important;
-            }
+    .toolbar {
+        display: none !important;
+    }
 
-            .lembar {
-                width: 210mm;
-                min-height: 297mm;
-                margin: 0;
-                padding: 15mm 18mm;
-                box-shadow: none;
-            }
+    .lembar {
+        width: 100% !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
+        box-shadow: none !important;
+    }
 
-            .halaman-pertama {
-                break-after: page;
-                page-break-after: always;
-            }
+    /* SURAT UTAMA: DIPADATKAN AGAR MUAT 1 HALAMAN */
+    .halaman-pertama {
+        break-after: page;
+        page-break-after: always;
+    }
 
-            .halaman-lampiran {
-                break-before: page;
-                page-break-before: always;
-            }
+    .halaman-pertama .kop-surat {
+        gap: 10px;
+    }
 
-            .tabel-riwayat thead {
-                display: table-header-group;
-            }
+    .halaman-pertama .logo-sekolah {
+        width: 78px;
+        height: 78px;
+    }
 
-            .tabel-riwayat tr {
-                break-inside: avoid;
-                page-break-inside: avoid;
-            }
-        }
+    .halaman-pertama .identitas-sekolah h2 {
+        font-size: 16px;
+        margin-bottom: 2px;
+    }
+
+    .halaman-pertama .identitas-sekolah p {
+        font-size: 9px;
+        line-height: 1.15;
+        margin: 1px 0;
+    }
+
+    .halaman-pertama .garis-kop {
+        margin-top: 7px;
+        margin-bottom: 13px;
+    }
+
+    .halaman-pertama .judul-surat {
+        font-size: 14px;
+        margin-bottom: 2px;
+    }
+
+    .halaman-pertama .nomor-surat {
+        font-size: 10px;
+        margin-bottom: 12px;
+    }
+
+    .halaman-pertama .isi-surat {
+        font-size: 10.5pt;
+        line-height: 1.22;
+    }
+
+    .halaman-pertama .isi-surat p {
+        margin-top: 0;
+        margin-bottom: 7px;
+    }
+
+    .halaman-pertama .identitas {
+        margin: 5px 0 7px 18px;
+        font-size: 10.5pt;
+    }
+
+    .halaman-pertama .identitas td {
+        padding: 1px 3px;
+    }
+
+    .halaman-pertama .ttd {
+        width: 220px;
+        margin-top: 8px;
+        font-size: 10.5pt;
+    }
+
+    .halaman-pertama .nama-ttd {
+        margin-top: 35px;
+    }
+
+    /* LAMPIRAN DIMULAI PADA HALAMAN BARU */
+    .halaman-lampiran {
+        break-before: page;
+        page-break-before: always;
+    }
+
+    .halaman-lampiran .tabel-riwayat {
+        font-size: 9pt;
+    }
+
+    .halaman-lampiran .tabel-riwayat th,
+    .halaman-lampiran .tabel-riwayat td {
+        padding: 5px;
+    }
+
+    .tabel-riwayat thead {
+        display: table-header-group;
+    }
+
+    .tabel-riwayat tr {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+}
 
         @media screen and (max-width: 800px) {
             .lembar {

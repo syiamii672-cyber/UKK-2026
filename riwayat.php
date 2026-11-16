@@ -423,7 +423,7 @@ body {
                             <th>Kelas</th>
                             <th>Pelanggaran</th>
                             <th>Pengurangan Poin</th>
-                            <th>Guru</th>
+                            <th>Guru Pencatat</th>
                             <th>Tindakan</th>
                             <th>Status</th>
                         </tr>

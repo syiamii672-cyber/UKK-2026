@@ -288,8 +288,10 @@ if (isset($_SESSION['id'])) {
             </div>
 
             <h1>
-                Sistem Informasi<br>
-                Pelanggaran Siswa
+                Sistem Informasi Pelanggaran dan Pembinaan
+                Siswa Muhammadiyah
+                <!-- Sistem Informasi<br>
+                Pelanggaran Siswa -->
             </h1>
 
             <p>

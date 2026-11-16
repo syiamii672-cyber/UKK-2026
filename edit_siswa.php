@@ -15,7 +15,7 @@ if (!$id || $id < 1) {
     exit;
 }
 
-// Ambil data siswa berdasarkan ID.
+// Ambil data siswa
 $stmt = mysqli_prepare(
     $koneksi,
     "SELECT nis, nisn, nama, jenis_kelamin, tanggal_lahir,
@@ -26,10 +26,8 @@ $stmt = mysqli_prepare(
 
 mysqli_stmt_bind_param($stmt, "i", $id);
 mysqli_stmt_execute($stmt);
-
 $result = mysqli_stmt_get_result($stmt);
 $siswa = mysqli_fetch_assoc($result);
-
 mysqli_stmt_close($stmt);
 
 if (!$siswa) {
@@ -39,7 +37,7 @@ if (!$siswa) {
 
 $error = "";
 
-// Ambil nilai awal dari database.
+// Nilai awal
 $nis = $siswa['nis'];
 $nisn = $siswa['nisn'];
 $nama = $siswa['nama'];
@@ -48,7 +46,7 @@ $tanggal_lahir = $siswa['tanggal_lahir'];
 $alamat = $siswa['alamat'];
 $status_aktif = (string) $siswa['status_aktif'];
 
-// Proses ketika form disubmit.
+// Proses form
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $nis = trim($_POST['nis'] ?? '');
@@ -59,6 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $alamat = trim($_POST['alamat'] ?? '');
     $status_aktif = $_POST['status_aktif'] ?? '';
 
+    // Validasi kolom wajib
     if (
         $nis == '' || $nisn == '' || $nama == '' ||
         !in_array($jenis_kelamin, ['L', 'P'], true) ||
@@ -67,12 +66,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     ) {
         $error = "Semua kolom wajib diisi dengan benar.";
 
+    // NIS harus 9 digit
     } elseif (!preg_match('/^[0-9]{9}$/', $nis)) {
         $error = "NIS harus tepat 9 digit angka.";
 
+    // NISN harus 10 digit
     } elseif (!preg_match('/^[0-9]{10}$/', $nisn)) {
         $error = "NISN harus tepat 10 digit angka.";
 
+    // Validasi tanggal lahir
     } elseif (
         !preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggal_lahir) ||
         !checkdate(
@@ -85,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     } else {
 
-        // Cek NIS atau NISN milik siswa lain.
+        // Cek NIS dan NISN duplikat
         $cek = mysqli_prepare(
             $koneksi,
             "SELECT id
@@ -96,7 +98,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         mysqli_stmt_bind_param($cek, "ssi", $nis, $nisn, $id);
         mysqli_stmt_execute($cek);
-
         $hasilCek = mysqli_stmt_get_result($cek);
 
         if (mysqli_num_rows($hasilCek) > 0) {
@@ -105,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         mysqli_stmt_close($cek);
 
-        // Jika tidak ada duplikasi, lakukan update.
+        // Update data jika valid
         if ($error == '') {
 
             $query = "UPDATE t_siswa
@@ -137,31 +138,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             );
 
             if (mysqli_stmt_execute($update)) {
-
                 mysqli_stmt_close($update);
-
                 header("Location: siswa.php?pesan=edit");
                 exit;
-
             } else {
-
                 $error = "Data siswa gagal diperbarui.";
             }
 
             mysqli_stmt_close($update);
         }
     }
-
-    // Pertahankan isian jika validasi gagal.
-    $siswa = [
-        'nis' => $nis,
-        'nisn' => $nisn,
-        'nama' => $nama,
-        'jenis_kelamin' => $jenis_kelamin,
-        'tanggal_lahir' => $tanggal_lahir,
-        'alamat' => $alamat,
-        'status_aktif' => $status_aktif
-    ];
 }
 
 $menuAktif = "siswa";
@@ -169,12 +155,10 @@ $menuAktif = "siswa";
 
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Edit Data Siswa</title>
+    <title>Edit Data Siswa - SIPENA MU</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
           rel="stylesheet">

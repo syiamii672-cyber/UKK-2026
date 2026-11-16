@@ -33,10 +33,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         !in_array($status_aktif, ['0', '1'], true)
     ) {
         $error = "Semua kolom wajib diisi dengan benar.";
-    } elseif (!preg_match('/^[0-9]{10}$/', $nis)) {
-        $error = "NIS harus tepat 10 digit angka.";
+
+    } elseif (!preg_match('/^[0-9]{9}$/', $nis)) {
+        $error = "NIS harus tepat 9 digit angka.";
+
     } elseif (!preg_match('/^[0-9]{10}$/', $nisn)) {
         $error = "NISN harus tepat 10 digit angka.";
+
     } elseif (
         !preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggal_lahir) ||
         !checkdate(
@@ -46,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         )
     ) {
         $error = "Tanggal lahir tidak valid.";
+
     } else {
         // Cek NIS atau NISN yang sudah digunakan.
         $cek = mysqli_prepare(
@@ -156,26 +160,29 @@ $menuAktif = "siswa";
 
                 <div class="mb-3">
                     <label class="form-label">NIS</label>
+
                     <input
                         type="text"
                         name="nis"
                         class="form-control"
-                        minlength="10"
-                        maxlength="10"
-                        pattern="[0-9]{10}"
+                        minlength="9"
+                        maxlength="9"
+                        pattern="[0-9]{9}"
                         inputmode="numeric"
-                        title="NIS harus tepat 10 digit angka."
-                        placeholder="Masukkan 10 digit NIS"
+                        title="NIS harus tepat 9 digit angka."
+                        placeholder="Masukkan 9 digit NIS"
                         required
                         value="<?= htmlspecialchars($nis, ENT_QUOTES, 'UTF-8'); ?>"
                     >
+
                     <small class="text-muted">
-                        NIS wajib tepat 10 digit angka.
+                        NIS wajib tepat 9 digit angka.
                     </small>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">NISN</label>
+
                     <input
                         type="text"
                         name="nisn"
@@ -189,6 +196,7 @@ $menuAktif = "siswa";
                         required
                         value="<?= htmlspecialchars($nisn, ENT_QUOTES, 'UTF-8'); ?>"
                     >
+
                     <small class="text-muted">
                         NISN wajib tepat 10 digit angka.
                     </small>
@@ -196,6 +204,7 @@ $menuAktif = "siswa";
 
                 <div class="mb-3">
                     <label class="form-label">Nama Lengkap</label>
+
                     <input
                         type="text"
                         name="nama"
@@ -208,11 +217,14 @@ $menuAktif = "siswa";
 
                 <div class="mb-3">
                     <label class="form-label">Jenis Kelamin</label>
+
                     <select name="jenis_kelamin" class="form-select" required>
                         <option value="">-- Pilih Jenis Kelamin --</option>
+
                         <option value="L" <?= $jenis_kelamin == 'L' ? 'selected' : ''; ?>>
                             Laki-laki
                         </option>
+
                         <option value="P" <?= $jenis_kelamin == 'P' ? 'selected' : ''; ?>>
                             Perempuan
                         </option>
@@ -221,6 +233,7 @@ $menuAktif = "siswa";
 
                 <div class="mb-3">
                     <label class="form-label">Tanggal Lahir</label>
+
                     <input
                         type="date"
                         name="tanggal_lahir"
@@ -232,6 +245,7 @@ $menuAktif = "siswa";
 
                 <div class="mb-3">
                     <label class="form-label">Alamat</label>
+
                     <textarea
                         name="alamat"
                         class="form-control"
@@ -242,10 +256,12 @@ $menuAktif = "siswa";
 
                 <div class="mb-3">
                     <label class="form-label">Status</label>
+
                     <select name="status_aktif" class="form-select" required>
                         <option value="1" <?= $status_aktif == '1' ? 'selected' : ''; ?>>
                             Aktif
                         </option>
+
                         <option value="0" <?= $status_aktif == '0' ? 'selected' : ''; ?>>
                             Tidak Aktif
                         </option>
@@ -255,6 +271,7 @@ $menuAktif = "siswa";
                 <button type="submit" class="btn btn-primary">
                     Simpan
                 </button>
+
                 <a href="siswa.php" class="btn btn-secondary">
                     Batal
                 </a>
@@ -264,6 +281,8 @@ $menuAktif = "siswa";
     </div>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
 window.addEventListener('pageshow', function(event) {
     if (event.persisted) {
@@ -271,5 +290,6 @@ window.addEventListener('pageshow', function(event) {
     }
 });
 </script>
+
 </body>
 </html>
